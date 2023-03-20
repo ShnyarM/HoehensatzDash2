@@ -11,5 +11,7 @@ function preload(){
   images.GravityOrb = loadImage("rsc/images/gravityRing.png")
   images.GreenOrb = loadImage("rsc/images/greenRing.png")
   images.JumpPad = loadImage("rsc/images/jumpPad.png")
+  images.HighJumpPad = loadImage("rsc/images/highJumpPad.png")
+  images.LowJumpPad = loadImage("rsc/images/lowJumpPad.png")
   console.log(images)
 }

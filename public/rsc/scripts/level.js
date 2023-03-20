@@ -51,6 +51,9 @@ function levelSetup(){
 
   interactObjects[4] = new gameObject("GravityOrb", 10, 1)
   interactObjects[5] = new gameObject("GreenOrb", 40, 2)
+  
+  interactObjects[6] = new gameObject("LowJumpPad", 50, 1)
+  interactObjects[7] = new gameObject("HighJumpPad", 60, 1)
 
   groundObjects[22] = new gameObject("Block", 10, 3)
   groundObjects[23] = new gameObject("Block", 11, 3)
@@ -60,12 +63,13 @@ function levelSetup(){
   fgColor = [0, 74, 1]
   colorBackground()
   colorForeground()
+
 }
 
 function drawLevel(){
-  groundObjects.forEach(element => element.draw());
-  interactObjects.forEach(element => element.draw());
-  deathObjects.forEach(element => element.draw());
+  groundObjects.forEach(element => drawObject(element));
+  interactObjects.forEach(element => drawObject(element));
+  deathObjects.forEach(element => drawObject(element));
   
 }
 

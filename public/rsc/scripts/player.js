@@ -132,44 +132,9 @@ class Player{
   }
 
   //Switch gravity, if instant velocity also flips (blue jump ring)
-  switchGravity(instant){
-    this.gravitySwitch = this.gravitySwitch == 1 ? -1 : 1
+  switchGravity(){
+    this.gravitySwitch = -this.gravitySwitch
     this.onGround = false
-
-    if(instant) this.yVelocity = -0.3*this.jumpStrength*this.gravitySwitch
-  }
-
-  //See if player can use Ring
-  useRing(){
-    if(!this.input || !this.canUseRing) return
-
-    //Check jumprings
-    for(const ring of jumpRings){
-      if(ring.collision()) {
-        ring.used = true
-        switch(ring.type){
-          case 0: //yellow jump ring
-            this.jump()
-            break;
-          case 1:
-            this.switchGravity(true);
-            break;
-        }
-        return
-      }
-    }
-  }
-
-  //See if player is touching jumppad
-  usePad(){
-    //Check jumpPads
-    for(const pad of jumpPads){
-      if(pad.collision()) { //use jumppad
-        pad.used = true
-        this.jump(jumpPadStrength)
-        return
-      }
-    }
   }
 
   //Check if player can and wants to jump
@@ -228,7 +193,7 @@ class Player{
 
   update(){
     interactObjects.forEach(element => {
-      element.collision(this)   
+      collisionObject(this, element)   
     }); //Check for interactable Objects
 
     this.checkJump() //Maybe not on right place
@@ -238,10 +203,10 @@ class Player{
 
     //check for obsticles
     groundObjects.forEach(element => {
-      element.collision(this)   
+      collisionObject(this, element)   
     });
     deathObjects.forEach(element => {
-      element.collision(this)   
+      collisionObject(this, element)   
     });
   }
 }
