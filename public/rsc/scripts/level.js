@@ -1,4 +1,4 @@
-let blocks = [], spikes = [], jumpRings = [], jumpPads = []
+let groundObjects, interactObjects, deathObjects//blocks = [], spikes = [], jumpRings = [], jumpPads = []
 const groundTileSize = 5 //Size of single groundtile
 const backgroundSize = 20, parallaxFactor = 15 //size of background tile and parralax Strength
 let bgColor, fgColor, coloredBg, coloredFg
@@ -6,52 +6,55 @@ const jumpPadStrength = 1.5
 const ceilingLimit = 140
 
 function levelSetup(){
-  blocks = []
-  blocks[0] = new Block(16, 1)
-  blocks[1] = new Block(17, 1)
-  blocks[2] = new Block(18, 1)
-  blocks[3] = new Block(19, 1)
-  blocks[4] = new Block(20, 1)
+  
+  groundObjects = [], interactObjects = [], deathObjects = []
 
-  blocks[5] = new Block(23, 3)
+  groundObjects[0] = new gameObject("Block", 16, 1)
+  groundObjects[1] = new gameObject("Block", 17, 1)
+  groundObjects[2] = new gameObject("Block", 18, 1)
+  groundObjects[3] = new gameObject("Block", 19, 1)
+  groundObjects[4] = new gameObject("Block", 20, 1)
 
-  blocks[6] = new Block(26, 5)
-  blocks[7] = new Block(29, 7)
-  blocks[11] = new Block(32, 9)
-  blocks[12] = new Block(35, 11)
-  blocks[13] = new Block(38, 13)
+  groundObjects[5] = new gameObject("Block", 23, 3)
 
-  blocks[14] = new Block(18, 10)
-  blocks[15] = new Block(19, 10)
-  blocks[16] = new Block(20, 10)
-  blocks[17] = new Block(21, 10)
-  blocks[18] = new Block(22, 10)
-  blocks[19] = new Block(23, 10)
-  blocks[20] = new Block(24, 10)
-  blocks[21] = new Block(25, 10)
+  groundObjects[6] = new gameObject("Block", 26, 5)
+  groundObjects[7] = new gameObject("Block", 29, 7)
+  groundObjects[11] = new gameObject("Block", 32, 9)
+  groundObjects[12] = new gameObject("Block", 35, 11)
+  groundObjects[13] = new gameObject("Block", 38, 13)
 
-  spikes[0] = new Spike(14, 1)
-  spikes[1] = new Spike(26, 1)
-  spikes[2] = new Spike(27, 1)
-  spikes[3] = new Spike(28, 1)
+  groundObjects[14] = new gameObject("Block", 18, 10)
+  groundObjects[15] = new gameObject("Block", 19, 10)
+  groundObjects[16] = new gameObject("Block", 20, 10)
+  groundObjects[17] = new gameObject("Block", 21, 10)
+  groundObjects[18] = new gameObject("Block", 22, 10)
+  groundObjects[19] = new gameObject("Block", 23, 10)
+  groundObjects[20] = new gameObject("Block", 24, 10)
+  groundObjects[21] = new gameObject("Block", 25, 10)
 
-  blocks[8] = new Block(32, 1)
-  blocks[9] = new Block(32, 2)
-  blocks[10] = new Block(32, 4)
+  //deathObjects[0] = new gameObject("Spike", 14, 1)
+  deathObjects[1] = new gameObject("Spike", 26, 1)
+  deathObjects[2] = new gameObject("Spike", 27, 1)
+  //deathObjects[3] = new gameObject("Spike", 28, 1)
 
-  jumpRings[0] = new JumpRing(20, 3, 1)
-  jumpRings[3] = new JumpRing(22, 8, 1)
+  groundObjects[8] = new gameObject("Block", 32, 1)
+  groundObjects[9] = new gameObject("Block", 32, 2)
+  groundObjects[10] = new gameObject("Block", 32, 4)
 
-  jumpRings[1] = new JumpRing(35, 2, 0)
-  jumpRings[2] = new JumpRing(38, 2, 0)
+  interactObjects[0] = new gameObject("JumpOrb", 20, 3)
+  interactObjects[3] = new gameObject("JumpOrb", 22, 8)
 
-  //jumpPads[0] = new JumpPad(12, 1)
+  interactObjects[1] = new gameObject("GravityOrb", 35, 2, 0)
+  interactObjects[2] = new gameObject("GravityOrb", 38, 2, 0)
 
-  jumpRings[4] = new JumpRing(10, 1, 1)
+  interactObjects[0] = new gameObject("JumpPad", 30, 1)
 
-  blocks[22] = new Block(10, 3)
-  blocks[23] = new Block(11, 3)
-  blocks[24] = new Block(12, 3)
+  interactObjects[4] = new gameObject("GravityOrb", 10, 1)
+  interactObjects[5] = new gameObject("GreenOrb", 40, 2)
+
+  groundObjects[22] = new gameObject("Block", 10, 3)
+  groundObjects[23] = new gameObject("Block", 11, 3)
+  groundObjects[24] = new gameObject("Block", 12, 3)
 
   bgColor = [7, 237, 11]
   fgColor = [0, 74, 1]
@@ -60,25 +63,10 @@ function levelSetup(){
 }
 
 function drawLevel(){
-  for(const block of blocks){ //Draw all blocks
-    block.draw()
-    //block.drawHitbox()
-  }
-
-  for(const spike of spikes){ //Draw all blocks
-    spike.draw()
-    //spike.drawHitbox()
-  }
-
-  for(const ring of jumpRings){ //Draw all blocks
-    ring.draw()
-    //ring.drawHitbox()
-  }
-
-  for(const pad of jumpPads){ //Draw all blocks
-    pad.draw()
-    //pad.drawHitbox()
-  }
+  groundObjects.forEach(element => element.draw());
+  interactObjects.forEach(element => element.draw());
+  deathObjects.forEach(element => element.draw());
+  
 }
 
 //draw background and forground

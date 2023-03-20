@@ -8,13 +8,7 @@ function playerDraw(){
   if(!player.dead){
     player.input = player.checkInput()
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
-    player.useRing()
-    player.usePad()
-    player.checkJump()
-    player.applyGravity()
-    player.checkGroundHeight()
-    player.move()
-    player.checkCollision()
+    player.update();
   }else{
     player.deathAnimation()
   }
@@ -195,10 +189,10 @@ class Player{
   //Check if block is under player and change ground height accordingly
   checkGroundHeight(){
     if(this.gravitySwitch == 1){ //normal gravity
-      if(blocks.length == 0){this.groundHeight = 0; return}
+      if(groundObjects.length == 0){this.groundHeight = 0; return}
 
       let highest = 0
-      for(const block of blocks){
+      for(const block of groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
           highest = block.y
@@ -209,10 +203,10 @@ class Player{
         this.onGround = false
       }
     }else{ //Upside down
-      if(blocks.length == 0){this.groundHeight = ceilingLimit; eturn}
+      if(groundObjects.length == 0){this.groundHeight = ceilingLimit; eturn}
 
       let highest = ceilingLimit
-      for(const block of blocks){
+      for(const block of groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
           highest = block.y-block.height
@@ -225,21 +219,29 @@ class Player{
     }
   }
 
-  //Check for collision to make player die
-  checkCollision(){
-    for(const block of blocks){
-      if(block.collision()) {this.dead = true; return}
-    }
-
-    for(const spike of spikes){
-      if(spike.collision()) {this.dead = true; return}
-    }
-  }
-
   deathAnimation(){
     this.deathAnimationTime += sdeltaTime
     if(this.deathAnimationTime >= this.deathAnimationTimeMax){
       resetLevel()
     }
+  }
+
+  update(){
+    interactObjects.forEach(element => {
+      element.collision(this)   
+    }); //Check for interactable Objects
+
+    this.checkJump() //Maybe not on right place
+    this.applyGravity()
+    this.checkGroundHeight()
+    this.move()
+
+    //check for obsticles
+    groundObjects.forEach(element => {
+      element.collision(this)   
+    });
+    deathObjects.forEach(element => {
+      element.collision(this)   
+    });
   }
 }
