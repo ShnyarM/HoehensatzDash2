@@ -39,7 +39,7 @@ let JumpPad = {
   yOffset: -0.8,
 }
 
-let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad}
+let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpRing": JumpOrb, "HighJumpRing": JumpOrb}
 
 
 function drawObject(object){
@@ -77,7 +77,7 @@ function collideObject(player, object){
     }break
     case "JumpPad":{
       if(object.used)break
-      player.jump();
+      player.jump(1);
       object.used = true;
     }break
     case "LowJumpPad":{
@@ -87,8 +87,26 @@ function collideObject(player, object){
     }break
     case "HighJumpPad":{
       if(object.used)break
-      player.jump(1.2);
+      player.jump(1.5);
       object.used = true;
+    }break
+    case "GravityPad":{
+      if(object.used)break
+      player.jump(1.2);
+      player.switchGravity();
+      object.used = true;
+    }break
+    case "HighJumpRing":{
+      if(!player.input || !player.canUseRing) return
+      if(object.used)return
+      player.jump(1.5)
+      object.used = true
+    }break
+    case "LowJumpRing":{
+      if(!player.input || !player.canUseRing) return
+      if(object.used)return
+      player.jump(0.8)
+      object.used = true
     }break
   }
 }
