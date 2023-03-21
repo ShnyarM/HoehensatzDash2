@@ -1,4 +1,16 @@
 let player; //Own Player
+let modeConstants = {
+  "0":{
+    width: 1,
+    height: 1,
+    gravityStrength: 73.5
+  },
+  "1":{
+    width: 1.5,
+    height: 0.75,
+    gravityStrength: 40
+  }
+}
 
 function playerSetup(){
   player = new Player()
@@ -54,15 +66,18 @@ class Player{
     this.xVelocity = 9
     this.yVelocity = 0
     this.jumpStrength = 17.5
-    this.gravityStrength = 4.2*this.jumpStrength
+    this.gravityStrength = 73.5//4.2*this.jumpStrength
     this.gravitySwitch = 1 //-1 is upside down
+
+    this.gameMode = 1 //0 = cube, 1 = ship
 
     this.rotation = 0
     this.rotationSpeed = 360
 
     this.input = false
     this.onGround = true
-    this.groundHeight = 0
+    this.lowCeiling = 0
+    this.highCeiling = ceilingLimit
     this.canUseRing = true
 
     this.dead = false
@@ -70,6 +85,7 @@ class Player{
     this.deathAnimationTimeMax = 1 //death animation time in seconds
 
     this.startJumpDeactivate = true //Make player unable to jump at start until letting go to stop jump at start
+    Object.assign(this, modeConstants[this.gameMode])
   }
   
   //Draw player on screen
@@ -96,17 +112,17 @@ class Player{
     this.y += (this.yVelocity*sdeltaTime) //add y
 
     if(this.gravitySwitch == 1){//put player on ground if touching ground
-      if(!this.onGround && this.y-this.height <= this.groundHeight){ //put player on ground if touching ground
+      if(!this.onGround && this.y-this.height <= this.lowCeiling){ //put player on ground if touching ground
         this.onGround = true
         this.yVelocity = 0
-        this.y = this.groundHeight+this.height
+        this.y = this.lowCeiling+this.height
         this.rotation = 0
       }
     }else{//upside down
-      if(!this.onGround && this.y >= this.groundHeight){ //put player on ground if touching ground
+      if(!this.onGround && this.y >= this.highCeiling){ //put player on ground if touching ground
         this.onGround = true
         this.yVelocity = 0
-        this.y = this.groundHeight
+        this.y = this.highCeiling
         this.rotation = 0
       }
     }
@@ -133,7 +149,7 @@ class Player{
   applyGravity(){
     if(this.onGround) return
 
-    this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
+    if(this.gameMode == 0) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
     this.yVelocity -= this.gravityStrength*sdeltaTime*this.gravitySwitch
   }
 
@@ -179,10 +195,18 @@ class Player{
   }
 
   //Check if player can and wants to jump
-  checkJump(){
+  cubeInput(){
     if(!this.input || !this.onGround) return
     
     this.jump()
+  }
+
+  //apply ship acceleration when there is input
+  shipInput(){
+    if(!this.input) return
+    
+    this.yVelocity += this.gravityStrength*sdeltaTime*this.gravitySwitch*2 //twice as strong as gravity since gravity will be applied either way
+    this.canUseRing = false
   }
 
   //Apply upwards velocity to player, strength is how strong with 1 = normal jump
@@ -225,6 +249,7 @@ class Player{
     }
   }
 
+<<<<<<< Updated upstream
   //Check for collision to make player die
   checkCollision(){
     for(const block of blocks){
@@ -233,6 +258,39 @@ class Player{
 
     for(const spike of spikes){
       if(spike.collision()) {this.dead = true; return}
+=======
+  //Get highest block from under player
+  getGroundDown(){
+    if(groundObjects.length == 0){this.groundHeight = 0; return}
+
+    let highest = 0
+    for(const block of groundObjects){
+      //Check if block is under player and higher than highest
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
+        highest = block.y
+    }
+    this.groundHeight = highest
+
+    if(this.onGround && this.y-this.height != highest){ //Make player fall if not on block and in air
+      this.onGround = false
+    }
+  }
+
+  //Get lowest block from above player
+  getGroundTop(){
+    if(groundObjects.length == 0){this.groundHeight = ceilingLimit; return}
+
+    let highest = ceilingLimit
+    for(const block of groundObjects){
+      //Check if block is under player and higher than highest
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
+        highest = block.y-block.height
+    }
+    this.groundHeight = highest
+
+    if(this.onGround && this.y != highest){ //Make player fall if not on block and in air
+      this.onGround = false
+>>>>>>> Stashed changes
     }
   }
 
@@ -242,4 +300,33 @@ class Player{
       resetLevel()
     }
   }
+<<<<<<< Updated upstream
+=======
+
+  update(){
+    interactObjects.forEach(element => {
+      collisionObject(this, element)   
+    }); //Check for interactable Objects
+
+    switch(this.gameMode){ //Maybe not on right place
+      case 0:
+        this.cubeInput()
+        break;
+      case 1:
+        this.shipInput()
+        break;
+    }
+    this.applyGravity()
+    this.checkGroundHeight()
+    this.move()
+
+    //check for obsticles
+    groundObjects.forEach(element => {
+      collisionObject(this, element)   
+    });
+    deathObjects.forEach(element => {
+      collisionObject(this, element)   
+    });
+  }
+>>>>>>> Stashed changes
 }

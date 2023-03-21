@@ -2,6 +2,7 @@ let camera; //Camera Object
 
 function cameraSetup(){
   camera = new Camera()
+  camera.lock()
 }
 
 function cameraDraw(){
@@ -27,9 +28,12 @@ class Camera{
 
     this.slowSpeed = 8
     this.fastSpeed = 20
+
+    this.locked = false
   }
 
   updateOffset(){
+    if(this.locked) return
     //X position gets moved in player.move()
     
     //If player is inside of Inner Border, move Player with speed matching to distance from Outer Border
@@ -53,5 +57,12 @@ class Camera{
     rect(0, height - this.yobBorder * u, width, this.yobBorder * u)
 
     line(this.xBorder*u, 0, this.xBorder*u, height)
+  }
+
+  //lock y Camera in place
+  lock(){
+    this.locked = true;
+    this.topLock = this.offsetY
+    if(this.topLock < 9) {this.topLock = 9; this.offsetY = 9}
   }
 }
