@@ -26,14 +26,25 @@ function draw() {
   sdeltaTime=(deltaTime/1000)*timescale //convert deltatime into seconds and multiplay with timescale
   updateMouseClicked()
   background("#1b71c3")
-  if(gameState == 0){
-    menuDraw()
-  }else{
-    drawBackground()
-    playerDraw();
-    drawLevel();
-    cameraDraw();
-    drawUI()
+  switch(gameState){
+    case 0:{
+      menuDraw()
+    }break
+
+    case 1:{
+      drawBackground(activeLevel)
+      playerDraw();
+      drawLevel(activeLevel);
+      cameraDraw();
+      drawUI()
+    }break
+    case 2:{
+      drawEditor();
+    }break
+
+    default:{
+      text("error", 100, 100);
+    }break
   }
 }
 
@@ -48,7 +59,7 @@ function openLevel(){
   gameState = 1;
   playerSetup()
   cameraSetup()
-  levelSetup()
+  levelSetup("/rsc/levels/1.json")
 }
 
 //Leave current world and go back to main menu, kicked says if player was kicked by server
@@ -64,14 +75,13 @@ function leaveGame(kicked = false){
 //reset and restart current level
 function resetLevel(){
   //Delete everything
-  deleteLevel()
   deleteCamera()
   deletePlayer()
 
   //Setup everything again
   playerSetup()
   cameraSetup()
-  levelSetup()  
+  levelSetup("/rsc/levels/1.json")  
 }
 
 //Checks if mouse was clicked in that frame
@@ -122,7 +132,6 @@ function mousePressed(){
 }
 
 function mouseReleased(){
-  
 }
 
 function mouseDragged(){
@@ -185,6 +194,21 @@ function buttonCenter(x, y, l, h){
 //Draw Rect with unit coordinates and cameraOffset
 function unitRect(x, y, rWidth, rHeight){
   rect((x-camera.offsetX)*u, (y-camera.offsetY)*-u, rWidth*u, rHeight*u)
+}
+function unitToPixelX(x){
+  return (x-camera.offsetX)*u
+}
+
+function unitToPixelY(y){
+  return (y-camera.offsetY)*-u
+}
+
+function pixelToUnitX(x){
+  return x/u+camera.offsetX;
+}
+
+function pixelToUnitY(y){
+  return y/-u+camera.offsetY;
 }
 
 //Draw Image with unit coordinates and cameraOffset, last parameters says if image should be flipped
@@ -251,36 +275,4 @@ function windowResized(){
   uwidth = width/u //Width in units
   uheight = zoom //Height in units
   if(gameState==0) windowResizedMenu() //If in main menu
-}
-
-//Fast inverse Square root, from https://gist.github.com/starfys/aaaee80838d0e013c27d
-function Q_rsqrt(number)
-{
-    var i;
-    var x2, y;
-    const threehalfs = 1.5;
-
-    x2 = number * 0.5;
-    y = number;
-    //evil floating bit level hacking
-    var buf = new ArrayBuffer(4);
-    (new Float32Array(buf))[0] = number;
-    i =  (new Uint32Array(buf))[0];
-    i = (0x5f3759df - (i >> 1)); //What the fuck?
-    (new Uint32Array(buf))[0] = i;
-    y = (new Float32Array(buf))[0];
-    y  = y * ( threehalfs - ( x2 * y * y ) );   // 1st iteration
-//  y  = y * ( threehalfs - ( x2 * y * y ) );   // 2nd iteration, this can be removed
-
-    return y;
-}
-
-//find array in array
-//From: https://stackoverflow.com/questions/6315180/javascript-search-array-of-arrays
-Array.prototype.containsArray = function(val) {
-    var hash = {};
-    for(var i=0; i<this.length; i++) {
-        hash[this[i]] = i;
-    }
-    return hash.hasOwnProperty(val);
 }

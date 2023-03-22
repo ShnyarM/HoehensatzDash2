@@ -1,0 +1,6 @@
+{
+    "interactObjects":[{"type":"GreenOrb", "x":16, "y":3}],
+    "groundObjects":[{"type":"Block","x":0,"y":0},{"type":"Block","x":5,"y":1},{"type":"Block","x":6,"y":1},{"type":"Block","x":7,"y":1},{"type":"Block","x":8,"y":1},{"type":"Block","x":9,"y":1},{"type":"Block","x":10,"y":1},{"type":"Block","x":8,"y":2},{"type":"Block","x":9,"y":2},{"type":"Block","x":10,"y":2},{"type":"Block","x":11,"y":2},{"type":"Block","x":12,"y":2},{"type":"Block","x":13,"y":2}],
+    "deathObjects":[{"type":"Spike", "x":40, "y":1}],
+    "decoration":{"bgSprite":0, "fgSprite":0, "bgColor": [7, 237, 11], "fgColor": [0, 74, 1]}
+}

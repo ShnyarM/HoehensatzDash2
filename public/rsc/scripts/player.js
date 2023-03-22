@@ -154,10 +154,10 @@ class Player{
   //Check if block is under player and change ground height accordingly
   checkGroundHeight(){
     if(this.gravitySwitch == 1){ //normal gravity
-      if(groundObjects.length == 0){this.groundHeight = 0; return}
+      if(activeLevel.groundObjects.length == 0){this.groundHeight = 0; return}
 
       let highest = 0
-      for(const block of groundObjects){
+      for(const block of activeLevel.groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
           highest = block.y
@@ -168,10 +168,10 @@ class Player{
         this.onGround = false
       }
     }else{ //Upside down
-      if(groundObjects.length == 0){this.groundHeight = ceilingLimit; eturn}
+      if(activeLevel.groundObjects.length == 0){this.groundHeight = ceilingLimit; eturn}
 
       let highest = ceilingLimit
-      for(const block of groundObjects){
+      for(const block of activeLevel.groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
           highest = block.y-block.height
@@ -192,7 +192,7 @@ class Player{
   }
 
   update(){
-    interactObjects.forEach(element => {
+    activeLevel.interactObjects.forEach(element => {
       collisionObject(this, element)   
     }); //Check for interactable Objects
 
@@ -202,10 +202,10 @@ class Player{
     this.move()
 
     //check for obsticles
-    groundObjects.forEach(element => {
+    activeLevel.groundObjects.forEach(element => {
       collisionObject(this, element)   
     });
-    deathObjects.forEach(element => {
+    activeLevel.deathObjects.forEach(element => {
       collisionObject(this, element)   
     });
   }
