@@ -49,7 +49,7 @@ function levelSetup(){
 
   interactObjects[0] = new gameObject("JumpPad", 30, 1)
 
-  interactObjects[4] = new gameObject("GravityOrb", 10, 1)
+  //interactObjects[4] = new gameObject("GravityOrb", 10, 1)
   interactObjects[5] = new gameObject("GreenOrb", 40, 3)
   
   interactObjects[6] = new gameObject("LowJumpPad", 50, 1)
@@ -58,6 +58,8 @@ function levelSetup(){
 
   interactObjects[9] = new gameObject("LowJumpRing", 80, 1)
   interactObjects[10] = new gameObject("HighJumpRing", 90, 1)
+
+  interactObjects[11] = new gameObject("ShipPortal", 10, 2)
 
   groundObjects[22] = new gameObject("Block", 10, 3)
   groundObjects[23] = new gameObject("Block", 11, 3)

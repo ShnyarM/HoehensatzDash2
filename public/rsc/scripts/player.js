@@ -3,12 +3,16 @@ let modeConstants = {
   "0":{
     width: 1,
     height: 1,
-    gravityStrength: 73.5
+    gravityStrength: 73.5,
+    ceilingDeath: true,
+    cameraLock: false
   },
   "1":{
     width: 1.5,
     height: 0.75,
-    gravityStrength: 40
+    gravityStrength: 40,
+    ceilingDeath: false,
+    cameraLock: true
   }
 }
 
@@ -63,7 +67,8 @@ class Player{
     this.gravityStrength = 73.5//4.2*this.jumpStrength
     this.gravitySwitch = 1 //-1 is upside down
 
-    this.gameMode = 1 //0 = cube, 1 = ship
+    this.gameMode = 0 //0 = cube, 1 = ship
+    this.ceilingDeath = true
 
     this.rotation = 0
     this.rotationSpeed = 360
@@ -79,7 +84,7 @@ class Player{
     this.deathAnimationTimeMax = 1 //death animation time in seconds
 
     this.startJumpDeactivate = true //Make player unable to jump at start until letting go to stop jump at start
-    Object.assign(this, modeConstants[this.gameMode])
+    //Object.assign(this, modeConstants[this.gameMode])
   }
   
   //Draw player on screen
@@ -112,6 +117,11 @@ class Player{
         this.y = this.lowCeiling+this.height
         this.rotation = 0
       }
+      if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
+        this.yVelocity = 0
+        this.y = this.highCeiling
+        this.rotation = 0
+      }
     }else{//upside down
       if(!this.onGround && this.y >= this.highCeiling){ //put player on ground if touching ground
         this.onGround = true
@@ -119,13 +129,28 @@ class Player{
         this.y = this.highCeiling
         this.rotation = 0
       }
+      if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
+        this.yVelocity = 0
+        this.y = this.lowCeiling+this.height
+        this.rotation = 0
+      }
     }
     
     //Kill player if hit ceiling limit or ground when upside down
-    if(player.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0){
+    if(player.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0 && this.ceilingDeath){
       this.dead = true
     }
-}
+  }
+
+  //Switch to new gamemode
+  switchMode(newMode){
+    if(newMode == this.gameMode || !modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
+
+    this.gameMode = newMode //assign new Mode
+    Object.assign(this, modeConstants[newMode]) //change variables to fit with new mode
+    if(modeConstants[newMode].cameraLock) camera.lock() //Lock or unlock camera depending on gamemode
+    else camera.unlock()
+  }
 
   //Check if button to perform action is clicked
   checkInput(){
@@ -175,39 +200,6 @@ class Player{
     this.canUseRing = false
   }
   
-  //Check if block is under player and change ground height accordingly
-  checkGroundHeight(){
-    if(this.gravitySwitch == 1){ //normal gravity
-      if(groundObjects.length == 0){this.groundHeight = 0; return}
-
-      let highest = 0
-      for(const block of groundObjects){
-        //Check if block is under player and higher than highest
-        if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
-          highest = block.y
-      }
-      this.groundHeight = highest
-
-      if(this.onGround && this.y-this.height != highest){ //Make player fall if not on block and in air
-        this.onGround = false
-      }
-    }else{ //Upside down
-      if(groundObjects.length == 0){this.groundHeight = ceilingLimit; eturn}
-
-      let highest = ceilingLimit
-      for(const block of groundObjects){
-        //Check if block is under player and higher than highest
-        if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
-          highest = block.y-block.height
-      }
-      this.groundHeight = highest
-
-      if(this.onGround && this.y != highest){ //Make player fall if not on block and in air
-        this.onGround = false
-      }
-    }
-  }
-
   //Check for collision to make player die
   checkCollision(){
     for(const block of blocks){
@@ -220,35 +212,35 @@ class Player{
   }
 
   //Get highest block from under player
-  getGroundDown(){
-    if(groundObjects.length == 0){this.groundHeight = 0; return}
+  getLowCeiling(){
+    let highest = camera.locked ? camera.downLock : 0 //Set lowest possible ceiling
+    if(highest < 0) highest = 0 //increase lowest if below ground
 
-    let highest = 0
     for(const block of groundObjects){
       //Check if block is under player and higher than highest
       if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
         highest = block.y
     }
-    this.groundHeight = highest
+    this.lowCeiling = highest
 
-    if(this.onGround && this.y-this.height != highest){ //Make player fall if not on block and in air
+    if(this.gravitySwitch == 1 && this.onGround && this.y-this.height != highest){ //Make player fall if not on block and in air
       this.onGround = false
     }
   }
 
   //Get lowest block from above player
-  getGroundTop(){
-    if(groundObjects.length == 0){this.groundHeight = ceilingLimit; return}
+  getHighCeiling(){
+    let highest = camera.locked ? camera.topLock : ceilingLimit //Set highest possible ceiling
+    if(highest > ceilingLimit) highest = ceilingLimit //reduce highest if above ceiling limit
 
-    let highest = ceilingLimit
     for(const block of groundObjects){
       //Check if block is under player and higher than highest
       if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
         highest = block.y-block.height
     }
-    this.groundHeight = highest
+    this.highCeiling = highest
 
-    if(this.onGround && this.y != highest){ //Make player fall if not on block and in air
+    if(this.gravitySwitch == -1 && this.onGround && this.y != highest){ //Make player fall if not on block and in air
       this.onGround = false
     }
   }
@@ -274,9 +266,9 @@ class Player{
         this.shipInput()
         break;
     }
-    this.checkJump() //Maybe not on right place
     this.applyGravity()
-    this.checkGroundHeight()
+    this.getLowCeiling()
+    this.getHighCeiling()
     this.move()
 
     //check for obsticles

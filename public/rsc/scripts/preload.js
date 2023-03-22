@@ -16,5 +16,6 @@ function preload(){
   images.GravityPad = loadImage("rsc/images/gravityPad.png")
   images.LowJumpRing = loadImage("rsc/images/lowJumpRing.png")
   images.HighJumpRing = loadImage("rsc/images/highJumpRing.png")
+  images.ShipPortal = loadImage("rsc/images/ShipPortal.png")
   console.log(images)
 }

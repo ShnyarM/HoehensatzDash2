@@ -2,7 +2,7 @@ let camera; //Camera Object
 
 function cameraSetup(){
   camera = new Camera()
-  camera.lock()
+  //camera.lock()
 }
 
 function cameraDraw(){
@@ -64,5 +64,11 @@ class Camera{
     this.locked = true;
     this.topLock = this.offsetY
     if(this.topLock < 9) {this.topLock = 9; this.offsetY = 9}
+    this.downLock = this.offsetY - uheight
+  }
+
+  //unlock y of camera
+  unlock(){
+    this.locked = false;
   }
 }

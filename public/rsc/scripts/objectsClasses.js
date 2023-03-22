@@ -39,7 +39,18 @@ let JumpPad = {
   yOffset: -0.8,
 }
 
-let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpRing": JumpOrb, "HighJumpRing": JumpOrb}
+let Portal = {
+  height: 2,
+  width: 1,
+  used: false,
+  boxWidth: 1, //Size of hitbox
+  boxHeight: 2,
+  boxOffsetX: 0,
+  boxOffsetY: 0,
+  yOffset: 0
+}
+
+let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpRing": JumpOrb, "HighJumpRing": JumpOrb, "ShipPortal": Portal}
 
 
 function drawObject(object){
@@ -98,14 +109,19 @@ function collideObject(player, object){
     }break
     case "HighJumpRing":{
       if(!player.input || !player.canUseRing) return
-      if(object.used)return
+      if(object.used)break
       player.jump(1.5)
       object.used = true
     }break
     case "LowJumpRing":{
       if(!player.input || !player.canUseRing) return
-      if(object.used)return
+      if(object.used)break
       player.jump(0.8)
+      object.used = true
+    }break
+    case "ShipPortal":{
+      if(object.used)break
+      player.switchMode(1)
       object.used = true
     }break
   }
