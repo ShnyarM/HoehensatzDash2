@@ -1,14 +1,7 @@
-//Start express server
-var express = require("express");
-var app = express();
-//var server = app.listen(16761)
-var server = app.listen(16761)
-app.use(express.static("public"));
-//Parse incoming POST requests to make them useable
-//app.use(express.json());
-//app.use(express.urlencoded({extended: false}))
+const express = require('express');
+const app = express();
 
-//filereading
-var fs = require("fs")
+const PORT = 80;
 
-console.log("Server is running");
+app.use(express.static('public'));
+app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
