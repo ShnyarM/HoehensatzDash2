@@ -4,7 +4,7 @@ function playerSetup(){
   player = new Player()
 }
 
-function playerDraw(){
+function playerUpdate(){
   if(!player.dead){
     player.input = player.checkInput()
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active

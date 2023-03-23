@@ -4,7 +4,7 @@ function cameraSetup(){
   camera = new Camera()
 }
 
-function cameraDraw(){
+function cameraUpdate(){
   camera.updateOffset()
   //camera.debug()
 }

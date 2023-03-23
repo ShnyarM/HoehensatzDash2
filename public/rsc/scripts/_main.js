@@ -2,30 +2,27 @@ let canvas;
 let u, uwidth, uheight, zoom = 10; //Units are used instead of pixels, so there are no problems with different resolutions
 let sdeltaTime, timescale=1 //sdeltatime says time between frames in seconds, can be scaled up and down time with timescale
 let debug = false
-let lastFrames = [], fps = 120
+let lastFrames, fps = 60
 let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
-let loggedIn=null, username//is loggedIn, own username
-let mouseClick = false, mouseClickUpdated = false //says if mouse was pressed in that frame, updated is used to make it possible
-let godmode = false
+let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible
 
 function setup() {
   canvas = createCanvas(1, 1)
   //textFont(pixelDownFont)
   noSmooth()
-  windowResized()
-  frameRate(fps)
+  windowResized();
   angleMode(DEGREES)
 
   //Stop contextmenu
-  document.getElementsByClassName("p5Canvas")[0].addEventListener("contextmenu", (e) => e.preventDefault());
+  canvas.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  for(let i = 0; i < fps; i++) lastFrames.push(0)
+  lastFrames = new Array(fps);
 }
 
 function draw() {
   sdeltaTime=(deltaTime/1000)*timescale //convert deltatime into seconds and multiplay with timescale
-  updateMouseClicked()
-  background("#1b71c3")
+
+  background("#1b71c3") 
   switch(gameState){
     case 0:{
       menuDraw()
@@ -33,9 +30,9 @@ function draw() {
 
     case 1:{
       drawBackground(activeLevel)
-      playerDraw();
+      playerUpdate();
       drawLevel(activeLevel);
-      cameraDraw();
+      cameraUpdate();
       drawUI()
     }break
     case 2:{
@@ -46,6 +43,8 @@ function draw() {
       text("error", 100, 100);
     }break
   }
+
+  mouseClick = false
 }
 
 //Draw the User Interface while in game
@@ -59,11 +58,11 @@ function openLevel(){
   gameState = 1;
   playerSetup()
   cameraSetup()
-  levelSetup("/rsc/levels/1.json")
+  levelSetup("/rsc/levels/1.json") //ATTENTION
 }
 
 //Leave current world and go back to main menu, kicked says if player was kicked by server
-function leaveGame(kicked = false){
+function leaveGame(kicked = false){ //ATTENTION
   gameState = 0;
   gamePaused = false
   
@@ -73,7 +72,7 @@ function leaveGame(kicked = false){
 }
 
 //reset and restart current level
-function resetLevel(){
+function resetLevel(){ //ATTENTION
   //Delete everything
   deleteCamera()
   deletePlayer()
@@ -82,13 +81,6 @@ function resetLevel(){
   playerSetup()
   cameraSetup()
   levelSetup("/rsc/levels/1.json")  
-}
-
-//Checks if mouse was clicked in that frame
-function updateMouseClicked(){
-  if(mouseIsPressed&&!mouseClickUpdated){mouseClick=true; mouseClickUpdated=true}
-  else mouseClick = false
-  if(!mouseIsPressed && mouseClickUpdated) mouseClickUpdated=false
 }
 
 function drawFramerate(){
@@ -128,7 +120,7 @@ function keyPressed(){
 
 
 function mousePressed(){
-  
+  mouseClick = true
 }
 
 function mouseReleased(){
@@ -140,7 +132,7 @@ function mouseDragged(){
 
 function mouseWheel(event){
   switch(gameState){
-    case 2:{
+    case 2:{ // Editor to move around
       if(camera.offsetY > 1.5||event.deltaY < 0)camera.offsetY -= event.deltaY/10
       if(camera.offsetX > -1.5||event.deltaX > 0)camera.offsetX += event.deltaX/10
     }break
@@ -180,20 +172,12 @@ function borderRect(x, y, w, h){
 
 //Check if mouse is over button with Top Left Mode
 function button(x, y, l, h){
-  if (mouseX > x && mouseX < x + l && mouseY > y && mouseY < y + h) {
-    return true;
-  } else {
-    return false;
-  }
+  return (mouseX > x && mouseX < x + l && mouseY > y && mouseY < y + h)
 }
 
 //Check if mouse is over button with center mode
 function buttonCenter(x, y, l, h){
-  if (mouseX > x - l / 2 && mouseX < x + l / 2 && mouseY > y - h / 2 && mouseY < y + h / 2) {
-    return true;
-  } else {
-    return false;
-  }
+  return (mouseX > x - l / 2 && mouseX < x + l / 2 && mouseY > y - h / 2 && mouseY < y + h / 2)
 }
 
 //Draw Rect with unit coordinates and cameraOffset
@@ -250,10 +234,7 @@ function rotateUnitImage(img, x, y, l, h, rotAmn){
 
 //Detect collision between objects with pos and size
 function collision(x1, y1, w1, h1, x2, y2, w2, h2){
-  if (x1 + w1 > x2 && x1 < x2 + w2 && y1 - h1 < y2 && y1 > y2 - h2)
-    return true;
-  else
-    return false;
+  return (x1 + w1 > x2 && x1 < x2 + w2 && y1 - h1 < y2 && y1 > y2 - h2)
 }
 
 function windowResized(){
@@ -279,5 +260,4 @@ function windowResized(){
   u = height/zoom //Pixel per Unit
   uwidth = width/u //Width in units
   uheight = zoom //Height in units
-  if(gameState==0) windowResizedMenu() //If in main menu
 }
