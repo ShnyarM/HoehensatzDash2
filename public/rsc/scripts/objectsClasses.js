@@ -52,7 +52,8 @@ let Portal = {
   boxHeight: 2,
   boxOffsetX: 0,
   boxOffsetY: 0,
-  yOffset: 0
+  yOffset: 0,
+  xOffset:0
 }
 
 let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal}
