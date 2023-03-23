@@ -29,11 +29,8 @@ function draw() {
     }break
 
     case 1:{
-      drawBackground(activeLevel)
-      playerUpdate();
-      drawLevel(activeLevel);
-      cameraUpdate();
-      drawUI()
+      playLevel()
+      drawUI();
     }break
     case 2:{
       drawEditor();
@@ -51,36 +48,6 @@ function draw() {
 function drawUI(){
   if(debug) drawFramerate()
   if(gamePaused) drawPauseMenu()
-}
-
-//Join a game, first part of Setup, second part starts in serverClient.js (update player and camera), and then third part starts (map)
-function openLevel(){
-  gameState = 1;
-  playerSetup()
-  cameraSetup()
-  levelSetup("/rsc/levels/1.json") //ATTENTION
-}
-
-//Leave current world and go back to main menu, kicked says if player was kicked by server
-function leaveGame(kicked = false){ //ATTENTION
-  gameState = 0;
-  gamePaused = false
-  
-  deleteLevel()
-  deleteCamera()
-  deletePlayer()
-}
-
-//reset and restart current level
-function resetLevel(){ //ATTENTION
-  //Delete everything
-  deleteCamera()
-  deletePlayer()
-
-  //Setup everything again
-  playerSetup()
-  cameraSetup()
-  levelSetup("/rsc/levels/1.json")  
 }
 
 function drawFramerate(){

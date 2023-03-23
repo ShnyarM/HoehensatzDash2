@@ -13,7 +13,7 @@ function drawPauseMenu(){
   text("Paused", width/2, height*0.075)
 
   buttonRect(width*0.15, height / 2.5 - height / 8, width / 5, height/ 10, "Continue", height / 45, () => gamePaused = false)
-  buttonRect(width*0.15, height / 2.5, width / 5, height/ 10, "Exit Game", height / 45, leaveGame)
+  buttonRect(width*0.15, height / 2.5, width / 5, height/ 10, "Exit Game", height / 45, closeLevel)
   //buttonRect(width*0.15, height / 2.5, width / 5, height/ 10, "Settings", height / 45, () => {console.log("settings")})
   //buttonRect(width*0.15, height / 2.5 + height/ 8, width / 5, height/ 10, "Exit Game", height / 45, leaveGame)
 }

@@ -5,14 +5,17 @@ const backgroundSize = 20, parallaxFactor = 15 //size of background tile and par
 const jumpPadStrength = 1.5
 const ceilingLimit = 140
 
-function levelSetup(path){
-  activeLevel = new Level("read", path)
-}
-
 function drawLevel(levelObj){
   levelObj.groundObjects.forEach(element => drawObject(element));
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
+}
+
+function playLevel(){
+  drawBackground(activeLevel)
+  playerUpdate(activeLevel);
+  drawLevel(activeLevel);
+  cameraUpdate();
 }
 
 //draw background and forground
@@ -34,6 +37,36 @@ function drawBackground(levelObj){
     strokeWeight(0.06*u)
     line(0, camera.offsetY*u, width, camera.offsetY*u)
   }
+}
+
+//Join a game, first part of Setup, second part starts in serverClient.js (update player and camera), and then third part starts (map)
+function openLevel(levelObj){
+  gameState = 1;
+  playerSetup();
+  cameraSetup();
+  activeLevel = levelObj;
+}
+
+//Leave current world and go back to main menu, kicked says if player was kicked by server
+function closeLevel(){ //ATTENTION
+  gameState = 0;
+  gamePaused = false
+  
+  delete activeLevel
+  deleteCamera()
+  deletePlayer()
+}
+
+//reset and restart current level
+function resetLevel(levelObj){ //ATTENTION
+
+  //Setup everything again
+  levelObj.interactObjects.forEach(element => {
+    element.used = false   
+  });
+
+  playerSetup()
+  cameraSetup()
 }
 
 class Level{

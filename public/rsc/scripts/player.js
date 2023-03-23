@@ -4,13 +4,13 @@ function playerSetup(){
   player = new Player()
 }
 
-function playerUpdate(){
+function playerUpdate(levelObj){
   if(!player.dead){
     player.input = player.checkInput()
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
-    player.update();
+    player.update(levelObj);
   }else{
-    player.deathAnimation()
+    player.deathAnimation(levelObj)
   }
 
   player.draw()
@@ -84,7 +84,7 @@ class Player{
     
     //If player touches border/line, move camera to right
     if(this.x + this.width - camera.offsetX >= camera.xBorder){
-      camera.offsetX = player.x - 3.05
+      camera.offsetX = this.x - 3.05
     }
 
     this.y += (this.yVelocity*sdeltaTime) //add y
@@ -106,7 +106,7 @@ class Player{
     }
     
     //Kill player if hit ceiling limit or ground when upside down
-    if(player.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0){
+    if(this.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0){
       this.dead = true
     }
 }
@@ -117,7 +117,7 @@ class Player{
     if(keyIsDown(32)) return true //check spacebar
 
     //if here, nothing is being clicked
-    if(player.startJumpDeactivate && !player.input) player.startJumpDeactivate = false //Deactivate jump block if player is not pressing
+    if(this.startJumpDeactivate && !this.input) this.startJumpDeactivate = false //Deactivate jump block if player is not pressing
     if(!this.canUseRing) this.canUseRing = true //Make rings available again since player is not pressing
 
     return false
@@ -152,12 +152,12 @@ class Player{
   }
   
   //Check if block is under player and change ground height accordingly
-  checkGroundHeight(){
+  checkGroundHeight(levelObj){
     if(this.gravitySwitch == 1){ //normal gravity
-      if(activeLevel.groundObjects.length == 0){this.groundHeight = 0; return}
+      if(levelObj.groundObjects.length == 0){this.groundHeight = 0; return}
 
       let highest = 0
-      for(const block of activeLevel.groundObjects){
+      for(const block of levelObj.groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
           highest = block.y
@@ -168,10 +168,10 @@ class Player{
         this.onGround = false
       }
     }else{ //Upside down
-      if(activeLevel.groundObjects.length == 0){this.groundHeight = ceilingLimit; return}
+      if(levelObj.groundObjects.length == 0){this.groundHeight = ceilingLimit; return}
 
       let highest = ceilingLimit
-      for(const block of activeLevel.groundObjects){
+      for(const block of levelObj.groundObjects){
         //Check if block is under player and higher than highest
         if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
           highest = block.y-block.height
@@ -184,28 +184,28 @@ class Player{
     }
   }
 
-  deathAnimation(){
+  deathAnimation(levelObj){
     this.deathAnimationTime += sdeltaTime
     if(this.deathAnimationTime >= this.deathAnimationTimeMax){
-      resetLevel()
+      resetLevel(levelObj)
     }
   }
 
-  update(){
-    activeLevel.interactObjects.forEach(element => {
+  update(levelObj){
+    levelObj.interactObjects.forEach(element => {
       collisionObject(this, element)   
     }); //Check for interactable Objects
 
     this.checkJump() //Maybe not on right place
     this.applyGravity()
-    this.checkGroundHeight()
+    this.checkGroundHeight(levelObj)
     this.move()
 
     //check for obsticles
-    activeLevel.groundObjects.forEach(element => {
+    levelObj.groundObjects.forEach(element => {
       collisionObject(this, element)   
     });
-    activeLevel.deathObjects.forEach(element => {
+    levelObj.deathObjects.forEach(element => {
       collisionObject(this, element)   
     });
   }

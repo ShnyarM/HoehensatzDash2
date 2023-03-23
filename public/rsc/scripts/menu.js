@@ -18,7 +18,7 @@ function drawMainMenu(){
   text("Höhensatz Dash 2.2", width*0.5, height*0.075)
 
   buttonRect(width*0.25, height / 2.5 - height / 8, width / 5, height/ 10, "Play", height / 45, () => { //get own world
-    openLevel()
+    openLevel(new Level("read", "/rsc/levels/1.json"))
   })
   buttonRect(width*0.25, height / 2.5 + height / 8, width / 5, height/ 10, "Level Editor", height / 45, () => { //get own world
     setupEditor()
