@@ -120,6 +120,7 @@ class Level{
         case "HighJumpPad":
         case "LowJumpPad":
         case "GravityPad":
+        case "ShipPortal":
         this.interactObjects.push(obj)
         break
         }
