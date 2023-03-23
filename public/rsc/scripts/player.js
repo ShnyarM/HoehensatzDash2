@@ -168,7 +168,7 @@ class Player{
         this.onGround = false
       }
     }else{ //Upside down
-      if(activeLevel.groundObjects.length == 0){this.groundHeight = ceilingLimit; eturn}
+      if(activeLevel.groundObjects.length == 0){this.groundHeight = ceilingLimit; return}
 
       let highest = ceilingLimit
       for(const block of activeLevel.groundObjects){

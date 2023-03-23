@@ -103,13 +103,13 @@ function collideObject(player, object){
       player.switchGravity();
       object.used = true;
     }break
-    case "HighJumpRing":{
+    case "HighJumpOrb":{
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.jump(1.5)
       object.used = true
     }break
-    case "LowJumpRing":{
+    case "LowJumpOrb":{
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.jump(0.8)

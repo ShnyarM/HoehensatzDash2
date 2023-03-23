@@ -52,7 +52,11 @@ class Level{
     fetch(path)
     .then((response) => response.json())
     .then((json) => {
-      json.deathObjects.forEach(element => {
+      json.objects.forEach(element => {
+        this.addObject(new gameObject(element.type, element.x, element.y))
+      })
+      this.decoration = json.decoration
+      /*json.deathObjects.forEach(element => {
         this.deathObjects.push(new gameObject(element.type, element.x, element.y)); 
       });
 
@@ -62,28 +66,50 @@ class Level{
 
       json.groundObjects.forEach(element => {
         this.groundObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });
+      });*/
     });
+  }
+
+  addObject(obj){
+    switch(obj.type){
+      case "Spike":
+        this.deathObjects.push(obj); 
+        break
+      case "Block":
+        this.groundObjects.push(obj);
+        break;
+        case "JumpOrb":
+        case "LowJumpOrb":
+        case "HighJumpOrb":
+        case "GravityOrb":
+        case "GreenOrb":
+        case "JumpPad":
+        case "HighJumpPad":
+        case "LowJumpPad":
+        case "GravityPad":
+        this.interactObjects.push(obj)
+        break
+        }
   }
 
   saveLevel(path){
     let levelSave = {
-      "interactObjects":[],
-      "groundObjects":[],
-      "deathObjects":[]
+      "objects":[],
+      "decoration": this.decoration
     }
     this.deathObjects.forEach(element => {
-      levelSave.deathObjects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
+      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
     });
     this.groundObjects.forEach(element => {
 
-      levelSave.groundObjects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
+      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
     });
     this.interactObjects.forEach(element => {
-      levelSave.interactObjects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
+      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
     });
     var levelJson = JSON.stringify(levelSave);
     console.log(levelJson)
+    download("level.txt", levelJson)
   }
 
   tintDeco(){
@@ -92,7 +118,7 @@ class Level{
     let coloredBg = createGraphics(bg.width, bg.height) //create new canvas which will become bg image
     coloredBg.tint(...this.decoration.bgColor)
     coloredBg.image(bg, 0, 0, bg.width, bg.height) //Draw white bg image to canvas with tint
-
+    console.log(this.decoration.fgColor)
     let coloredFg = createGraphics(fg.width, fg.height) //create new canvas which will become bg image
     coloredFg.tint(...this.decoration.fgColor)
     coloredFg.image(fg, 0, 0, fg.width, fg.height) //Draw white bg image to canvas with tint
@@ -101,4 +127,17 @@ class Level{
     this.fg = coloredFg;
   }
   
+}
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
