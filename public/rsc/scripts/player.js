@@ -1,18 +1,52 @@
 let player; //Own Player
 let modeConstants = {
-  "0":{
+  "0":{ //cube
     width: 1,
     height: 1,
     gravityStrength: 73.5,
     ceilingDeath: true,
-    cameraLock: false
+    cameraLock: false,
+    rotationActive: true
   },
-  "1":{
+  "1":{ //Ship
     width: 1.5,
     height: 0.75,
     gravityStrength: 40,
     ceilingDeath: false,
-    cameraLock: true
+    cameraLock: true,
+    rotationActive: false
+  },
+  "2":{ //Ball
+    width: 1,
+    height: 1,
+    gravityStrength: 73.5,
+    ceilingDeath: true,
+    cameraLock: true,
+    rotationActive: true
+  },
+  "3":{ //Ufo
+    width: 1.5,
+    height: 1,
+    gravityStrength: 73.5,
+    ceilingDeath: false,
+    cameraLock: true,
+    rotationActive: false
+  },
+  "4":{ //Wave
+    width: 1,
+    height: 1,
+    gravityStrength: 0,
+    ceilingDeath: false,
+    cameraLock: true,
+    rotationActive: false
+  },
+  "6":{ //Spider
+    width: 1,
+    height: 1,
+    gravityStrength: 73.5,
+    ceilingDeath: true,
+    cameraLock: true,
+    rotationActive: false
   }
 }
 
@@ -84,7 +118,7 @@ class Player{
     this.deathAnimationTimeMax = 1 //death animation time in seconds
 
     this.startJumpDeactivate = true //Make player unable to jump at start until letting go to stop jump at start
-    //Object.assign(this, modeConstants[this.gameMode])
+    Object.assign(this, modeConstants[this.gameMode])
   }
   
   //Draw player on screen
@@ -111,7 +145,7 @@ class Player{
     this.y += (this.yVelocity*sdeltaTime) //add y
 
     if(this.gravitySwitch == 1){//put player on ground if touching ground
-      if(!this.onGround && this.y-this.height <= this.lowCeiling){ //put player on ground if touching ground
+      if(this.y-this.height <= this.lowCeiling){ //put player on ground if touching ground
         this.onGround = true
         this.yVelocity = 0
         this.y = this.lowCeiling+this.height
@@ -123,7 +157,7 @@ class Player{
         this.rotation = 0
       }
     }else{//upside down
-      if(!this.onGround && this.y >= this.highCeiling){ //put player on ground if touching ground
+      if(this.y >= this.highCeiling){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
         this.onGround = true
         this.yVelocity = 0
         this.y = this.highCeiling
@@ -168,7 +202,7 @@ class Player{
   applyGravity(){
     if(this.onGround) return
 
-    if(this.gameMode == 0) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
+    if(this.rotationActive) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
     this.yVelocity -= this.gravityStrength*sdeltaTime*this.gravitySwitch
   }
 
@@ -190,6 +224,38 @@ class Player{
     if(!this.input) return
     
     this.yVelocity += this.gravityStrength*sdeltaTime*this.gravitySwitch*2 //twice as strong as gravity since gravity will be applied either way
+    this.canUseRing = false
+  }
+
+  //change gravity if on ground and input during ball mode
+  ballInput(){
+    if(!this.input || !this.onGround || !this.canUseRing) return
+    
+    this.switchGravity()
+    this.canUseRing = false
+  }
+
+  //Make player jump when clicked
+  ufoInput(){
+    if(!this.input || !this.canUseRing) return
+    
+    this.jump()
+  }
+
+  //change velocity to constants
+  waveInput(){
+    if(this.input) {this.yVelocity = this.xVelocity*this.gravitySwitch; this.canUseRing = false; this.rotation = 45}
+    else {this.yVelocity = -this.xVelocity*this.gravitySwitch; this.rotation = 315}
+  }
+
+  //teleport up and down when clicked
+  spiderInput(){
+    if(!this.input || !this.onGround || !this.canUseRing) return
+    
+    if(this.gravitySwitch == 1) this.y = this.highCeiling //Teleport up
+    else this.y = this.lowCeiling + this.height //Teleport down
+
+    this.switchGravity()
     this.canUseRing = false
   }
 
@@ -216,6 +282,8 @@ class Player{
     let highest = camera.locked ? camera.downLock : 0 //Set lowest possible ceiling
     if(highest < 0) highest = 0 //increase lowest if below ground
 
+    if(this.gameMode==4){this.lowCeiling = highest; console.log(highest); return} //Ignore blocks completly if in wave gamemode
+
     for(const block of groundObjects){
       //Check if block is under player and higher than highest
       if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
@@ -233,9 +301,11 @@ class Player{
     let highest = camera.locked ? camera.topLock : ceilingLimit //Set highest possible ceiling
     if(highest > ceilingLimit) highest = ceilingLimit //reduce highest if above ceiling limit
 
+    if(this.gameMode==4) {this.highCeiling = highest; return} //Ignore blocks completly if in wave gamemode
+
     for(const block of groundObjects){
       //Check if block is under player and higher than highest
-      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y < highest) 
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y-block.height < highest) 
         highest = block.y-block.height
     }
     this.highCeiling = highest
@@ -264,6 +334,18 @@ class Player{
         break;
       case 1:
         this.shipInput()
+        break;
+      case 2:
+        this.ballInput()
+        break;
+      case 3:
+        this.ufoInput()
+        break;
+      case 4:
+        this.waveInput()
+        break;
+      case 6:
+        this.spiderInput()
         break;
     }
     this.applyGravity()
