@@ -1,6 +1,6 @@
 let list = [["Spike", "Block", "JumpOrb", "JumpPad"], ["GravityOrb", "GravityPad", "LowJumpOrb", "LowJumpPad"]]
 let editorLevel;
-let editor = {type:"Block"}
+let editor = {type:"ShipPortal"}
 
 let editorWindow = {}
 

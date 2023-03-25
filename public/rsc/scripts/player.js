@@ -6,15 +6,17 @@ let modeConstants = {
     gravityStrength: 73.5,
     ceilingDeath: true,
     cameraLock: false,
-    rotationActive: true
+    rotationActive: true,
+    jumpStrength: 17.5
   },
   "1":{ //Ship
-    width: 1.5,
-    height: 0.75,
-    gravityStrength: 40,
+    width: 1,
+    height: 1,
+    gravityStrength: 35,
     ceilingDeath: false,
     cameraLock: true,
-    rotationActive: false
+    rotationActive: false,
+    jumpStrength: 17.5 
   },
   "2":{ //Ball
     width: 1,
@@ -22,15 +24,17 @@ let modeConstants = {
     gravityStrength: 73.5,
     ceilingDeath: true,
     cameraLock: true,
-    rotationActive: true
+    rotationActive: true,
+    jumpStrength: 17.5
   },
   "3":{ //Ufo
-    width: 1.5,
+    width: 1,
     height: 1,
-    gravityStrength: 73.5,
+    gravityStrength: 40,
     ceilingDeath: false,
     cameraLock: true,
-    rotationActive: false
+    rotationActive: false,
+    jumpStrength: 12
   },
   "4":{ //Wave
     width: 1,
@@ -38,7 +42,7 @@ let modeConstants = {
     gravityStrength: 0,
     ceilingDeath: false,
     cameraLock: true,
-    rotationActive: false
+    rotationActive: false,
   },
   "6":{ //Spider
     width: 1,
@@ -46,7 +50,8 @@ let modeConstants = {
     gravityStrength: 73.5,
     ceilingDeath: true,
     cameraLock: true,
-    rotationActive: false
+    rotationActive: false,
+    jumpStrength: 17.5
   }
 }
 
@@ -118,6 +123,9 @@ class Player{
     this.deathAnimationTimeMax = 1 //death animation time in seconds
 
     this.startJumpDeactivate = true //Make player unable to jump at start until letting go to stop jump at start
+
+    this.wavePoints = [] //List of coordinates where Wave changed direction to draw a line
+    this.yVelocityBefore = 0; //says yvelocity in frame before, only used for wavepoints
     Object.assign(this, modeConstants[this.gameMode])
   }
   
@@ -128,7 +136,7 @@ class Player{
     let xDraw = this.x
 
     if(this.rotation == 0) unitImage(icon, xDraw, this.y, this.width, this.height)
-    else rotateUnitImage(icon, xDraw+this.width*0.5, this.y-this.height*0.5, this.width, this.height, this.rotation) //draw rotated image if is rotating
+    else rotateUnitImage(icon, xDraw, this.y, this.width, this.height, this.rotation) //draw rotated image if is rotating
 
     //unitRect(this.x, this.y, this.width, this.height)
   }
@@ -184,6 +192,11 @@ class Player{
     Object.assign(this, modeConstants[newMode]) //change variables to fit with new mode
     if(modeConstants[newMode].cameraLock) camera.lock() //Lock or unlock camera depending on gamemode
     else camera.unlock()
+
+    if(newMode == 4){ //Delete old wave Points and add one if changing to wave
+      this.wavePoints = []
+      this.wavePoints.push([this.x+0.5*this.width, this.y-0.5*this.height])
+    }
   }
 
   //Check if button to perform action is clicked
@@ -203,6 +216,12 @@ class Player{
     if(this.onGround) return
 
     if(this.rotationActive) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
+    else if(this.gameMode == 1 && this.y != this.highCeiling){ //Perform special calculation for rotation if in ship mode
+      const tanAlpha = -this.yVelocity/this.xVelocity //Get tan of angle
+      const alpha = atan(tanAlpha) //Get degree alpha
+      this.rotation = alpha
+    }
+
     this.yVelocity -= this.gravityStrength*sdeltaTime*this.gravitySwitch
   }
 
@@ -244,8 +263,11 @@ class Player{
 
   //change velocity to constants
   waveInput(){
-    if(this.input) {this.yVelocity = this.xVelocity*this.gravitySwitch; this.canUseRing = false; this.rotation = 45}
-    else {this.yVelocity = -this.xVelocity*this.gravitySwitch; this.rotation = 315}
+    const dir = this.input ? 1 : -1; //In which direction wave is going 
+
+    this.yVelocity = this.xVelocity*this.gravitySwitch*dir
+    this.rotation = dir*45
+    if(this.input) this.canUseRing = false
   }
 
   //teleport up and down when clicked
@@ -259,6 +281,30 @@ class Player{
     this.canUseRing = false
   }
 
+  //create and draw wavePoints
+  makeWavePoints(){
+    if(this.yVelocityBefore != this.yVelocity){ //Add another wavepoint if velocity changed
+      this.wavePoints.push([this.x+0.5*this.width, this.y-0.5*this.height-(this.yVelocity*sdeltaTime)]) //remove velocity to revert changes made in this.move() and store correct position
+    }
+
+    //Delete old ones which are not visible anymore
+    for(let i = 0; i < this.wavePoints.length-1; i++){
+      if(this.wavePoints[i][0] < camera.offsetX && this.wavePoints[i+1][0] >= camera.offsetX) {this.wavePoints.splice(0, i); break} //Delete all before if current one is last one behind border
+      else if(this.wavePoints[i][0] > camera.offsetX) break //Stop loop if already over border (idk if this is even neccesary)
+    }
+
+    stroke("white")
+    strokeWeight(0.2*u)
+    //Draw all lines
+    for(let i = 0; i < this.wavePoints.length-1; i++){
+      if(this.wavePoints[i][0] < camera.offsetX && this.wavePoints[i+1][0] >= camera.offsetX) this.wavePoints
+      unitLine(this.wavePoints[i][0], this.wavePoints[i][1], this.wavePoints[i+1][0], this.wavePoints[i+1][1])
+    }
+    unitLine(this.x+0.5*this.width, this.y-0.5*this.height, this.wavePoints[this.wavePoints.length-1][0], this.wavePoints[this.wavePoints.length-1][1]) //Draw line from player
+
+    this.yVelocityBefore = this.yVelocity //Store for next frame
+  }
+
   //Apply upwards velocity to player, strength is how strong with 1 = normal jump
   jump(strength = 1){
     this.yVelocity = this.jumpStrength*strength*this.gravitySwitch
@@ -268,10 +314,10 @@ class Player{
   
   //Get highest block from under player
   getLowCeiling(levelObj){
-    let highest = camera.locked ? camera.downLock : 0 //Set lowest possible ceiling
+    let highest = camera.locked ? camera.downLock+camLockBorder : 0 //Set lowest possible ceiling, add camLockBorder because ground offset from camera border
     if(highest < 0) highest = 0 //increase lowest if below ground
 
-    if(this.gameMode==4){this.lowCeiling = highest; console.log(highest); return} //Ignore blocks completly if in wave gamemode
+    if(this.gameMode==4){this.lowCeiling = highest; return} //Ignore blocks completly if in wave gamemode
 
     for(const block of levelObj.groundObjects){
       //Check if block is under player and higher than highest
@@ -287,7 +333,7 @@ class Player{
 
   //Get lowest block from above player
   getHighCeiling(levelObj){
-    let highest = camera.locked ? camera.topLock : ceilingLimit //Set highest possible ceiling
+    let highest = camera.locked ? camera.topLock-camLockBorder : ceilingLimit //Set highest possible ceiling, add camLockBorder because ground offset from camera border
     if(highest > ceilingLimit) highest = ceilingLimit //reduce highest if above ceiling limit
 
     if(this.gameMode==4) {this.highCeiling = highest; return} //Ignore blocks completly if in wave gamemode
@@ -341,6 +387,8 @@ class Player{
     this.getLowCeiling(levelObj)
     this.getHighCeiling(levelObj)
     this.move()
+
+    if(this.gameMode == 4) this.makeWavePoints() //Draw and create wavepoints, has to be after this.move()
 
     //check for obsticles
     levelObj.groundObjects.forEach(element => {

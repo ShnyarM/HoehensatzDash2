@@ -12,6 +12,7 @@ function setup() {
   noSmooth()
   windowResized();
   angleMode(DEGREES)
+  frameRate(120)
 
   //Stop contextmenu
   canvas.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -183,6 +184,11 @@ function unitText(textString, x, y){
   text(textString, (x-camera.offsetX)*u, (y-camera.offsetY)*-u)
 }
 
+//Draw line with unit coordinates and cameraOffset
+function unitLine(x1, y1, x2, y2){
+  line(unitToPixelX(x1), unitToPixelY(y1), unitToPixelX(x2), unitToPixelY(y2))
+}
+
 //Draw a rotated image
 function rotateImage(img, x, y, l, h, rotAmn){
   imageMode(CENTER);
@@ -196,7 +202,7 @@ function rotateImage(img, x, y, l, h, rotAmn){
 
 //Draw a rotated image in unit coordinates
 function rotateUnitImage(img, x, y, l, h, rotAmn){
-  rotateImage(img, (x-camera.offsetX)*u, (y-camera.offsetY)*-u, l*u, h*u, rotAmn)
+  rotateImage(img, (x-camera.offsetX)*u+(l*u*0.5), (y-camera.offsetY)*-u+(h*u*0.5), l*u, h*u, rotAmn)
 }
 
 //Detect collision between objects with pos and size

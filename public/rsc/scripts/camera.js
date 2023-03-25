@@ -1,4 +1,5 @@
 let camera; //Camera Object
+const camLockBorder = 0.5 //Size of border at top and bottom of screen when camera is locked
 
 function cameraSetup(){
   camera = new Camera()
@@ -7,6 +8,12 @@ function cameraSetup(){
 
 function cameraUpdate(){
   camera.updateOffset()
+  if(camera.locked){
+    if(camera.groundPosition != 1) camera.animateGround(1) //ground animation
+    if(camera.topLock != camera.offsetY) camera.adjustPosition() //Camera is locked but not on position, move it
+  }else{
+    if(camera.groundPosition != 0) camera.animateGround(-1) //Move ground away if unlocked but still in
+  }
   //camera.debug()
 }
 
@@ -30,6 +37,10 @@ class Camera{
     this.fastSpeed = 20
 
     this.locked = false
+
+    this.groundPosition = 0 //Used for animation of ground moving up when locking camera, ranges from 0-1
+    this.groundAdjustSpeed = 3 //Determines how quick animation goes
+    this.cameraAdjustSpeed = 6 //Determines how quick camera adjusts itself when locking
   }
 
   updateOffset(){
@@ -43,6 +54,24 @@ class Camera{
     }else if (player.y - player.width - this.offsetY < -uheight + this.yibBorder){
       const toMove = map(player.y - player.width, -uheight + this.yibBorder + this.offsetY, -uheight + this.yobBorder + this.offsetY, this.slowSpeed*sdeltaTime, this.fastSpeed*sdeltaTime);
       this.offsetY -= toMove
+    }
+  }
+
+  //Animation of ground moving in when locking camera, dir says if animate in or out
+  animateGround(dir){
+    this.groundPosition += (this.groundAdjustSpeed*sdeltaTime*dir)
+    if(dir == 1 && this.groundPosition > 1) this.groundPosition = 1 //Stop animation
+    else if(dir == -1 && this.groundPosition < 0) this.groundPosition = 0 //Stop animation
+  }
+  
+  //Camera is locked but not on position, move it
+  adjustPosition(){
+    if(this.topLock > this.offsetY){ //Camera is under intended position, move it up
+      this.offsetY += (this.cameraAdjustSpeed*sdeltaTime)
+      if(this.offsetY > this.topLock) this.offsetY = this.topLock
+    }else{ //Camera is above intended position, move it down
+      this.offsetY -= (this.cameraAdjustSpeed*sdeltaTime)
+      if(this.offsetY < this.topLock) this.offsetY = this.topLock
     }
   }
 
@@ -63,8 +92,11 @@ class Camera{
   lock(){
     this.locked = true;
     this.topLock = this.offsetY
-    if(this.topLock < 9) {this.topLock = 9; this.offsetY = 9}
-    this.downLock = this.offsetY - uheight
+
+    if(this.topLock < uheight - camLockBorder) {this.topLock = uheight - camLockBorder} //if below camera would be below ground, move it up
+    else if(this.topLock > ceilingLimit) {this.topLock = ceilingLimit} //prevent camera from going above ceiling
+
+    this.downLock = this.topLock - uheight
   }
 
   //unlock y of camera
