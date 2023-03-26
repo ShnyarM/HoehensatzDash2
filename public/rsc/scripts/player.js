@@ -12,7 +12,7 @@ let modeConstants = {
   "1":{ //Ship
     width: 1,
     height: 1,
-    gravityStrength: 35,
+    gravityStrength: 30,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
@@ -44,11 +44,28 @@ let modeConstants = {
     cameraLock: true,
     rotationActive: false,
   },
+  "5":{ //Robot
+    width: 1,
+    height: 1,
+    gravityStrength: 73.5,
+    ceilingDeath: true,
+    cameraLock: false,
+    rotationActive: false,
+  },
   "6":{ //Spider
     width: 1,
     height: 1,
     gravityStrength: 73.5,
     ceilingDeath: true,
+    cameraLock: true,
+    rotationActive: false,
+    jumpStrength: 17.5
+  },
+  "7":{ //Swing Copter
+    width: 1,
+    height: 1,
+    gravityStrength: 40,
+    ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
     jumpStrength: 17.5
@@ -64,11 +81,10 @@ function playerUpdate(levelObj){
     player.input = player.checkInput()
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
     player.update(levelObj);
+    player.draw()
   }else{
     player.deathAnimation(levelObj)
   }
-
-  player.draw()
 }
 
 function playerMouseClicked(){
@@ -126,6 +142,13 @@ class Player{
 
     this.wavePoints = [] //List of coordinates where Wave changed direction to draw a line
     this.yVelocityBefore = 0; //says yvelocity in frame before, only used for wavepoints
+
+    //Used for robot gamemode
+    this.robotJumpTime = 0 //How long player has been jumping
+    this.robotJumpTimeMax = 1  //Max jump time, constant
+    this.robotBoostStrength = 107 //How strong jump is, constant
+    this.canRobotJump = true  //shows if player is allowed to thrust
+
     Object.assign(this, modeConstants[this.gameMode])
   }
   
@@ -158,6 +181,8 @@ class Player{
         this.yVelocity = 0
         this.y = this.lowCeiling+this.height
         this.rotation = 0
+        this.canRobotJump = true //For Robot mode
+        this.robotJumpTime = 0
       }
       if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
@@ -170,6 +195,8 @@ class Player{
         this.yVelocity = 0
         this.y = this.highCeiling
         this.rotation = 0
+        this.canRobotJump = true //For Robot mode
+        this.robotJumpTime = 0
       }
       if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
@@ -216,7 +243,7 @@ class Player{
     if(this.onGround) return
 
     if(this.rotationActive) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
-    else if(this.gameMode == 1 && this.y != this.highCeiling){ //Perform special calculation for rotation if in ship mode
+    else if((this.gameMode == 1 || this.gameMode == 7) && this.y != this.highCeiling){ //Perform special calculation for rotation if in ship or swing copter mode
       const tanAlpha = -this.yVelocity/this.xVelocity //Get tan of angle
       const alpha = atan(tanAlpha) //Get degree alpha
       this.rotation = alpha
@@ -270,15 +297,53 @@ class Player{
     if(this.input) this.canUseRing = false
   }
 
+  //add to velocity when boosting
+  robotInput(){
+    if(!this.input || !this.canRobotJump || (!this.canUseRing && this.robotJumpTime == 0)){this.canRobotJump = false; return} //Last one: if robotJumptime is not 0 a boost is already going on
+
+    if(this.robotJumpTime == 0) this.jump(0.3) //Add small initial jump when starting boost
+    this.yVelocity += (this.robotBoostStrength*sdeltaTime*this.gravitySwitch) //Add velocity
+    this.robotJumpTime += (4*sdeltaTime) //Decrease remaining boost time
+    this.canUseRing = false
+
+    if(this.robotJumpTime >= this.robotJumpTimeMax) this.canRobotJump = false //Stop boosting if max time is reached
+  }
+
   //teleport up and down when clicked
-  spiderInput(){
+  spiderInput(levelObj){
     if(!this.input || !this.onGround || !this.canUseRing) return
     
     if(this.gravitySwitch == 1) this.y = this.highCeiling //Teleport up
     else this.y = this.lowCeiling + this.height //Teleport down
 
+    //Check if death objects are in way of teleportation to kill player
+    let hitDeathObjects = [] //list of y coordinates death objects in way
+    levelObj.deathObjects.forEach(element => {
+      if(collision(element.x+element.boxOffsetX, element.y-element.boxOffsetY, element.boxWidth, element.boxHeight, this.x, this.highCeiling, this.width, this.highCeiling-this.lowCeiling)){
+        hitDeathObjects.push(element.y) //Add to list
+      }
+    });
+
+    //Go through all found deathobjects and search for closest one, so it wont look like player is teleporting through spike
+    if(hitDeathObjects.length != 0){
+      let lowestDifference = [0, abs(hitDeathObjects[0]-this.y)] //Store first object as closest, [0] is index of block in hitdeathobjects, [1] is distance from player
+      for(let i = 1; i < hitDeathObjects.length; i++){
+        const difference = abs(hitDeathObjects[i]-this.y) //calculate distance
+        if(difference > lowestDifference[1]) lowestDifference = [i, difference] //set as closest if closer, idk why > but it works :/
+      }
+      this.y = hitDeathObjects[lowestDifference[0]] //Move player to death object so he dies
+    }
+
     this.switchGravity()
     this.canUseRing = false
+  }
+
+  //change gravity when clicking
+  swingCopterInput(){
+    if(!this.input || !this.canUseRing) return
+    
+    this.switchGravity()
+    this.canUseRing = false;
   }
 
   //create and draw wavePoints
@@ -353,6 +418,7 @@ class Player{
 
   deathAnimation(levelObj){
     this.deathAnimationTime += sdeltaTime
+    circle(unitToPixelX(this.x+this.width*0.5,), unitToPixelY(this.y-this.height*0.5), this.deathAnimationTime*2*u)
     if(this.deathAnimationTime >= this.deathAnimationTimeMax){
       resetLevel(levelObj)
     }
@@ -379,8 +445,14 @@ class Player{
       case 4:
         this.waveInput()
         break;
+      case 5:
+        this.robotInput()
+        break;
       case 6:
-        this.spiderInput()
+        this.spiderInput(levelObj)
+        break;
+      case 7:
+        this.swingCopterInput()
         break;
     }
     this.applyGravity()
