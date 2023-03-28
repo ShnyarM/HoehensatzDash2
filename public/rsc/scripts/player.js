@@ -21,7 +21,7 @@ let modeConstants = {
   "2":{ //Ball
     width: 1,
     height: 1,
-    gravityStrength: 73.5,
+    gravityStrength: 40,
     ceilingDeath: true,
     cameraLock: true,
     rotationActive: true,

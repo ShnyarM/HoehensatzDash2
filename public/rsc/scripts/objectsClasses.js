@@ -134,7 +134,7 @@ function collideObject(player, object){
     }break
     case "ShipPortal":{
       if(object.used)break
-      player.switchMode(7)
+      player.switchMode(2)
       object.used = true
     }break
   }
