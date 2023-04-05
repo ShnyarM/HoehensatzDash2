@@ -1,10 +1,10 @@
 let Block = {
   height: 1,
   width: 1,
-  boxWidth: 0.8, //Size of hitbox
-  boxHeight: 0.8,
-  get boxOffsetX(){ return(this.width-this.boxWidth)*0.5},
-  get boxOffsetY(){ return(this.width-this.boxWidth)*0.5},
+  boxWidth: 1, //Size of hitbox
+  boxHeight: 1,
+  boxOffsetX: 0,
+  boxOffsetY: 0,
   yOffset: 0,
   xOffset:0
 }
@@ -67,6 +67,11 @@ function collisionObject(player, object){
   if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x, player.y, player.width, player.height))collideObject(player, object)//this.collide(collider, this)
 }
 
+//Maybe this can be optimized since we know type == block
+function collisionBlockObject(player, object){
+  if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x+player.blockHitboxOffset, player.y-player.blockHitboxOffset, player.blockHitboxSize, player.blockHitboxSize))collideObject(player, object)//this.collide(collider, this)
+}
+
 function collideObject(player, object){
   switch (object.type){
     case "Spike":
@@ -111,7 +116,7 @@ function collideObject(player, object){
     }break
     case "GravityPad":{
       if(object.used)break
-      player.jump(1.2);
+      player.jump(0.4);
       player.switchGravity();
       object.used = true;
     }break
@@ -134,7 +139,7 @@ function collideObject(player, object){
     }break
     case "ShipPortal":{
       if(object.used)break
-      player.switchMode(2)
+      player.switchMode(1)
       object.used = true
     }break
   }

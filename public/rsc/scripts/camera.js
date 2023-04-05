@@ -33,8 +33,8 @@ class Camera{
     this.yobBorder = 0.13*zoom //Outer Border of the y Axis bottom
     this.xBorder = 4 //at which x coordinate to move player
 
-    this.slowSpeed = 8
-    this.fastSpeed = 20
+    this.slowSpeed = 4
+    this.fastSpeed = 35
 
     this.locked = false
 

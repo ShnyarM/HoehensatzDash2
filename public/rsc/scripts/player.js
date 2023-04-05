@@ -7,24 +7,28 @@ let modeConstants = {
     ceilingDeath: true,
     cameraLock: false,
     rotationActive: true,
-    jumpStrength: 17.5
+    jumpStrength: 17.5,
+    terminalVelocityActive: true
   },
   "1":{ //Ship
     gravityStrength: 30,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
+    terminalVelocityActive: false
   },
   "2":{ //Ball
     gravityStrength: 40,
     cameraLock: true,
+    terminalVelocityActive: false
   },
   "3":{ //Ufo
     gravityStrength: 40,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
-    jumpStrength: 12
+    jumpStrength: 12,
+    terminalVelocityActive: false
   },
   "4":{ //Wave
     gravityStrength: 0,
@@ -38,12 +42,14 @@ let modeConstants = {
   "6":{ //Spider
     cameraLock: true,
     rotationActive: false,
+    terminalVelocityActive: false
   },
   "7":{ //Swing Copter
     gravityStrength: 40,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
+    terminalVelocityActive: false
   }
 }
 
@@ -57,6 +63,7 @@ function playerUpdate(levelObj){
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
     player.update(levelObj);
     player.draw()
+    //player.drawHitbox()
   }else{
     player.deathAnimation(levelObj)
   }
@@ -86,10 +93,18 @@ function deletePlayer(){
 //Own Player
 class Player{
   constructor(){
-    this.width = 1
+    this.width = 1 //Hitbox of player
     this.height = 1
     this.x = 0
     this.y = this.height
+
+    this.blockHitboxSize = 0.4 //Size of hitbox to for block interactions
+    this.blockHitboxOffset = (this.height-this.blockHitboxSize)*0.5 //How much it is offset from original player position
+
+    this.drawnWidth = 1 //Size of player as drawn
+    this.drawnHeight = 1
+    this.drawOffsetX = 0 //By how much draw will be offset in positive X
+    this.drawOffsetY = 0 //By how much draw will be offset in positive Y
 
     this.xVelocity = 9
     this.yVelocity = 0
@@ -97,11 +112,16 @@ class Player{
     this.gravityStrength = 73.5//4.2*this.jumpStrength
     this.gravitySwitch = 1 //-1 is upside down
 
-    this.gameMode = 0 //0 = cube, 1 = ship
+    this.terminalVelocity = 30 //Fastest the player can fall down
+    this.terminalVelocityActive = true //Says if terminalvelocity is active in current gamemode
+
+    this.gameMode = 0 //check gamemodeconstants to know which number is which gamemode
     this.ceilingDeath = true
 
     this.rotation = 0
+    this.rotationAdjustSpeed = 500 //How fast rotation adjust to get into locked position
     this.rotationSpeed = 360
+    this.rotationBackfireThreshold = 35 //If difference from last 90 degrees rotation point is less than this when landing, rotation will be set back instead smoothly increasing till next 90 degrees point
 
     this.input = false
     this.onGround = true
@@ -131,13 +151,21 @@ class Player{
   //Draw player on screen
   draw(){
     fill("red")
-    //let xDraw = this.x-camera.offsetX <= 3 ? this.x : 3.05+camera.offsetX //if at camera border draw at fixed point to avoid stuttering
-    let xDraw = this.x
 
-    if(this.rotation == 0) unitImage(icon, xDraw, this.y, this.width, this.height)
-    else rotateUnitImage(icon, xDraw, this.y, this.width, this.height, this.rotation) //draw rotated image if is rotating
+    if(this.rotation % 90 == 0) unitImage(icon, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
+    else rotateUnitImage(icon, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
 
     //unitRect(this.x, this.y, this.width, this.height)
+  }
+
+  //Draws Hitbox of player
+  drawHitbox(){
+    fill(color(0, 0, 0, 0))
+    stroke("red")
+    unitRect(this.x, this.y, this.width, this.height) //Normal hitbox
+
+    stroke("blue")
+    unitRect(this.x+this.blockHitboxOffset, this.y-this.blockHitboxOffset, this.blockHitboxSize, this.blockHitboxSize)
   }
 
   //Move player according to velocity
@@ -158,7 +186,6 @@ class Player{
       if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
         this.y = this.highCeiling
-        this.rotation = 0
       }
     }else{//upside down
       if(this.y >= this.highCeiling){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
@@ -167,7 +194,6 @@ class Player{
       if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
         this.y = this.lowCeiling+this.height
-        this.rotation = 0
       }
     }
     
@@ -182,9 +208,9 @@ class Player{
     this.onGround = true
     this.yVelocity = 0
     this.y = this.gravitySwitch == 1 ? this.lowCeiling+this.height : this.highCeiling //Add to height depending on if gravity switched or not
-    this.rotation = 0
     this.canRobotJump = true //For Robot mode
     this.robotJumpTime = 0
+    if(this.rotationActive && this.rotation % 90 < this.rotationBackfireThreshold) this.rotation = floor(this.rotation/90)*90 //turn back rotation incase threshold wasnt exceeded
   }
 
   //Switch to new gamemode
@@ -219,14 +245,31 @@ class Player{
   applyGravity(){
     if(this.onGround) return
 
-    if(this.rotationActive) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch
-    else if((this.gameMode == 1 || this.gameMode == 7) && this.y != this.highCeiling){ //Perform special calculation for rotation if in ship or swing copter mode
+    //if(!this.terminalVelocityActive || this.gravitySwitch == 1 ? -this.yVelocity < this.terminalVelocity : this.yVelocity < this.terminalVelocity) //Apply gravity if terminal velocity not reached
+    if(this.terminalVelocityActive == false || (this.gravitySwitch == 1 ? -this.yVelocity < this.terminalVelocity : this.yVelocity < this.terminalVelocity))
+      this.yVelocity -= this.gravityStrength*sdeltaTime*this.gravitySwitch
+  }
+
+  //Change rotation based on what is happening
+  applyRotationChange(){
+    if(this.rotationActive){ //Current gamemode has normal rotation (spin when in air)
+      if(!this.onGround) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch //Spin when in air
+      else if(this.rotation % 90 != 0){ //Adjust player rotation once ground is hit
+        const rotationBefore = this.rotation //Save rotation player had before adding
+        this.rotation += this.rotationAdjustSpeed*sdeltaTime*this.gravitySwitch //Spin when in air
+
+        const rotToReach = (floor(rotationBefore/90)+1)*90 //Find next rotation dividable by 90
+        if(this.rotation >= rotToReach) this.rotation = rotToReach //Lock in place once number reached
+      }
+
+      if(this.rotation >= 360) this.rotation = this.rotation % 360 //loop back rotation to stay within 360 range
+      else if(this.rotation < 0) this.rotation = 360 - this.rotation
+
+    }else if((this.gameMode == 1 || this.gameMode == 7)){ //Perform special calculation for rotation if in ship or swing copter mode
       const tanAlpha = -this.yVelocity/this.xVelocity //Get tan of angle
       const alpha = atan(tanAlpha) //Get degree alpha
       this.rotation = alpha
     }
-
-    this.yVelocity -= this.gravityStrength*sdeltaTime*this.gravitySwitch
   }
 
   //Switch gravity, if instant velocity also flips (blue jump ring)
@@ -363,7 +406,7 @@ class Player{
 
     for(const block of levelObj.groundObjects){
       //Check if block is under player and higher than highest
-      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY <= this.y-this.height && block.y > highest) 
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y <= this.y-this.blockHitboxOffset-this.blockHitboxSize && block.y > highest) 
         highest = block.y
     }
     this.lowCeiling = highest
@@ -382,7 +425,7 @@ class Player{
 
     for(const block of levelObj.groundObjects){
       //Check if block is under player and higher than highest
-      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxOffsetY-block.boxHeight >= this.y && block.y-block.height < highest) 
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.height >= this.y-this.blockHitboxOffset && block.y-block.height < highest) 
         highest = block.y-block.height
     }
     this.highCeiling = highest
@@ -436,12 +479,13 @@ class Player{
     this.getLowCeiling(levelObj)
     this.getHighCeiling(levelObj)
     this.move()
+    this.applyRotationChange()
 
     if(this.gameMode == 4) this.makeWavePoints() //Draw and create wavepoints, has to be after this.move()
 
     //check for obsticles
     levelObj.groundObjects.forEach(element => {
-      collisionObject(this, element)   
+      collisionBlockObject(this, element)   
     });
     levelObj.deathObjects.forEach(element => {
       collisionObject(this, element)   
