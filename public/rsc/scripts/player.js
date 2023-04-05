@@ -1,6 +1,6 @@
 let player; //Own Player
 let modeConstants = {
-  "0":{ //cube
+  "0":{ //cube, default values
     width: 1,
     height: 1,
     gravityStrength: 73.5,
@@ -10,26 +10,16 @@ let modeConstants = {
     jumpStrength: 17.5
   },
   "1":{ //Ship
-    width: 1,
-    height: 1,
     gravityStrength: 30,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
-    jumpStrength: 17.5 
   },
   "2":{ //Ball
-    width: 1,
-    height: 1,
     gravityStrength: 40,
-    ceilingDeath: true,
     cameraLock: true,
-    rotationActive: true,
-    jumpStrength: 17.5
   },
   "3":{ //Ufo
-    width: 1,
-    height: 1,
     gravityStrength: 40,
     ceilingDeath: false,
     cameraLock: true,
@@ -37,38 +27,23 @@ let modeConstants = {
     jumpStrength: 12
   },
   "4":{ //Wave
-    width: 1,
-    height: 1,
     gravityStrength: 0,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
   },
   "5":{ //Robot
-    width: 1,
-    height: 1,
-    gravityStrength: 73.5,
-    ceilingDeath: true,
-    cameraLock: false,
     rotationActive: false,
   },
   "6":{ //Spider
-    width: 1,
-    height: 1,
-    gravityStrength: 73.5,
-    ceilingDeath: true,
     cameraLock: true,
     rotationActive: false,
-    jumpStrength: 17.5
   },
   "7":{ //Swing Copter
-    width: 1,
-    height: 1,
     gravityStrength: 40,
     ceilingDeath: false,
     cameraLock: true,
     rotationActive: false,
-    jumpStrength: 17.5
   }
 }
 
@@ -149,6 +124,7 @@ class Player{
     this.robotBoostStrength = 107 //How strong jump is, constant
     this.canRobotJump = true  //shows if player is allowed to thrust
 
+    Object.assign(this, modeConstants[0]) //Set default values
     Object.assign(this, modeConstants[this.gameMode])
   }
   
@@ -177,12 +153,7 @@ class Player{
 
     if(this.gravitySwitch == 1){//put player on ground if touching ground
       if(this.y-this.height <= this.lowCeiling){ //put player on ground if touching ground
-        this.onGround = true
-        this.yVelocity = 0
-        this.y = this.lowCeiling+this.height
-        this.rotation = 0
-        this.canRobotJump = true //For Robot mode
-        this.robotJumpTime = 0
+        this.groundTouch()
       }
       if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
@@ -191,12 +162,7 @@ class Player{
       }
     }else{//upside down
       if(this.y >= this.highCeiling){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
-        this.onGround = true
-        this.yVelocity = 0
-        this.y = this.highCeiling
-        this.rotation = 0
-        this.canRobotJump = true //For Robot mode
-        this.robotJumpTime = 0
+        this.groundTouch()
       }
       if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
         this.yVelocity = 0
@@ -211,11 +177,22 @@ class Player{
     }
   }
 
+  //Code to be executed when player touches ground
+  groundTouch(){
+    this.onGround = true
+    this.yVelocity = 0
+    this.y = this.gravitySwitch == 1 ? this.lowCeiling+this.height : this.highCeiling //Add to height depending on if gravity switched or not
+    this.rotation = 0
+    this.canRobotJump = true //For Robot mode
+    this.robotJumpTime = 0
+  }
+
   //Switch to new gamemode
   switchMode(newMode){
     if(newMode == this.gameMode || !modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
 
     this.gameMode = newMode //assign new Mode
+    Object.assign(this, modeConstants[0]) //Apply default values before applying values of new Mode
     Object.assign(this, modeConstants[newMode]) //change variables to fit with new mode
     if(modeConstants[newMode].cameraLock) camera.lock() //Lock or unlock camera depending on gamemode
     else camera.unlock()
