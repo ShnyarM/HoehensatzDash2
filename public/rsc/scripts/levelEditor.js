@@ -1,4 +1,4 @@
-let list = [["Spike", "Block", "JumpOrb", "JumpPad"], ["GravityOrb", "GravityPad", "LowJumpOrb", "LowJumpPad"]]
+let list = [["Spike", "Block", "JumpOrb", "JumpPad"], ["GravityOrb", "ShipPortal", "MiniPortal", "BigPortal"]]
 let editorLevel;
 let editor = {type:"ShipPortal"}
 

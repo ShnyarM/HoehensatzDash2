@@ -8,7 +8,11 @@ let modeConstants = {
     cameraLock: false,
     rotationActive: true,
     jumpStrength: 17.5,
-    terminalVelocityActive: true
+    terminalVelocityActive: true,
+    drawnWidth: 1,
+    drawnHeight: 1,
+    blockHitboxSize: 0.4,
+    blockHitboxOffset: 0.3
   },
   "1":{ //Ship
     gravityStrength: 30,
@@ -50,6 +54,32 @@ let modeConstants = {
     cameraLock: true,
     rotationActive: false,
     terminalVelocityActive: false
+  },
+  "10":{ //mini cube
+    width: 0.5,
+    height: 0.5,
+    drawnWidth: 0.5,
+    drawnHeight: 0.5,
+    blockHitboxSize: 0.2,
+    blockHitboxOffset: 0.15,
+    jumpStrength: 14,
+  },
+  "11":{ //mini Ship
+    gravityStrength: 50,
+  },
+  "12":{ //mini Ball
+    gravityStrength: 50,
+  },
+  "13":{ //mini Ufo
+    gravityStrength: 40,
+    jumpStrength: 9,
+  },
+  "15":{ //mini Robot
+    rotationActive: false,
+    jumpStrength: 8,
+  },
+  "17":{ //mini Swing Copter
+    gravityStrength: 50,
   }
 }
 
@@ -116,6 +146,7 @@ class Player{
     this.terminalVelocityActive = true //Says if terminalvelocity is active in current gamemode
 
     this.gameMode = 0 //check gamemodeconstants to know which number is which gamemode
+    this.mini = false //Says if player is in mini gamemode
     this.ceilingDeath = true
 
     this.rotation = 0
@@ -174,7 +205,7 @@ class Player{
     
     //If player touches border/line, move camera to right
     if(this.x + this.width - camera.offsetX >= camera.xBorder){
-      camera.offsetX = this.x - 3.05
+      camera.offsetX = this.x+this.width-camera.xBorder
     }
 
     this.y += (this.yVelocity*sdeltaTime) //add y
@@ -218,8 +249,12 @@ class Player{
     if(newMode == this.gameMode || !modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
 
     this.gameMode = newMode //assign new Mode
-    Object.assign(this, modeConstants[0]) //Apply default values before applying values of new Mode
+    Object.assign(this, modeConstants[0]) //Apply default values before applying values of new Mode$
+    if(this.mini) Object.assign(this, modeConstants[10]) //Apply default values of mini before applying values of new Mode
+
     Object.assign(this, modeConstants[newMode]) //change variables to fit with new mode
+    if(this.mini) Object.assign(this, modeConstants[newMode+10]) //change specific values to fit with mini mode
+
     if(modeConstants[newMode].cameraLock) camera.lock() //Lock or unlock camera depending on gamemode
     else camera.unlock()
 
@@ -227,6 +262,30 @@ class Player{
       this.wavePoints = []
       this.wavePoints.push([this.x+0.5*this.width, this.y-0.5*this.height])
     }
+  }
+
+  //Make player mini
+  switchToMini(){
+    if(this.mini) return //Dont do anything if already mini
+
+    Object.assign(this, modeConstants[10]) //Apply default values of mini
+    Object.assign(this, modeConstants[this.gameMode+10]) //apply mini values of current mode
+    this.x = this.x+0.5 //Change x position so end of player stays at same point
+    this.y = this.y-0.25 //Change y position so middle is still in middle
+
+    this.mini = true
+  }
+
+  //Make player Big
+  switchToBig(){
+    if(!this.mini) return //Dont do anything if already Big
+
+    Object.assign(this, modeConstants[0]) //Apply default values
+    Object.assign(this, modeConstants[this.gameMode]) //apply values of current mode
+    this.x = this.x-0.5 //Change x position so end of player stays at same point
+    this.y = this.y+0.25 //Change y position so middle is still in middle
+
+    this.mini = false
   }
 
   //Check if button to perform action is clicked
@@ -312,8 +371,11 @@ class Player{
   waveInput(){
     const dir = this.input ? 1 : -1; //In which direction wave is going 
 
-    this.yVelocity = this.xVelocity*this.gravitySwitch*dir
-    this.rotation = dir*45
+    this.yVelocity = this.xVelocity*this.gravitySwitch*dir*(this.mini ? 2:1)
+
+    if(this.y == this.highCeiling || this.y-this.height == this.lowCeiling) this.rotation = 0 //Make rotation 0 if on ceiling or ground
+    else this.rotation = -dir*45*(this.mini ? 1.41:1)
+    
     if(this.input) this.canUseRing = false
   }
 

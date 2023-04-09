@@ -56,7 +56,7 @@ let Portal = {
   xOffset:0
 }
 
-let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal, "CubePortal": Portal}
+let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal, "CubePortal": Portal, "MiniPortal": Portal, "BigPortal": Portal}
 
 
 function drawObject(object){
@@ -139,7 +139,17 @@ function collideObject(player, object){
     }break
     case "ShipPortal":{
       if(object.used)break
-      player.switchMode(1)
+      player.switchMode(4)
+      object.used = true
+    }break
+    case "MiniPortal":{
+      if(object.used)break
+      player.switchToMini()
+      object.used = true
+    }break
+    case "BigPortal":{
+      if(object.used)break
+      player.switchToBig()
       object.used = true
     }break
   }

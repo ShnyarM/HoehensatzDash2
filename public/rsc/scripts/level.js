@@ -143,6 +143,8 @@ class Level{
         case "GravityPad":
         case "ShipPortal":
         case "CubePortal":
+        case "MiniPortal":
+        case "BigPortal":
         this.interactObjects.push(obj)
         break
         }

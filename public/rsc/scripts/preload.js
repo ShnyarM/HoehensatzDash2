@@ -17,5 +17,7 @@ function preload(){
   images.HighJumpOrb = loadImage("rsc/images/highJumpRing.png")
   images.ShipPortal = loadImage("rsc/images/ShipPortal.png")
   images.CubePortal = loadImage("rsc/images/ShipPortal.png")
+  images.MiniPortal = loadImage("rsc/images/MiniPortal.png")
+  images.BigPortal = loadImage("rsc/images/BigPortal.png")
   console.log(images)
 }
