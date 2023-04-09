@@ -78,18 +78,41 @@ class Level{
     if(mode == "read"){
       this.readData(data);
     }
-    this.tintDeco();
   }
 
   readData(path){
     fetch(path)
-    .then((response) => response.json())
-    .then((json) => {
-      json.objects.forEach(element => {
-        this.addObject(new gameObject(element.type, element.x, element.y))
+    .then((response) => response.text())
+    .then((txt) => {
+
+      let splitTxt = split(txt, "~");
+      let blocks = split(splitTxt[0], "+");
+
+      blocks.forEach((element, index) => {
+        blocks[index] = split(element, "°");
+        blocks[index].forEach((elem, ind) => {
+          blocks[index][ind] = parseInt(elem)
+        })
       })
+
+      let metaData = split(splitTxt[1], "+")
+
+      this.bgSprite = parseInt(metaData[0].toString())
+      this.fgSprite = parseInt(metaData[1])
+      this.bgColor = metaData[2]
+      this.fgColor = metaData[3]
+      this.levelName = metaData[4]
+      this.musicLink = metaData[5]
+
+
+      blocks.forEach(element => {
+        console.log(element)
+        this.addObject(new gameObject(element[0], element[1], element[2]))
+      })
+      this.tintDeco();
+      /*
       this.decoration = json.decoration
-      /*json.deathObjects.forEach(element => {
+      json.deathObjects.forEach(element => {
         this.deathObjects.push(new gameObject(element.type, element.x, element.y)); 
       });
 
@@ -104,26 +127,19 @@ class Level{
   }
 
   addObject(obj){
-    switch(obj.type){
-      case "Spike":
-        this.deathObjects.push(obj); 
-        break
-      case "Block":
+    console.log(obj)
+    switch(true){
+      case obj.id < 30:
         this.groundObjects.push(obj);
         break;
-        case "JumpOrb":
-        case "LowJumpOrb":
-        case "HighJumpOrb":
-        case "GravityOrb":
-        case "GreenOrb":
-        case "JumpPad":
-        case "HighJumpPad":
-        case "LowJumpPad":
-        case "GravityPad":
-        case "ShipPortal":
+      
+      case obj.id < 60:
+        this.deathObjects.push(obj); 
+        break
+      case obj.id >= 60:
         this.interactObjects.push(obj)
         break
-        }
+    }
   }
 
   saveLevel(path){
@@ -147,14 +163,14 @@ class Level{
   }
 
   tintDeco(){
-    let bg = images.bg[this.decoration.bgSprite];
-    let fg = images.fg[this.decoration.fgSprite]
+    let bg = images.bg[this.bgSprite];
+    let fg = images.fg[this.fgSprite]
     let coloredBg = createGraphics(bg.width, bg.height) //create new canvas which will become bg image
-    coloredBg.tint(...this.decoration.bgColor)
+    coloredBg.tint(this.bgColor)
     coloredBg.image(bg, 0, 0, bg.width, bg.height) //Draw white bg image to canvas with tint
-    console.log(this.decoration.fgColor)
+    console.log(this.fgColor)
     let coloredFg = createGraphics(fg.width, fg.height) //create new canvas which will become bg image
-    coloredFg.tint(...this.decoration.fgColor)
+    coloredFg.tint(this.fgColor)
     coloredFg.image(fg, 0, 0, fg.width, fg.height) //Draw white bg image to canvas with tint
 
     this.bg = coloredBg;

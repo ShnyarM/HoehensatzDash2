@@ -55,12 +55,12 @@ let Portal = {
   yOffset: 0,
   xOffset:0
 }
-
-let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal}
+let objectList = [Block]
+//let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal}
 
 
 function drawObject(object){
-  unitImage(images[object.type], object.x, object.y, object.width, object.height)
+  unitImage(objImages[object.type], object.x, object.y, object.width, object.height)
 }
 
 function collisionObject(player, object){
@@ -135,10 +135,10 @@ function collideObject(player, object){
   }
 }
 class gameObject{
-  constructor(type, x, y){
-    Object.assign(this, objectList[type])
+  constructor(id, x, y){
+    Object.assign(this, objectList[id])
     this.x = x + this.xOffset;
     this.y = y + this.yOffset;
-    this.type = type
+    this.id = id
   }
 }
