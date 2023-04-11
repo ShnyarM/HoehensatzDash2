@@ -198,7 +198,7 @@ class Level{
   }
 
   addObject(obj){
-    console.log(obj)
+    //console.log(obj)
     switch(true){
       case obj.id < 50:
         this.groundObjects.push(obj);
