@@ -211,7 +211,7 @@ class Player{
     this.y += (this.yVelocity*sdeltaTime) //add y
 
     if(this.gravitySwitch == 1){//put player on ground if touching ground
-      if(this.y-this.height <= this.lowCeiling){ //put player on ground if touching ground
+      if(this.y-this.height <= this.lowCeiling && this.yVelocity <= 0){ //put player on ground if touching ground
         this.groundTouch()
       }
       if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
@@ -219,7 +219,7 @@ class Player{
         this.y = this.highCeiling
       }
     }else{//upside down
-      if(this.y >= this.highCeiling){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
+      if(this.y >= this.highCeiling && this.yVelocity >= 0){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
         this.groundTouch()
       }
       if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
