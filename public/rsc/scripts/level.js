@@ -15,27 +15,48 @@ function playLevel(){
   drawBackground(activeLevel)
   playerUpdate(activeLevel);
   drawLevel(activeLevel);
+  drawForeground(activeLevel)
   cameraUpdate();
 }
 
-//draw background and forground
+//draw background
 function drawBackground(levelObj){
   const backStart = floor((camera.offsetX/parallaxFactor)/backgroundSize) //Get index of first image
   for(let i = backStart; i <= backStart+ceil(uwidth/backgroundSize); i++){ //Draw all background tiles
     image(levelObj.bg, (backgroundSize*i-camera.offsetX / parallaxFactor) * u, (10-camera.offsetY / parallaxFactor) * -u, backgroundSize * u, backgroundSize * u)
   } 
+}
 
-
-  if(camera.offsetY - uheight < 0){ //Draw ground if visible
+//Draw Foreground
+function drawForeground(levelObj){
+  if(!camera.locked){ //Camera not locked (for example cube), draw ground normally
+    if(camera.offsetY - uheight < 0){ //Draw ground if visible
+      const groundStart = floor(camera.offsetX/groundTileSize) //# of first ground tile, increases as player goes forward
+      for(let i = groundStart; i <= groundStart+ceil(uwidth/groundTileSize); i++){//Draw all ground tiles
+        unitImage(levelObj.fg, i*groundTileSize, 0, groundTileSize, groundTileSize)
+      }
+  
+      //Line seperating background and foreground
+      stroke("white")
+      strokeWeight(0.06*u)
+      line(0, camera.offsetY*u, width, camera.offsetY*u)
+    }
+  }
+  
+  if(camera.locked || camera.groundPosition != 0){ //Camera locked (Ship) or borders are still animating out, draw ground at bottom and top at fixed posititons
     const groundStart = floor(camera.offsetX/groundTileSize) //# of first ground tile, increases as player goes forward
+    const yBottom = camera.downLock == -camLockBorder ? 0 : camera.offsetY-uheight+(camLockBorder*camera.groundPosition) //Position of bottom ground, if its like normal ground just render at 0, else play animation and etc
+
     for(let i = groundStart; i <= groundStart+ceil(uwidth/groundTileSize); i++){//Draw all ground tiles
-      unitImage(levelObj.fg, i*groundTileSize, 0, groundTileSize, groundTileSize)
+      unitImage(levelObj.fg, i*groundTileSize, yBottom, groundTileSize, groundTileSize) //Bottom, +0.5 because cround is up by 0.5 from camera border, groundposition for animation
+      rotateUnitImage(levelObj.fg, i*groundTileSize, camera.offsetY-(camLockBorder*camera.groundPosition)+groundTileSize, groundTileSize, groundTileSize, 180) //Top, rotate so "up" of image is at the bottom
     }
 
     //Line seperating background and foreground
     stroke("white")
     strokeWeight(0.06*u)
-    line(0, camera.offsetY*u, width, camera.offsetY*u)
+    line(0, (camLockBorder*camera.groundPosition)*u, width, (camLockBorder*camera.groundPosition)*u) //top
+    line(0, unitToPixelY(yBottom), width, unitToPixelY(yBottom)) //bottom
   }
 }
 

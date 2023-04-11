@@ -1,10 +1,10 @@
 let Block = {
   height: 1,
   width: 1,
-  boxWidth: 0.8, //Size of hitbox
-  boxHeight: 0.8,
-  get boxOffsetX(){ return(this.width-this.boxWidth)*0.5},
-  get boxOffsetY(){ return(this.width-this.boxWidth)*0.5},
+  boxWidth: 1, //Size of hitbox
+  boxHeight: 1,
+  boxOffsetX: 0,
+  boxOffsetY: 0,
   yOffset: 0,
   xOffset:0
 }
@@ -55,8 +55,8 @@ let Portal = {
   yOffset: 0,
   xOffset:0
 }
-let objectList = [Block]
-//let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal}
+
+let objectList = {"Block": Block, "JumpOrb":JumpOrb, "Spike": Spike, "GravityOrb":JumpOrb, "JumpPad": JumpPad, "GreenOrb": JumpOrb, "LowJumpPad": JumpPad,"HighJumpPad": JumpPad, "GravityPad": JumpPad, "LowJumpOrb": JumpOrb, "HighJumpOrb": JumpOrb, "ShipPortal": Portal, "CubePortal": Portal, "MiniPortal": Portal, "BigPortal": Portal}
 
 
 function drawObject(object){
@@ -65,6 +65,11 @@ function drawObject(object){
 
 function collisionObject(player, object){
   if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x, player.y, player.width, player.height))collideObject(player, object)//this.collide(collider, this)
+}
+
+//Maybe this can be optimized since we know type == block
+function collisionBlockObject(player, object){
+  if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x+player.blockHitboxOffset, player.y-player.blockHitboxOffset, player.blockHitboxSize, player.blockHitboxSize))collideObject(player, object)//this.collide(collider, this)
 }
 
 function collideObject(player, object){
@@ -110,7 +115,7 @@ function collideObject(player, object){
     }break
     case "GravityPad":{
       if(object.used)break
-      player.jump(1.2);
+      player.jump(0.4);
       player.switchGravity();
       object.used = true;
     }break
@@ -126,9 +131,24 @@ function collideObject(player, object){
       player.jump(0.8)
       object.used = true
     }break
+    case "CubePortal":{
+      if(object.used)break
+      player.switchMode(0)
+      object.used = true
+    }break
     case "ShipPortal":{
       if(object.used)break
       player.switchMode(4)
+      object.used = true
+    }break
+    case "MiniPortal":{
+      if(object.used)break
+      player.switchToMini()
+      object.used = true
+    }break
+    case "BigPortal":{
+      if(object.used)break
+      player.switchToBig()
       object.used = true
     }break
   }
