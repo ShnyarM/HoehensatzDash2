@@ -122,7 +122,7 @@ function collideObject(player, object){
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.switchGravity()
-      player.jump(-0.5);
+      player.jump(-0.3);
       object.used = true
     }break
     case 104:{
@@ -135,22 +135,22 @@ function collideObject(player, object){
     }break
     case 105:{
       if(object.used)break
-      player.jump(1);
+      player.jump(1.5);
       object.used = true;
     }break
     case 106:{
       if(object.used)break
-      player.jump(0.8);
+      player.jump(0.9);
       object.used = true;
     }break
     case 107:{
       if(object.used)break
-      player.jump(1.5);
+      player.jump(1.9);
       object.used = true;
     }break
     case 108:{
       if(object.used)break
-      player.jump(0.4);
+      player.jump(0.3);
       player.switchGravity();
       object.used = true;
     }break
