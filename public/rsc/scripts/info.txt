@@ -1,0 +1,24 @@
+0: block
+
+50: spike
+
+100: orb
+101: pinkOrb
+102: redOrb
+103: gravityOrb
+104: GreenOrb
+105: jumpPad
+106: pinkpad
+107: redpad
+108: gravitypad
+
+120: CubePortal
+121: MiniPortal
+122: BigPortal
+123: ShipPortal
+124: BallPortal
+125: UfoPortal
+126: WavePortal
+127: RobotPortal
+128: SpiderPortal
+129: SwingCopterPortal

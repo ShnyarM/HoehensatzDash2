@@ -1,6 +1,11 @@
-let list = [["Spike", "Block", "JumpOrb", "JumpPad"], ["GravityOrb", "ShipPortal", "MiniPortal", "BigPortal"]]
+let editorList = [
+    [0],
+    [50],
+    [100, 101, 102, 103, 104, 105, 106, 107, 108, 120, 121, 122, 123, 124, 125, 126],
+    [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
+]
 let editorLevel;
-let editor = {type:"ShipPortal"}
+let editor = {type:0, category:"Orbs", rowNumb: 2, columNumb: 8}
 
 let editorWindow = {}
 
@@ -17,22 +22,22 @@ function setupEditor(){
 
 function drawEditor(){
     background("blue")
-    //drawBackground(editorLevel)
+
     drawGrid();
     drawLevel(editorLevel)
     drawEditorUI();
     if(mouseY < editorWindow.y){
         fill(255, 255, 255, 100)
-        unitImage(images[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1)
+        unitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1)
         if(mouseClick)editorLevel.addObject(new gameObject(editor.type, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY))))
     }else{
         if(mouseClick){
-            list.forEach((elem, parentIndex) => {
-                elem.forEach((element, index) => {
-                    let dim = {"x":width/4 +width/8*index, "y":editorWindow.y + editorWindow.height/10 + editorWindow.height/2*parentIndex, "width": editorWindow.height/3, "height": editorWindow.height/3}
-                    if(button(dim.x, dim.y, dim.width, dim.height))editor.type = element;
-                })
-            })
+            for(let j = 0; j < editor.rowNumb; j++){
+                for(let i = 0; i < editor.columNumb; i++){
+                    let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
+                    if(button(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight))editor.type = editorList[2][j*editor.columNumb+i]
+                }
+            }
         }
     }
 }
@@ -42,29 +47,37 @@ function drawEditorUI(){
     strokeWeight(0)
     rect(editorWindow.x, editorWindow.y, editorWindow.width, editorWindow.height)
     fill("green")
-    strokeWeight(0.04*u)
-    stroke(100, 200, 150)
-    list.forEach((elem, parentIndex) => {
-        elem.forEach((element, index) => {
-            let dim = {"x":width/4 +width/8*index, "y":editorWindow.y + editorWindow.height/10 + editorWindow.height/2*parentIndex, "width": editorWindow.height/3, "height": editorWindow.height/3}
-            rect(dim.x, dim.y, dim.width, dim.height);
-            image(images[element], dim.x + (objectList[element].xOffset * dim.width), dim.y - (objectList[element].yOffset * dim.height), dim.width * objectList[element].width, dim.height * objectList[element].height)
-        })
+
+    fill(40)
+    for(let j = 0; j < editor.rowNumb; j++){
+        for(let i = 0; i < editor.columNumb; i++){
+            let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
+            rect(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight)
+            image(objImages[editorList[2][j*editor.columNumb+i]], width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight)
+        }
+    }
+    editorList[2].forEach((element, index) => {
+        for(let i = 0; i < editor.rowNumb; i++){
+            //let dim = {"x":width/4 +width/8*index, "y":editorWindow.y + editorWindow.height/10 + editorWindow.height/2*parentIndex, "width": editorWindow.height/3, "height": editorWindow.height/3}
+            //rect(dim.x, dim.y, dim.width, dim.height);
+            //image(objImages[element], dim.x + (objectList[element].xOffset * dim.width), dim.y - (objectList[element].yOffset * dim.height), dim.width * objectList[element].width, dim.height * objectList[element].height)
+        }
     })
+
+    strokeWeight(0.04*u)
+    stroke(0)
     fill("red")
     rect(width*0.8, height*0.9, width*0.2, height*0.1)
-    textSize(0.5*u)
-    fill(0)
-    strokeWeight(0)
-    text("Save Level", width*0.9, height*0.95)
+
+    drawText("Save Level", width*0.9, height*0.95, 0.5*u)
     if(mouseClick&&button(width*0.8, height*0.9, width*0.2, height*0.1))editorLevel.saveLevel();
 
+    strokeWeight(0.04*u)
+    stroke(0) 
     fill("red")
     rect(0, height*0.9, width*0.2, height*0.1)
-    textSize(0.5*u)
-    fill(0)
-    strokeWeight(0)
-    text("Play Level", width*0.1, height*0.95)
+    drawText("Play Level", width*0.1, height*0.95, 0.5*u)
+
     if(mouseClick&&button(0, height*0.9, width*0.2, height*0.1)){
         gameState = 1;
         activeLevel = editorLevel;
@@ -86,4 +99,12 @@ function drawGrid(){
     stroke("black")
     line(0, unitToPixelY(0), width, unitToPixelY(0))
     line(unitToPixelX(0), 0, unitToPixelX(0), height)
+}
+
+function drawText(value, x, y, size = u, color = 0, strWeight = 0, strColor = 0){
+    strokeWeight(strWeight)
+    stroke(strColor)
+    fill(color)
+    textSize(size)
+    text(value, x, y)
 }

@@ -68,7 +68,6 @@ function openLevel(levelObj){
   activeLevel = levelObj;
 }
 
-//Leave current world and go back to main menu, kicked says if player was kicked by server
 function closeLevel(){ //ATTENTION
   gameState = 0;
   gamePaused = false
@@ -95,63 +94,72 @@ class Level{
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
-    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": [7, 237, 11], "fgColor": [0, 74, 1]}
+    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
+    
     if(mode == "read"){
       this.readData(data);
+    }else{
+      this.bgSprite = 0
+      this.fgSprite = 0
+      this.bgColor = "#FFFF00"
+      this.fgColor = "FF00FF"
+      this.levelName = "NewLevel"
+      this.musicLink = "/rsc/music/StereoMadness.mp4"
+      this.tintDeco();
     }
-    this.tintDeco();
   }
 
   readData(path){
     fetch(path)
-    .then((response) => response.json())
-    .then((json) => {
-      json.objects.forEach(element => {
-        this.addObject(new gameObject(element.type, element.x, element.y))
+    .then((response) => response.text())
+    .then((txt) => {
+
+      let splitTxt = split(txt, "~");
+      let blocks = split(splitTxt[0], "+");
+
+      blocks.forEach((element, index) => {
+        blocks[index] = split(element, "°");
+        blocks[index].forEach((elem, ind) => {
+          blocks[index][ind] = parseInt(elem)
+        })
       })
-      this.decoration = json.decoration
-      /*json.deathObjects.forEach(element => {
-        this.deathObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });
 
-      json.interactObjects.forEach(element => {
-        this.interactObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });
+      let metaData = split(splitTxt[1], "+")
 
-      json.groundObjects.forEach(element => {
-        this.groundObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });*/
+      this.bgSprite = parseInt(metaData[0].toString())
+      this.fgSprite = parseInt(metaData[1])
+      this.bgColor = metaData[2]
+      this.fgColor = metaData[3]
+      this.levelName = metaData[4]
+      this.musicLink = metaData[5]
+
+
+      blocks.forEach(element => {
+        console.log(element)
+        this.addObject(new gameObject(element[0], element[1], element[2]))
+      })
+      this.tintDeco();
     });
   }
 
   addObject(obj){
-    switch(obj.type){
-      case "Spike":
-        this.deathObjects.push(obj); 
-        break
-      case "Block":
+    console.log(obj)
+    switch(true){
+      case obj.id < 50:
         this.groundObjects.push(obj);
         break;
-        case "JumpOrb":
-        case "LowJumpOrb":
-        case "HighJumpOrb":
-        case "GravityOrb":
-        case "GreenOrb":
-        case "JumpPad":
-        case "HighJumpPad":
-        case "LowJumpPad":
-        case "GravityPad":
-        case "ShipPortal":
-        case "CubePortal":
-        case "MiniPortal":
-        case "BigPortal":
+      
+      case obj.id < 100:
+        this.deathObjects.push(obj); 
+        break
+      case obj.id >= 100:
         this.interactObjects.push(obj)
         break
-        }
+    }
   }
 
-  saveLevel(path){
-    let levelSave = {
+  saveLevel(path){ // TEMPORARY: get e txt file with useable level data
+    /*let levelSave = {
       "objects":[],
       "decoration": this.decoration
     }
@@ -166,19 +174,39 @@ class Level{
       levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
     });
     var levelJson = JSON.stringify(levelSave);
-    console.log(levelJson)
-    download("level.txt", levelJson)
+    console.log(levelJson)*/
+    let levelSave = ""
+    
+    this.deathObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+
+    this.interactObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+
+    this.groundObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+    levelSave = levelSave.substring(0,levelSave.length-1);
+
+    levelSave += "~"
+    levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
+    levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
+    levelSave += "+LevelName+/rsc/music/StereoMadness.mp4" // song link
+
+    download("level.hd", levelSave)
   }
 
   tintDeco(){
-    let bg = images.bg[this.decoration.bgSprite];
-    let fg = images.fg[this.decoration.fgSprite]
+    let bg = images.bg[this.bgSprite];
+    let fg = images.fg[this.fgSprite]
     let coloredBg = createGraphics(bg.width, bg.height) //create new canvas which will become bg image
-    coloredBg.tint(...this.decoration.bgColor)
+    coloredBg.tint(this.bgColor)
     coloredBg.image(bg, 0, 0, bg.width, bg.height) //Draw white bg image to canvas with tint
-    console.log(this.decoration.fgColor)
+    console.log(this.fgColor)
     let coloredFg = createGraphics(fg.width, fg.height) //create new canvas which will become bg image
-    coloredFg.tint(...this.decoration.fgColor)
+    coloredFg.tint(this.fgColor)
     coloredFg.image(fg, 0, 0, fg.width, fg.height) //Draw white bg image to canvas with tint
 
     this.bg = coloredBg;
@@ -187,7 +215,7 @@ class Level{
   
 }
 
-function download(filename, text) {
+function download(filename, text) { //TEMPORARY: used to download files
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', filename);
