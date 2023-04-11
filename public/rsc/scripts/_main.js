@@ -8,7 +8,7 @@ let mouseClick = false //says if mouse was pressed in that frame, updated is use
 
 function setup() {
   canvas = createCanvas(1, 1)
-  //textFont(pixelDownFont)
+  //textFont() Maybe custom Font?
   noSmooth()
   windowResized();
   angleMode(DEGREES)

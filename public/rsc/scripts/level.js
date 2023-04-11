@@ -68,7 +68,6 @@ function openLevel(levelObj){
   activeLevel = levelObj;
 }
 
-//Leave current world and go back to main menu, kicked says if player was kicked by server
 function closeLevel(){ //ATTENTION
   gameState = 0;
   gamePaused = false
@@ -95,9 +94,18 @@ class Level{
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
-    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": [7, 237, 11], "fgColor": [0, 74, 1]}
+    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
+    
     if(mode == "read"){
       this.readData(data);
+    }else{
+      this.bgSprite = 0
+      this.fgSprite = 0
+      this.bgColor = "#FFFF00"
+      this.fgColor = "FF00FF"
+      this.levelName = "NewLevel"
+      this.musicLink = "/rsc/music/StereoMadness.mp4"
+      this.tintDeco();
     }
   }
 
@@ -131,40 +139,27 @@ class Level{
         this.addObject(new gameObject(element[0], element[1], element[2]))
       })
       this.tintDeco();
-      /*
-      this.decoration = json.decoration
-      json.deathObjects.forEach(element => {
-        this.deathObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });
-
-      json.interactObjects.forEach(element => {
-        this.interactObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });
-
-      json.groundObjects.forEach(element => {
-        this.groundObjects.push(new gameObject(element.type, element.x, element.y)); 
-      });*/
     });
   }
 
   addObject(obj){
     console.log(obj)
     switch(true){
-      case obj.id < 30:
+      case obj.id < 50:
         this.groundObjects.push(obj);
         break;
       
-      case obj.id < 60:
+      case obj.id < 100:
         this.deathObjects.push(obj); 
         break
-      case obj.id >= 60:
+      case obj.id >= 100:
         this.interactObjects.push(obj)
         break
     }
   }
 
-  saveLevel(path){
-    let levelSave = {
+  saveLevel(path){ // TEMPORARY: get e txt file with useable level data
+    /*let levelSave = {
       "objects":[],
       "decoration": this.decoration
     }
@@ -179,8 +174,28 @@ class Level{
       levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
     });
     var levelJson = JSON.stringify(levelSave);
-    console.log(levelJson)
-    download("level.txt", levelJson)
+    console.log(levelJson)*/
+    let levelSave = ""
+    
+    this.deathObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+
+    this.interactObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+
+    this.groundObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+    levelSave = levelSave.substring(0,levelSave.length-1);
+
+    levelSave += "~"
+    levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
+    levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
+    levelSave += "+LevelName+/rsc/music/StereoMadness.mp4" // song link
+
+    download("level.hd", levelSave)
   }
 
   tintDeco(){
@@ -200,7 +215,7 @@ class Level{
   
 }
 
-function download(filename, text) {
+function download(filename, text) { //TEMPORARY: used to download files
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', filename);
