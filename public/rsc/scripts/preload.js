@@ -1,4 +1,5 @@
 let icon, images = {bg:[], fg:[]}, objImages=[]
+let endlessObstacles = []
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -43,4 +44,13 @@ function preload(){
   images.MiniPortal = loadImage("rsc/images/MiniPortal.png")
   images.BigPortal = loadImage("rsc/images/BigPortal.png")
   console.log(images)*/
+
+  loadStrings("rsc/levels/obstacles.txt", obstacles => {
+    for(let i = 0; i < obstacles.length; i++){//split blocks
+      endlessObstacles[i] = split(obstacles[i], "+")
+      for(let j = 0; j < endlessObstacles[i].length; j++){ //split elements of block
+        endlessObstacles[i][j] = split(endlessObstacles[i][j], "°")
+      }
+    }
+  })
 }

@@ -21,7 +21,7 @@ function setup() {
 }
 
 function draw() {
-  sdeltaTime=(deltaTime/1000)*timescale //convert deltatime into seconds and multiplay with timescale
+  sdeltaTime=(deltaTime/1000)*timescale //convert deltatime into seconds and multiply with timescale
 
   background("#1b71c3") 
   switch(gameState){
@@ -49,6 +49,7 @@ function draw() {
 function drawUI(){
   if(debug) drawFramerate()
   if(gamePaused) drawPauseMenu()
+  if(endless) endlessUI()
 }
 
 function drawFramerate(){

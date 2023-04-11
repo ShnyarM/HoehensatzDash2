@@ -20,7 +20,12 @@ function drawMainMenu(){
   buttonRect(width*0.25, height / 2.5 - height / 8, width / 5, height/ 10, "Play", height / 45, () => { //get own world
     openLevel(new Level("read", "/rsc/levels/1.hd"))
   })
+  
   buttonRect(width*0.25, height / 2.5 + height / 8, width / 5, height/ 10, "Level Editor", height / 45, () => { //get own world
     setupEditor()
+  })
+
+  buttonRect(width*0.25, height / 2.5 + (height / 8)*2, width / 5, height/ 10, "Endless", height / 45, () => { //get own world
+    openEndless()
   })
 }

@@ -17,10 +17,14 @@ function playLevel(){
   drawLevel(activeLevel);
   drawForeground(activeLevel)
   cameraUpdate();
+  if(endless) endlessUpdate(activeLevel)
+  else activeLevel.placeObjects() //place new objects
+  activeLevel.deleteObjects()
 }
 
 //draw background
 function drawBackground(levelObj){
+  if(!levelObj.bg) return //Fixes bug where game crashes when bg image hasnt loaded, temporary fix
   const backStart = floor((camera.offsetX/parallaxFactor)/backgroundSize) //Get index of first image
   for(let i = backStart; i <= backStart+ceil(uwidth/backgroundSize); i++){ //Draw all background tiles
     image(levelObj.bg, (backgroundSize*i-camera.offsetX / parallaxFactor) * u, (10-camera.offsetY / parallaxFactor) * -u, backgroundSize * u, backgroundSize * u)
@@ -29,6 +33,7 @@ function drawBackground(levelObj){
 
 //Draw Foreground
 function drawForeground(levelObj){
+  if(!levelObj.fg) return //Fixes bug where game crashes when fg image hasnt loaded, temporary fix
   if(!camera.locked){ //Camera not locked (for example cube), draw ground normally
     if(camera.offsetY - uheight < 0){ //Draw ground if visible
       const groundStart = floor(camera.offsetX/groundTileSize) //# of first ground tile, increases as player goes forward
@@ -60,7 +65,7 @@ function drawForeground(levelObj){
   }
 }
 
-//Join a game, first part of Setup, second part starts in serverClient.js (update player and camera), and then third part starts (map)
+//open a level
 function openLevel(levelObj){
   gameState = 1;
   playerSetup();
@@ -71,6 +76,7 @@ function openLevel(levelObj){
 function closeLevel(){ //ATTENTION
   gameState = 0;
   gamePaused = false
+  endless = false
   
   delete activeLevel
   deleteCamera()
@@ -79,18 +85,33 @@ function closeLevel(){ //ATTENTION
 
 //reset and restart current level
 function resetLevel(levelObj){ //ATTENTION
+  /*if(endless){ //Delete everything if in endless mode
+    resetEndless(levelObj)
+  }else{
+    //Setup everything again
+    levelObj.interactObjects.forEach(element => {
+      element.used = false   
+    });
+  }*/
 
-  //Setup everything again
-  levelObj.interactObjects.forEach(element => {
-    element.used = false   
-  });
+  levelObj.interactObjects = [] //Delete all objects
+  levelObj.groundObjects = []
+  levelObj.deathObjects = []
+
+  if(endless) resetEndless(levelObj)
+  else{
+    levelObj.placementIndex = 0
+  }
 
   playerSetup()
   cameraSetup()
+  levelObj.placeObjects() //Place all objects that are already in view at start
 }
 
 class Level{
   constructor(mode, data){
+    this.allObjects = []
+    this.placementIndex = 0 //Which block in allObjects has to be placed next
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
@@ -105,6 +126,7 @@ class Level{
       this.fgColor = "FF00FF"
       this.levelName = "NewLevel"
       this.musicLink = "/rsc/music/StereoMadness.mp4"
+
       this.tintDeco();
     }
   }
@@ -123,6 +145,8 @@ class Level{
           blocks[index][ind] = parseInt(elem)
         })
       })
+      this.allObjects = blocks
+      console.log(this.allObjects)
 
       let metaData = split(splitTxt[1], "+")
 
@@ -132,14 +156,45 @@ class Level{
       this.fgColor = metaData[3]
       this.levelName = metaData[4]
       this.musicLink = metaData[5]
+      this.placeObjects() //place all objects that are already in view at start
 
 
-      blocks.forEach(element => {
+      /*blocks.forEach(element => {
         console.log(element)
         this.addObject(new gameObject(element[0], element[1], element[2]))
-      })
+      })*/
       this.tintDeco();
     });
+  }
+
+  //Check if new objects has to be placed
+  placeObjects(){
+    while(this.placementIndex < this.allObjects.length && this.allObjects[this.placementIndex][1] < camera.offsetX+uwidth){ //place new object if in view of camera
+      this.addObject(new gameObject(this.allObjects[this.placementIndex][0], this.allObjects[this.placementIndex][1], this.allObjects[this.placementIndex][2]))
+      this.placementIndex++
+      console.log("new object placed")
+    }
+  }
+
+  //Delete objects that arent in view anymore
+  deleteObjects(){
+    while(this.groundObjects[0] && this.groundObjects[0].x+this.groundObjects[0].width < camera.offsetX){
+      delete this.groundObjects[0]
+      this.groundObjects.splice(0, 1)
+      console.log("deleted")
+    }
+
+    while(this.interactObjects[0] && this.interactObjects[0].x+this.interactObjects[0].width < camera.offsetX){
+      delete this.interactObjects[0]
+      this.interactObjects.splice(0, 1)
+      console.log("deleted")
+    }
+
+    while(this.deathObjects[0] && this.deathObjects[0].x+this.deathObjects[0].width < camera.offsetX){
+      delete this.deathObjects[0]
+      this.deathObjects.splice(0, 1)
+      console.log("deleted")
+    }
   }
 
   addObject(obj){
@@ -176,8 +231,16 @@ class Level{
     var levelJson = JSON.stringify(levelSave);
     console.log(levelJson)*/
     let levelSave = ""
+
+    //put all objects in one array and sort by x coordinate
+    let allObjects = [...this.deathObjects, ...this.interactObjects, ...this.groundObjects]
+    allObjects.sort((a, b) => (a.x > b.x) ? 1 : -1)
+    console.log(allObjects)
     
-    this.deathObjects.forEach(element => {
+    allObjects.forEach(element => {
+      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+    });
+    /*this.deathObjects.forEach(element => {
       levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
     });
 
@@ -187,7 +250,7 @@ class Level{
 
     this.groundObjects.forEach(element => {
       levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
-    });
+    });*/
     levelSave = levelSave.substring(0,levelSave.length-1);
 
     levelSave += "~"
