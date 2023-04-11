@@ -60,7 +60,7 @@ let objectList = [Block]
 
 
 function drawObject(object){
-  unitImage(objImages[object.type], object.x, object.y, object.width, object.height)
+  unitImage(objImages[object.id], object.x, object.y, object.width, object.height)
 }
 
 function collisionObject(player, object){
@@ -68,9 +68,8 @@ function collisionObject(player, object){
 }
 
 function collideObject(player, object){
-  switch (object.type){
-    case "Spike":
-    case "Block":{
+  switch (true){
+    case object.id < 40:{
       player.dead = true;
     }break
     case "JumpOrb":{

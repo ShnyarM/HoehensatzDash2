@@ -344,7 +344,7 @@ class Player{
 
     //check for obsticles
     levelObj.groundObjects.forEach(element => {
-      collisionObject(this, element)   
+      collisionObject(this, element)  
     });
     levelObj.deathObjects.forEach(element => {
       collisionObject(this, element)   

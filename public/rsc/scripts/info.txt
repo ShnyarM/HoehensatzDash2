@@ -1,0 +1,7 @@
+block: 0
+
+spike: 50
+
+orb:100
+pinkOrb:101
+redOrb:102
