@@ -13,6 +13,7 @@ function setup() {
   windowResized();
   angleMode(DEGREES)
   frameRate(120)
+  defineModeConstants() //Define modeconstants in modeConstants.js
 
   //Stop contextmenu
   canvas.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -204,6 +205,25 @@ function rotateImage(img, x, y, l, h, rotAmn){
 //Draw a rotated image in unit coordinates
 function rotateUnitImage(img, x, y, l, h, rotAmn){
   rotateImage(img, (x-camera.offsetX)*u+(l*u*0.5), (y-camera.offsetY)*-u+(h*u*0.5), l*u, h*u, rotAmn)
+}
+
+//Draw a rotated image, flipped
+function rotateImageFlipped(img, x, y, l, h, rotAmn){
+  imageMode(CENTER);
+  translate(x, y)
+  rotate(rotAmn)
+  push()
+  scale(-1, 1)
+  image(img, 0, 0, l, h)
+  pop()
+  rotate(-rotAmn)
+  translate(-x, -y)
+  imageMode(CORNER)
+}
+
+//Draw a rotated image in unit coordinates, flipped
+function rotateUnitImageFlipped(img, x, y, l, h, rotAmn){
+  rotateImageFlipped(img, (x-camera.offsetX)*u+(l*u*0.5), (y-camera.offsetY)*-u+(h*u*0.5), l*u, h*u, rotAmn)
 }
 
 //Detect collision between objects with pos and size

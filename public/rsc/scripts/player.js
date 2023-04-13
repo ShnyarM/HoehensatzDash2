@@ -1,87 +1,4 @@
 let player; //Own Player
-let modeConstants = {
-  "0":{ //cube, default values
-    width: 1,
-    height: 1,
-    gravityStrength: 73.5,
-    ceilingDeath: true,
-    cameraLock: false,
-    rotationActive: true,
-    jumpStrength: 17.5,
-    terminalVelocityActive: true,
-    drawnWidth: 1,
-    drawnHeight: 1,
-    blockHitboxSize: 0.4,
-    blockHitboxOffset: 0.3
-  },
-  "1":{ //Ship
-    gravityStrength: 30,
-    ceilingDeath: false,
-    cameraLock: true,
-    rotationActive: false,
-    terminalVelocityActive: false
-  },
-  "2":{ //Ball
-    gravityStrength: 40,
-    cameraLock: true,
-    terminalVelocityActive: false
-  },
-  "3":{ //Ufo
-    gravityStrength: 40,
-    ceilingDeath: false,
-    cameraLock: true,
-    rotationActive: false,
-    jumpStrength: 12,
-    terminalVelocityActive: false
-  },
-  "4":{ //Wave
-    gravityStrength: 0,
-    ceilingDeath: false,
-    cameraLock: true,
-    rotationActive: false,
-  },
-  "5":{ //Robot
-    rotationActive: false,
-  },
-  "6":{ //Spider
-    cameraLock: true,
-    rotationActive: false,
-    terminalVelocityActive: false
-  },
-  "7":{ //Swing Copter
-    gravityStrength: 40,
-    ceilingDeath: false,
-    cameraLock: true,
-    rotationActive: false,
-    terminalVelocityActive: false
-  },
-  "10":{ //mini cube
-    width: 0.5,
-    height: 0.5,
-    drawnWidth: 0.5,
-    drawnHeight: 0.5,
-    blockHitboxSize: 0.2,
-    blockHitboxOffset: 0.15,
-    jumpStrength: 14,
-  },
-  "11":{ //mini Ship
-    gravityStrength: 50,
-  },
-  "12":{ //mini Ball
-    gravityStrength: 50,
-  },
-  "13":{ //mini Ufo
-    gravityStrength: 40,
-    jumpStrength: 9,
-  },
-  "15":{ //mini Robot
-    rotationActive: false,
-    jumpStrength: 8,
-  },
-  "17":{ //mini Swing Copter
-    gravityStrength: 50,
-  }
-}
 
 function playerSetup(){
   player = new Player()
@@ -93,7 +10,7 @@ function playerUpdate(levelObj){
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
     player.update(levelObj);
     player.draw()
-    //player.drawHitbox()
+    player.drawHitbox()
   }else{
     player.deathAnimation(levelObj)
   }
@@ -135,6 +52,7 @@ class Player{
     this.drawnHeight = 1
     this.drawOffsetX = 0 //By how much draw will be offset in positive X
     this.drawOffsetY = 0 //By how much draw will be offset in positive Y
+    this.image = icon
 
     this.xVelocity = 9
     this.yVelocity = 0
@@ -150,9 +68,9 @@ class Player{
     this.ceilingDeath = true
 
     this.rotation = 0
-    this.rotationAdjustSpeed = 500 //How fast rotation adjust to get into locked position
+    this.rotationAdjustSpeed = 700 //How fast rotation adjust to get into locked position
     this.rotationSpeed = 360
-    this.rotationBackfireThreshold = 35 //If difference from last 90 degrees rotation point is less than this when landing, rotation will be set back instead smoothly increasing till next 90 degrees point
+    this.rotationBackfireThreshold = 45 //If difference from last 90 degrees rotation point is less than this when landing, rotation will be set back instead smoothly increasing till next 90 degrees point
 
     this.input = false
     this.onGround = true
@@ -175,6 +93,11 @@ class Player{
     this.robotBoostStrength = 107 //How strong jump is, constant
     this.canRobotJump = true  //shows if player is allowed to thrust
 
+    //Used for walking animations of spider and robot
+    this.walkAnimation = 0 //At which point walking animation for spider and robot is
+    this.walkAnimationSpeed = 15 //how fast animation goes
+    this.robotAnimationDirection = 1 //In which direction animation is currently going, changes in this.robotAnimation
+
     Object.assign(this, modeConstants[0]) //Set default values
     Object.assign(this, modeConstants[this.gameMode])
   }
@@ -183,16 +106,19 @@ class Player{
   draw(){
     fill("red")
 
-    if(this.rotation % 90 == 0) unitImage(icon, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
-    else rotateUnitImage(icon, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
-
-    //unitRect(this.x, this.y, this.width, this.height)
+    if(this.gravitySwitch == -1 && this.gameMode != 0 && this.gameMode != 2 && this.gameMode != 4 && this.gameMode != 7){ //If upside and not cube, ball, wave or swing copter, flip image upside down
+      rotateUnitImageFlipped(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, 180+this.rotation)
+    }else{
+      if(this.rotation % 90 == 0) unitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
+      else rotateUnitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
+    }
   }
 
   //Draws Hitbox of player
   drawHitbox(){
     fill(color(0, 0, 0, 0))
     stroke("red")
+    strokeWeight(0.05*u)
     unitRect(this.x, this.y, this.width, this.height) //Normal hitbox
 
     stroke("blue")
@@ -247,6 +173,8 @@ class Player{
   //Switch to new gamemode
   switchMode(newMode){
     if(newMode == this.gameMode || !modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
+    const oldWidth = this.width //Save width and height before change
+    const oldHeight = this.height
 
     this.gameMode = newMode //assign new Mode
     Object.assign(this, modeConstants[0]) //Apply default values before applying values of new Mode$
@@ -262,30 +190,51 @@ class Player{
       this.wavePoints = []
       this.wavePoints.push([this.x+0.5*this.width, this.y-0.5*this.height])
     }
+
+    this.adjustXPosition(oldWidth)
+    this.adjustYPosition(oldHeight)
   }
 
   //Make player mini
   switchToMini(){
     if(this.mini) return //Dont do anything if already mini
+    const oldWidth = this.width //Save width and height before change
+    const oldHeight = this.height
 
     Object.assign(this, modeConstants[10]) //Apply default values of mini
     Object.assign(this, modeConstants[this.gameMode+10]) //apply mini values of current mode
-    this.x = this.x+0.5 //Change x position so end of player stays at same point
-    this.y = this.y-0.25 //Change y position so middle is still in middle
 
     this.mini = true
+    this.adjustXPosition(oldWidth)
+    this.adjustYPosition(oldHeight)
   }
 
   //Make player Big
   switchToBig(){
     if(!this.mini) return //Dont do anything if already Big
+    const oldWidth = this.width //Save width and height before change
+    const oldHeight = this.height
 
     Object.assign(this, modeConstants[0]) //Apply default values
     Object.assign(this, modeConstants[this.gameMode]) //apply values of current mode
-    this.x = this.x-0.5 //Change x position so end of player stays at same point
-    this.y = this.y+0.25 //Change y position so middle is still in middle
 
     this.mini = false
+    this.adjustXPosition(oldWidth)
+    this.adjustYPosition(oldHeight)
+  }
+
+  //Adjust position after changing width so the players end stays at the same place
+  adjustXPosition(oldWidth){
+    if(oldWidth == this.width) return
+    
+    this.x = this.x+(oldWidth-this.width)
+  }
+
+  //Adjust position after changing height so the players mid position stays at the same place
+  adjustYPosition(oldHeight){
+    if(oldHeight == this.height) return
+    
+    this.y = this.y-((oldHeight-this.height)*0.5)
   }
 
   //Check if button to perform action is clicked
@@ -311,7 +260,7 @@ class Player{
 
   //Change rotation based on what is happening
   applyRotationChange(){
-    if(this.rotationActive){ //Current gamemode has normal rotation (spin when in air)
+    if(this.gameMode == 0){ //cube
       if(!this.onGround) this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch //Spin when in air
       else if(this.rotation % 90 != 0){ //Adjust player rotation once ground is hit
         const rotationBefore = this.rotation //Save rotation player had before adding
@@ -328,6 +277,8 @@ class Player{
       const tanAlpha = -this.yVelocity/this.xVelocity //Get tan of angle
       const alpha = atan(tanAlpha) //Get degree alpha
       this.rotation = alpha
+    }else if(this.gameMode == 2){ //Ball
+      this.rotation += this.rotationSpeed*sdeltaTime*this.gravitySwitch //constant rotation
     }
   }
 
@@ -452,6 +403,34 @@ class Player{
     this.yVelocityBefore = this.yVelocity //Store for next frame
   }
 
+  //Animate robot walking animation
+  robotAnimation(){
+    this.walkAnimation += this.walkAnimationSpeed*this.robotAnimationDirection*sdeltaTime //Progress animation
+    if(this.walkAnimation >= 4.5){ //Change direction if an maximum was hit
+      this.robotAnimationDirection = -this.robotAnimationDirection
+      this.walkAnimation = 4.5
+    }else if(this.walkAnimation < 0.5){
+      this.robotAnimationDirection = -this.robotAnimationDirection
+      this.walkAnimation = 0.5
+    }
+
+    //Choose frame to show in current frame
+    if(this.onGround) this.image = robotImgs[floor(this.walkAnimation)]
+    else this.image = robotJump //If in air show jump frame
+  }
+
+  //Animate spider walking animation
+  spiderAnimation(){
+    this.walkAnimation += this.walkAnimationSpeed*sdeltaTime //Progress animation
+    if(this.walkAnimation >= 5){ //reset to zero if max was hit
+      this.walkAnimation = 0
+    }
+
+    //Choose frame to show in current frame
+    if(this.onGround) this.image = spiderImgs[floor(this.walkAnimation)]
+    else this.image = spiderJump //If in air show jump frame
+  }
+
   //Apply upwards velocity to player, strength is how strong with 1 = normal jump
   jump(strength = 1){
     this.yVelocity = this.jumpStrength*strength*this.gravitySwitch
@@ -529,9 +508,11 @@ class Player{
         break;
       case 5:
         this.robotInput()
+        this.robotAnimation()
         break;
       case 6:
         this.spiderInput(levelObj)
+        this.spiderAnimation()
         break;
       case 7:
         this.swingCopterInput()

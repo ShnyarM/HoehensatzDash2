@@ -5,7 +5,7 @@ let editorList = [
     [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
 ]
 let editorLevel;
-let editor = {type:0, category:"Orbs", rowNumb: 2, columNumb: 8}
+let editor = {type:128, category:"Orbs", rowNumb: 2, columNumb: 8}
 
 let editorWindow = {}
 

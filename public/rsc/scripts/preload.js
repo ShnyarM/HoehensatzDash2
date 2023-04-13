@@ -1,8 +1,23 @@
-let icon, images = {bg:[], fg:[]}, objImages=[]
+let images = {bg:[], fg:[]}, objImages=[]
 let endlessObstacles = []
+let icon, ship, ball, ufo, wave, swingCopter
+let robotImgs = [], robotJump
+let spiderImgs = [], spiderJump
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
+  ship = loadImage("rsc/images/ship.png")
+  ball = loadImage("rsc/images/ball.png")
+  ufo = loadImage("rsc/images/ufo.png")
+  wave = loadImage("rsc/images/wave.png")
+  swingCopter = loadImage("rsc/images/swingCopter.png")
+
+  for(let i = 0; i < 5; i++) robotImgs[i] = loadImage("rsc/images/robotFrames/" + i + ".png")
+  robotJump = loadImage("rsc/images/robotFrames/jump.png")
+
+  for(let i = 0; i < 5; i++) spiderImgs[i] = loadImage("rsc/images/spiderFrames/" + i + ".png")
+  spiderJump = loadImage("rsc/images/spiderFrames/jump.png")
+
   images.bg[0] = loadImage("rsc/images/bg.png")
   images.fg[0] = loadImage("rsc/images/ground.png")
   objImages[0] = loadImage("rsc/images/block.png")
