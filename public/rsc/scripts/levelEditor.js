@@ -5,7 +5,8 @@ let editorList = [
     [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
 ]
 let editorLevel;
-let editor = {type:128, category:"Orbs", rowNumb: 2, columNumb: 8}
+let editor = {type:50, category:"Orbs", rowNumb: 2, columNumb: 8}
+let editorPlaytest = false
 
 let editorWindow = {}
 
@@ -79,11 +80,53 @@ function drawEditorUI(){
     drawText("Play Level", width*0.1, height*0.95, 0.5*u)
 
     if(mouseClick&&button(0, height*0.9, width*0.2, height*0.1)){
-        gameState = 1;
-        activeLevel = editorLevel;
-    playerSetup()
-    cameraSetup()
+      startEditorLevel()
     }
+}
+
+//Playtest level in editor
+function startEditorLevel(){
+  //convert three arrays into one allobjects array which can be read to place blocks
+  let allObjects = [...editorLevel.deathObjects, ...editorLevel.interactObjects, ...editorLevel.groundObjects]
+  allObjects.sort((a, b) => (a.x > b.x) ? 1 : -1)
+  for(const o in allObjects){
+    const convertedData = convertObjToStringForm(allObjects[o])
+    editorLevel.allObjects.push(convertedData)
+  }
+
+  //Delete all objects
+  editorLevel.interactObjects = [];
+  editorLevel.groundObjects = [];
+  editorLevel.deathObjects=[];
+
+  //Start game
+  gameState = 1;
+  editorPlaytest = true
+  activeLevel = editorLevel;
+  activeLevel.song.play()
+  playerSetup()
+  cameraSetup()
+}
+
+function stopEditorLevel(){
+  //open editor
+  gameState = 2;
+  editorPlaytest = false
+  editorLevel.song.stop()
+  
+  //Delete all objects
+  editorLevel.interactObjects = [];
+  editorLevel.groundObjects = [];
+  editorLevel.deathObjects=[];
+
+  //Place all blocks again
+  for(const obj of editorLevel.allObjects){
+    console.log(obj)
+    editorLevel.addObject(new gameObject(obj[0], obj[1], obj[2]))
+  }
+
+  editorLevel.allObjects = [] //Clear
+  editorLevel.placementIndex = 0
 }
 
 function drawGrid(){

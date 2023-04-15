@@ -25,6 +25,7 @@ function defineModeConstants(){
       terminalVelocityActive: false,
       drawnWidth: 1.295,
       drawOffsetX: -0.1475,
+      jumpStrength: 7,
       image: ship
     },
     "2":{ //Ball
@@ -35,6 +36,7 @@ function defineModeConstants(){
       drawnHeight: 1.1,
       drawOffsetX: -0.05,
       drawOffsetY: 0.05,
+      jumpStrength: 12,
       image: ball
     },
     "3":{ //Ufo
@@ -66,19 +68,22 @@ function defineModeConstants(){
       drawnWidth: 1.1
     },
     "6":{ //Spider
+      gravityStrength: 45,
       drawnWidth: 1.2,
       drawnHeight: 1.15,
       drawOffsetX: -0.2,
       drawOffsetY: 0.1,
       cameraLock: true,
       rotation: 0,
-      terminalVelocityActive: false
+      terminalVelocityActive: false,
+      jumpStrength: 12,
     },
     "7":{ //Swing Copter
-      gravityStrength: 40,
+      gravityStrength: 35,
       ceilingDeath: false,
       cameraLock: true,
       terminalVelocityActive: false,
+      jumpStrength: 10,
       image: swingCopter
     },
     "10":{ //mini cube
@@ -92,6 +97,7 @@ function defineModeConstants(){
     },
     "11":{ //mini Ship
       gravityStrength: 40,
+      jumpStrength: 10,
       drawnWidth: 0.6475,
       drawOffsetX: -0.07375,
     },
@@ -99,6 +105,7 @@ function defineModeConstants(){
       gravityStrength: 50,
       drawnWidth: 0.6,
       drawnHeight: 0.6,
+      jumpStrength: 12
     },
     "13":{ //mini Ufo
       gravityStrength: 40,
@@ -116,13 +123,15 @@ function defineModeConstants(){
       drawOffsetY: 0.05,
     },
     "15":{ //mini Robot
-      jumpStrength: 8,
+      jumpStrength: 12,
       drawnWidth: 0.6
     },
     "16":{ //mini spider
+      gravityStrength: 50,
       drawnWidth: 0.6,
       drawnHeight: 0.55,
       drawOffsetX: -0.1,
+      jumpStrength: 12
     },
     "17":{ //mini Swing Copter
       gravityStrength: 50,

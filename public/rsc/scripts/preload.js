@@ -3,6 +3,7 @@ let endlessObstacles = []
 let icon, ship, ball, ufo, wave, swingCopter
 let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
+let objectInfo
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -20,7 +21,18 @@ function preload(){
 
   images.bg[0] = loadImage("rsc/images/bg.png")
   images.fg[0] = loadImage("rsc/images/ground.png")
-  objImages[0] = loadImage("rsc/images/block.png")
+
+  loadJSON("rsc/json/objects.json", data => {
+    objectInfo = data
+    for(const id in objectInfo){
+      objImages[id] = loadImage("rsc/images/objects/"+id+".png")
+    }
+    console.log(objImages)
+  })
+
+  
+
+  /*objImages[0] = loadImage("rsc/images/block.png")
   objImages[50] = loadImage("rsc/images/spike.png")
   objImages[100] = loadImage("rsc/images/yellowOrb.png")
   objImages[101] = loadImage("rsc/images/pinkOrb.png")
@@ -42,6 +54,11 @@ function preload(){
   objImages[127] = loadImage("rsc/images/robotPortal.png")
   objImages[128] = loadImage("rsc/images/spiderPortal.png")
   objImages[129] = loadImage("rsc/images/swingcopterPortal.png")
+  objImages[130] = loadImage("rsc/images/Speed0.png")
+  objImages[131] = loadImage("rsc/images/Speed1.png")
+  objImages[132] = loadImage("rsc/images/Speed2.png")
+  objImages[133] = loadImage("rsc/images/Speed3.png")
+  objImages[134] = loadImage("rsc/images/Speed4.png")
 
   /*images.Spike = loadImage("rsc/images/spike.png")
   images.Block = loadImage("rsc/images/block.png")

@@ -2,8 +2,8 @@
 let activeLevel;
 const groundTileSize = 5 //Size of single groundtile
 const backgroundSize = 20, parallaxFactor = 15 //size of background tile and parralax Strength
-const jumpPadStrength = 1.5
 const ceilingLimit = 140
+let openingLevel = false //says if game is currently opening level, used to prevent multiple levels from opening at oncc
 
 function drawLevel(levelObj){
   levelObj.groundObjects.forEach(element => drawObject(element));
@@ -20,11 +20,15 @@ function playLevel(){
   if(endless) endlessUpdate(activeLevel)
   else activeLevel.placeObjects() //place new objects
   activeLevel.deleteObjects()
+
+  //Draw exit button when in editorPlaytest mode
+  if(editorPlaytest) buttonRect(width*0.05, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+    stopEditorLevel()
+  })
 }
 
 //draw background
 function drawBackground(levelObj){
-  if(!levelObj.bg) return //Fixes bug where game crashes when bg image hasnt loaded, temporary fix
   const backStart = floor((camera.offsetX/parallaxFactor)/backgroundSize) //Get index of first image
   for(let i = backStart; i <= backStart+ceil(uwidth/backgroundSize); i++){ //Draw all background tiles
     image(levelObj.bg, (backgroundSize*i-camera.offsetX / parallaxFactor) * u, (10-camera.offsetY / parallaxFactor) * -u, backgroundSize * u, backgroundSize * u)
@@ -33,7 +37,6 @@ function drawBackground(levelObj){
 
 //Draw Foreground
 function drawForeground(levelObj){
-  if(!levelObj.fg) return //Fixes bug where game crashes when fg image hasnt loaded, temporary fix
   if(!camera.locked){ //Camera not locked (for example cube), draw ground normally
     if(camera.offsetY - uheight < 0){ //Draw ground if visible
       const groundStart = floor(camera.offsetX/groundTileSize) //# of first ground tile, increases as player goes forward
@@ -66,18 +69,26 @@ function drawForeground(levelObj){
 }
 
 //open a level
-function openLevel(levelObj){
-  gameState = 1;
-  playerSetup();
-  cameraSetup();
-  activeLevel = levelObj;
+function openLevel(type, path = ""){
+  if(openingLevel) return //Stop if a level is already being opened
+
+  openingLevel = true
+  activeLevel = new Level(type, path, () => {
+    gameState = 1;
+    playerSetup();
+    cameraSetup();
+    activeLevel.song.play()
+    openingLevel = false
+  })
 }
 
 function closeLevel(){ //ATTENTION
   gameState = 0;
   gamePaused = false
   endless = false
+  editorPlaytest = false
   
+  if(activeLevel.song.isPlaying()) activeLevel.song.stop()
   delete activeLevel
   deleteCamera()
   deletePlayer()
@@ -85,15 +96,6 @@ function closeLevel(){ //ATTENTION
 
 //reset and restart current level
 function resetLevel(levelObj){ //ATTENTION
-  /*if(endless){ //Delete everything if in endless mode
-    resetEndless(levelObj)
-  }else{
-    //Setup everything again
-    levelObj.interactObjects.forEach(element => {
-      element.used = false   
-    });
-  }*/
-
   levelObj.interactObjects = [] //Delete all objects
   levelObj.groundObjects = []
   levelObj.deathObjects = []
@@ -106,32 +108,40 @@ function resetLevel(levelObj){ //ATTENTION
   playerSetup()
   cameraSetup()
   levelObj.placeObjects() //Place all objects that are already in view at start
+  if(!endless) levelObj.song.play() //Start song again if not in endless
 }
 
+//callback to signalise level has finished loading
 class Level{
-  constructor(mode, data){
+  constructor(mode, data, callback = () => {}){
     this.allObjects = []
     this.placementIndex = 0 //Which block in allObjects has to be placed next
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
     this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
+    this.song = 0
     
     if(mode == "read"){
-      this.readData(data);
+      this.readData(data, callback);
     }else{
       this.bgSprite = 0
       this.fgSprite = 0
       this.bgColor = "#FFFF00"
       this.fgColor = "FF00FF"
       this.levelName = "NewLevel"
-      this.musicLink = "/rsc/music/StereoMadness.mp4"
+      this.musicLink = "/rsc/music/stereoMadness.mp3"
 
       this.tintDeco();
+      loadSound(this.musicLink, data => {
+        this.song = data
+        this.song.setVolume(0.3)
+        callback() //Level has finished loading, start game
+      })
     }
   }
 
-  readData(path){
+  readData(path, callback){
     fetch(path)
     .then((response) => response.text())
     .then((txt) => {
@@ -146,7 +156,6 @@ class Level{
         })
       })
       this.allObjects = blocks
-      console.log(this.allObjects)
 
       let metaData = split(splitTxt[1], "+")
 
@@ -156,7 +165,7 @@ class Level{
       this.fgColor = metaData[3]
       this.levelName = metaData[4]
       this.musicLink = metaData[5]
-      this.placeObjects() //place all objects that are already in view at start
+      //this.placeObjects() //place all objects that are already in view at start
 
 
       /*blocks.forEach(element => {
@@ -164,6 +173,11 @@ class Level{
         this.addObject(new gameObject(element[0], element[1], element[2]))
       })*/
       this.tintDeco();
+      loadSound(this.musicLink, data => {
+        this.song = data
+        this.song.setVolume(0.3)
+        callback() //Level has finished loading, start game
+      })
     });
   }
 
@@ -235,10 +249,10 @@ class Level{
     //put all objects in one array and sort by x coordinate
     let allObjects = [...this.deathObjects, ...this.interactObjects, ...this.groundObjects]
     allObjects.sort((a, b) => (a.x > b.x) ? 1 : -1)
-    console.log(allObjects)
     
     allObjects.forEach(element => {
-      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
+      const convertData = convertObjToStringForm(element)
+      levelSave += convertData[0] + "°" + convertData[1] + "°" + convertData[2] + "+"; 
     });
     /*this.deathObjects.forEach(element => {
       levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
@@ -256,7 +270,7 @@ class Level{
     levelSave += "~"
     levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
     levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
-    levelSave += "+LevelName+/rsc/music/StereoMadness.mp4" // song link
+    levelSave += "+LevelName+/rsc/music/stereoMadness.mp3" // song link
 
     download("level.hd", levelSave)
   }
@@ -275,7 +289,6 @@ class Level{
     this.bg = coloredBg;
     this.fg = coloredFg;
   }
-  
 }
 
 function download(filename, text) { //TEMPORARY: used to download files

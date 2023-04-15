@@ -5,7 +5,7 @@ const obstacleDistance = 6 //minimum distance between obstacles
 
 //Open endless mode
 function openEndless(){
-  openLevel(new Level("read", "/rsc/levels/endless.hd"))
+  openLevel("read", "/rsc/levels/endless.hd")
   endless = true
   setupEndless(activeLevel)
 }

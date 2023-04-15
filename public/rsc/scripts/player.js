@@ -1,4 +1,5 @@
 let player; //Own Player
+const normalXVelocity = 9
 
 function playerSetup(){
   player = new Player()
@@ -10,7 +11,7 @@ function playerUpdate(levelObj){
     if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
     player.update(levelObj);
     player.draw()
-    player.drawHitbox()
+    //player.drawHitbox()
   }else{
     player.deathAnimation(levelObj)
   }
@@ -54,7 +55,7 @@ class Player{
     this.drawOffsetY = 0 //By how much draw will be offset in positive Y
     this.image = icon
 
-    this.xVelocity = 9
+    this.xVelocity = normalXVelocity
     this.yVelocity = 0
     this.jumpStrength = 17.5
     this.gravityStrength = 73.5//4.2*this.jumpStrength
@@ -70,7 +71,7 @@ class Player{
     this.rotation = 0
     this.rotationAdjustSpeed = 700 //How fast rotation adjust to get into locked position
     this.rotationSpeed = 360
-    this.rotationBackfireThreshold = 45 //If difference from last 90 degrees rotation point is less than this when landing, rotation will be set back instead smoothly increasing till next 90 degrees point
+    this.rotationBackfireThreshold = 30 //If difference from last 90 degrees rotation point is less than this when landing, rotation will be set back instead smoothly increasing till next 90 degrees point
 
     this.input = false
     this.onGround = true
@@ -156,7 +157,7 @@ class Player{
     
     //Kill player if hit ceiling limit or ground when upside down
     if(this.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0 && this.ceilingDeath){
-      this.dead = true
+      this.die()
     }
   }
 
@@ -167,7 +168,7 @@ class Player{
     this.y = this.gravitySwitch == 1 ? this.lowCeiling+this.height : this.highCeiling //Add to height depending on if gravity switched or not
     this.canRobotJump = true //For Robot mode
     this.robotJumpTime = 0
-    if(this.rotationActive && this.rotation % 90 < this.rotationBackfireThreshold) this.rotation = floor(this.rotation/90)*90 //turn back rotation incase threshold wasnt exceeded
+    if(this.gameMode == 0 && this.rotation % 90 < this.rotationBackfireThreshold) this.rotation = floor(this.rotation/90)*90 //turn back rotation incase threshold wasnt exceeded
   }
 
   //Switch to new gamemode
@@ -476,6 +477,11 @@ class Player{
     }
   }
 
+  //Make player die
+  die(){  
+    this.dead = true
+    if(!endless) activeLevel.song.stop() //Stop music if not in endless
+  }
 
   deathAnimation(levelObj){
     this.deathAnimationTime += sdeltaTime

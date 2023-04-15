@@ -103,7 +103,7 @@ function mouseDragged(){
 function mouseWheel(event){
   switch(gameState){
     case 2:{ // Editor to move around
-      if(camera.offsetY > 1.5||event.deltaY < 0)camera.offsetY -= event.deltaY/10
+      if(camera.offsetY > 1.5||event.deltaY < 0)camera.offsetY -= event.deltaY/100
       if(camera.offsetX > -1.5||event.deltaX > 0)camera.offsetX += event.deltaX/10
     }break
   }

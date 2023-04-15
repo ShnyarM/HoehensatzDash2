@@ -57,25 +57,8 @@ let Portal = {
   yOffset: 0,
   xOffset:0
 }
-let objectList = [Block]
-objectList[50] = Spike
-objectList[100] = JumpOrb
-objectList[101] = JumpOrb
-objectList[102] = JumpOrb
-objectList[103] = JumpOrb
-objectList[104] = JumpOrb
 
-objectList[105] = JumpPad
-objectList[106] = JumpPad
-objectList[107] = JumpPad
-objectList[108] = JumpPad
-
-for(i = 120; i<130;i++){
-  objectList[i] = Portal
-}
-//        ^
-//        |
-//OPTIMIZE THIS WHOLE SHIT WTF
+let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal] //Assign different types to a specific id
 
 function drawObject(object){
   unitImage(objImages[object.id], object.x, object.y, object.width, object.height)
@@ -95,10 +78,10 @@ function collisionBlockObject(player, object){
 function collideObject(player, object){
   switch (object.id){
     case 0:{
-      player.dead = true;
+      player.die()
     }break
     case 50:{
-      player.dead = true;
+      player.die()
     }break
     case 100:{
       if(!player.input || !player.canUseRing) return
@@ -204,13 +187,47 @@ function collideObject(player, object){
       player.switchMode(7)
       object.used = true
     }break
+    case 130:{
+      if(object.used)break
+      player.xVelocity = 0.8*normalXVelocity
+      object.used = true
+    }break
+    case 131:{
+      if(object.used)break
+      player.xVelocity = 1*normalXVelocity
+      object.used = true
+    }break
+    case 132:{
+      if(object.used)break
+      player.xVelocity = 1.25*normalXVelocity
+      object.used = true
+    }break
+    case 133:{
+      if(object.used)break
+      player.xVelocity = 1.5*normalXVelocity
+      object.used = true
+    }break
+    case 134:{
+      if(object.used)break
+      player.xVelocity = 1.85*normalXVelocity
+      object.used = true
+    }break
   }
 }
+
+//Convert object Object into string form, returns an array with all needed vars
+function convertObjToStringForm(obj){
+  const type = objectTypes[objectInfo[obj.id].type] //Get type object of object (block, spike, portal...)
+  return [obj.id, obj.x-type.xOffset, obj.y-type.yOffset]
+}
+
 class gameObject{
   constructor(id, x, y){
-    Object.assign(this, objectList[id])
+    Object.assign(this, objectTypes[objectInfo[id].type])
     this.x = x + this.xOffset;
     this.y = y + this.yOffset;
     this.id = id
+
+    Object.assign(this, objectInfo[id].extra) //Assign object from objects.js to get special properties like different width
   }
 }
