@@ -100,6 +100,7 @@ function startEditorLevel(){
   editorLevel.deathObjects=[];
 
   //Start game
+  changeZoom(defaultZoom)
   gameState = 1;
   editorPlaytest = true
   activeLevel = editorLevel;

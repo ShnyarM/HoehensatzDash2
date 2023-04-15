@@ -27,7 +27,6 @@ function preload(){
     for(const id in objectInfo){
       objImages[id] = loadImage("rsc/images/objects/"+id+".png")
     }
-    console.log(objImages)
   })
 
   

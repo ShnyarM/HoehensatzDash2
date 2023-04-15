@@ -1,5 +1,6 @@
 let canvas;
-let u, uwidth, uheight, zoom = 10; //Units are used instead of pixels, so there are no problems with different resolutions
+const defaultZoom = 10
+let u, uwidth, uheight, zoom = defaultZoom; //Units are used instead of pixels, so there are no problems with different resolutions
 let sdeltaTime, timescale=1 //sdeltatime says time between frames in seconds, can be scaled up and down time with timescale
 let debug = false
 let lastFrames, fps = 60
@@ -83,6 +84,15 @@ function keyPressed(){
         break;
       case 27: //esc, toggle pauseMenu
         gamePaused = !gamePaused
+        break;
+    }
+  }else if(gameState==2){ //editor
+    switch(keyCode){
+      case 38: //up arrow, zoom in
+        changeZoom(zoom-1)
+        break;
+      case 40: //downarrow, zoom out
+        changeZoom(zoom+1)
         break;
     }
   }
@@ -251,6 +261,14 @@ function windowResized(){
       canvas.position(0, (windowHeight-calculatedHeight)*0.5)
       break;
   }
+  u = height/zoom //Pixel per Unit
+  uwidth = width/u //Width in units
+  uheight = zoom //Height in units
+}
+
+function changeZoom(newZoomValue){
+  zoom = newZoomValue
+
   u = height/zoom //Pixel per Unit
   uwidth = width/u //Width in units
   uheight = zoom //Height in units

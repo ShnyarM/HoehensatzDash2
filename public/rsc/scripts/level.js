@@ -186,7 +186,6 @@ class Level{
     while(this.placementIndex < this.allObjects.length && this.allObjects[this.placementIndex][1] < camera.offsetX+uwidth){ //place new object if in view of camera
       this.addObject(new gameObject(this.allObjects[this.placementIndex][0], this.allObjects[this.placementIndex][1], this.allObjects[this.placementIndex][2]))
       this.placementIndex++
-      console.log("new object placed")
     }
   }
 
@@ -195,19 +194,16 @@ class Level{
     while(this.groundObjects[0] && this.groundObjects[0].x+this.groundObjects[0].width < camera.offsetX){
       delete this.groundObjects[0]
       this.groundObjects.splice(0, 1)
-      console.log("deleted")
     }
 
     while(this.interactObjects[0] && this.interactObjects[0].x+this.interactObjects[0].width < camera.offsetX){
       delete this.interactObjects[0]
       this.interactObjects.splice(0, 1)
-      console.log("deleted")
     }
 
     while(this.deathObjects[0] && this.deathObjects[0].x+this.deathObjects[0].width < camera.offsetX){
       delete this.deathObjects[0]
       this.deathObjects.splice(0, 1)
-      console.log("deleted")
     }
   }
 
@@ -281,7 +277,6 @@ class Level{
     let coloredBg = createGraphics(bg.width, bg.height) //create new canvas which will become bg image
     coloredBg.tint(this.bgColor)
     coloredBg.image(bg, 0, 0, bg.width, bg.height) //Draw white bg image to canvas with tint
-    console.log(this.fgColor)
     let coloredFg = createGraphics(fg.width, fg.height) //create new canvas which will become bg image
     coloredFg.tint(this.fgColor)
     coloredFg.image(fg, 0, 0, fg.width, fg.height) //Draw white bg image to canvas with tint
