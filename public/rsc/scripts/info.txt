@@ -27,6 +27,8 @@
 132: Speed2
 133: Speed3
 134: Speed4
+135: gravityPortal1
+136: gravityPortal2
 
 
 

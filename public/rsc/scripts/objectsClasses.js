@@ -77,38 +77,38 @@ function collisionBlockObject(player, object){
 //       ↓
 function collideObject(player, object){
   switch (object.id){
-    case 0:{
+    case 0:{ //block
       player.die()
     }break
-    case 50:{
+    case 50:{ //spike
       player.die()
     }break
-    case 100:{
+    case 100:{ //orb
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.jump()
       object.used = true
     }break
-    case 101:{
+    case 101:{ //pink orb
       if(!player.input || !player.canUseRing) return
       if(object.used)break
       player.jump(0.8)
       object.used = true
     }break
-    case 102:{
+    case 102:{ //red orb
       if(!player.input || !player.canUseRing) return
       if(object.used)break
       player.jump(1.5)
       object.used = true
     }break
-    case 103:{
+    case 103:{ //gravityOrb
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.switchGravity()
       player.jump(-0.3);
       object.used = true
     }break
-    case 104:{
+    case 104:{  //green orb
       if(!player.input || !player.canUseRing) return
       if(object.used)return
       player.switchGravity()
@@ -116,100 +116,110 @@ function collideObject(player, object){
       player.jump(0.9);
       object.used = true
     }break
-    case 105:{
+    case 105:{ //jump pad
       if(object.used)break
       player.jump(1.5);
       object.used = true;
     }break
-    case 106:{
+    case 106:{ //pink pad
       if(object.used)break
       player.jump(0.9);
       object.used = true;
     }break
-    case 107:{
+    case 107:{ //red pad
       if(object.used)break
       player.jump(1.9);
       object.used = true;
     }break
-    case 108:{
+    case 108:{ //gravity pad
       if(object.used)break
       player.jump(0.3);
       player.switchGravity();
       object.used = true;
     }break
-    case 120:{
+    case 120:{ //cube portal
       if(object.used)break
       player.switchMode(0)
       object.used = true
     }break
-    case 121:{
+    case 121:{ //mini portal
       if(object.used)break
       player.switchToMini()
       object.used = true
     }break
-    case 122:{
+    case 122:{ //big portal
       if(object.used)break
       player.switchToBig()
       object.used = true
     }break
-    case 123:{
+    case 123:{ //ship portal
       if(object.used)break
       player.switchMode(1)
       object.used = true
     }break
-    case 124:{
+    case 124:{ //ball portal
       if(object.used)break
       player.switchMode(2)
       object.used = true
     }break
-    case 125:{
+    case 125:{ //ufo portal
       if(object.used)break
       player.switchMode(3)
       object.used = true
     }break
-    case 126:{
+    case 126:{ //wave portal
       if(object.used)break
       player.switchMode(4)
       object.used = true
     }break
-    case 127:{
+    case 127:{ //robot portal
       if(object.used)break
       player.switchMode(5)
       object.used = true
     }break
-    case 128:{
+    case 128:{ //spider portal
       if(object.used)break
       player.switchMode(6)
       object.used = true
     }break
-    case 129:{
+    case 129:{ //swing copter portal
       if(object.used)break
       player.switchMode(7)
       object.used = true
     }break
-    case 130:{
+    case 130:{ //speed 0
       if(object.used)break
       player.xVelocity = 0.8*normalXVelocity
       object.used = true
     }break
-    case 131:{
+    case 131:{ //speed 1
       if(object.used)break
       player.xVelocity = 1*normalXVelocity
       object.used = true
     }break
-    case 132:{
+    case 132:{ //speed 2
       if(object.used)break
       player.xVelocity = 1.25*normalXVelocity
       object.used = true
     }break
-    case 133:{
+    case 133:{ //speed 3
       if(object.used)break
       player.xVelocity = 1.5*normalXVelocity
       object.used = true
     }break
-    case 134:{
+    case 134:{ //speed 4
       if(object.used)break
       player.xVelocity = 1.85*normalXVelocity
+      object.used = true
+    }break
+    case 135:{ //normal gravity portal
+      if(object.used)break
+      player.gravitySwitch = 1
+      object.used = true
+    }break
+    case 136:{ //upside down gravity portal
+      if(object.used)break
+      player.gravitySwitch = -1
       object.used = true
     }break
   }

@@ -156,7 +156,7 @@ class Player{
     }
     
     //Kill player if hit ceiling limit or ground when upside down
-    if(this.y >= ceilingLimit || this.gravitySwitch == -1 && this.y - this.height <= 0 && this.ceilingDeath){
+    if(this.y > ceilingLimit || this.gravitySwitch == -1 && this.y - this.height < 0 && this.ceilingDeath){
       this.die()
     }
   }

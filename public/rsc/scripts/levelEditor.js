@@ -122,7 +122,6 @@ function stopEditorLevel(){
 
   //Place all blocks again
   for(const obj of editorLevel.allObjects){
-    console.log(obj)
     editorLevel.addObject(new gameObject(obj[0], obj[1], obj[2]))
   }
 
