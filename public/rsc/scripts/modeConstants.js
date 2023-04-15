@@ -134,7 +134,7 @@ function defineModeConstants(){
       jumpStrength: 12
     },
     "17":{ //mini Swing Copter
-      gravityStrength: 50,
+      gravityStrength: 45,
     }
   }
 }
