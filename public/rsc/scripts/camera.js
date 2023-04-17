@@ -88,10 +88,10 @@ class Camera{
     line(this.xBorder*u, 0, this.xBorder*u, height)
   }
 
-  //lock y Camera in place
-  lock(){
+  //lock y Camera in place, object is the portal which caused the camera to lock
+  lock(object = {y:camera.offsetY-4}){
     this.locked = true;
-    this.topLock = this.offsetY
+    this.topLock = round(object.y+4)+camLockBorder //Plus 4 because it will be 9 tall, so with 4 added portal will be in the middle
 
     if(this.topLock < uheight - camLockBorder) {this.topLock = uheight - camLockBorder} //if below camera would be below ground, move it up
     else if(this.topLock > ceilingLimit) {this.topLock = ceilingLimit} //prevent camera from going above ceiling

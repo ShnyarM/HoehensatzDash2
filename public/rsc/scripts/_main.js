@@ -85,16 +85,12 @@ function keyPressed(){
       case 27: //esc, toggle pauseMenu
         gamePaused = !gamePaused
         break;
+      case 79: //o, toggle time running on and off
+        timescale = timescale == 1 ? 0:1
+        break
     }
   }else if(gameState==2){ //editor
-    switch(keyCode){
-      case 38: //up arrow, zoom in
-        changeZoom(zoom-1)
-        break;
-      case 40: //downarrow, zoom out
-        changeZoom(zoom+1)
-        break;
-    }
+    editorKeyPressed()
   }
 }
 
@@ -193,7 +189,7 @@ function unitImage(img, x, y, rWidth, rHeight, flip = false){
 
 //Draw Text with unit coordinates and cameraOffset
 function unitText(textString, x, y){
-  text(textString, (x-camera.offsetX)*u, (y-camera.offsetY)*-u)
+  text(textString, unitToPixelX(x)*u, unitToPixelY(y)*-u)
 }
 
 //Draw line with unit coordinates and cameraOffset
@@ -212,10 +208,27 @@ function rotateImage(img, x, y, l, h, rotAmn){
   imageMode(CORNER)
 }
 
+//rotate by a specific point and draw image in new coordinateSystem
+//rotX and rotY describe rotation point, rest is like rotateImage()
+function rotateImageByPointRotation(img, rotX, rotY, x, y, l, h, rotAmn){
+  translate(rotX, rotY)
+  rotate(rotAmn)
+  image(img, x, y, l, h)
+  rotate(-rotAmn)
+  translate(-rotX, -rotY)
+}
+
 //Draw a rotated image in unit coordinates
 function rotateUnitImage(img, x, y, l, h, rotAmn){
-  rotateImage(img, (x-camera.offsetX)*u+(l*u*0.5), (y-camera.offsetY)*-u+(h*u*0.5), l*u, h*u, rotAmn)
+  rotateImage(img, unitToPixelX(x)+(l*u*0.5), unitToPixelY(y)+(h*u*0.5), l*u, h*u, rotAmn)
 }
+
+//rotate by a specific point and draw image in new coordinateSystem in unit coordinates
+//rotX and rotY describe rotation point, rest is like rotateUnitImage()
+function rotateUnitImageByPointRotation(img, rotX, rotY, x, y, l, h, rotAmn){
+  rotateImageByPointRotation(img, unitToPixelX(rotX), unitToPixelY(rotY), x*u, -y*u, l*u, h*u, rotAmn)
+}
+
 
 //Draw a rotated image, flipped
 function rotateImageFlipped(img, x, y, l, h, rotAmn){
@@ -234,6 +247,15 @@ function rotateImageFlipped(img, x, y, l, h, rotAmn){
 //Draw a rotated image in unit coordinates, flipped
 function rotateUnitImageFlipped(img, x, y, l, h, rotAmn){
   rotateImageFlipped(img, (x-camera.offsetX)*u+(l*u*0.5), (y-camera.offsetY)*-u+(h*u*0.5), l*u, h*u, rotAmn)
+}
+
+
+function drawText(value, x, y, size = u, color = 0, strWeight = 0, strColor = 0){
+  strokeWeight(strWeight)
+  stroke(strColor)
+  fill(color)
+  textSize(size)
+  text(value, x, y)
 }
 
 //Detect collision between objects with pos and size

@@ -1,76 +1,141 @@
 //THIS WHOLE SCRIPT REFACTORING
 
 let Block = {
+  width: 1, //How much space object takes up
   height: 1,
-  width: 1,
+
+  drawnWidth: 1,//How big will be drawn
+  drawnHeight: 1, 
+  drawOffsetX: -0.5, //Offset of drawn image from middle point
+  drawOffsetY: 0.5,
+  
   boxWidth: 1, //Size of hitbox
   boxHeight: 1,
-  boxOffsetX: 0,
+  boxOffsetX: 0, //Offset of hitbox from origin (x, y)
   boxOffsetY: 0,
-  yOffset: 0,
-  xOffset:0
 }
 
 let JumpOrb = {
-  height: 0.75,
-  width: 0.75,
-  used: false,
+  width: 1, //How much space object takes up
+  height: 1,
+
+  drawnWidth: 0.75,//How big will be drawn
+  drawnHeight: 0.75, 
+  drawOffsetX: -0.375, //Offset of drawn image from middle point
+  drawOffsetY: 0.375,
+  
   boxWidth: 0.75, //Size of hitbox
   boxHeight: 0.75,
-  boxOffsetX: 0,
-  boxOffsetY: 0,
-  xOffset: 0.125,
-  yOffset: -0.125
+  boxOffsetX: 0.125, //Offset of hitbox from origin (x, y)
+  boxOffsetY: -0.125,
 }
 
 let Spike = {
+  width: 1, //How much space object takes up
   height: 1,
-  width: 1,
+
+  drawnWidth: 1,//How big will be drawn
+  drawnHeight: 1,
+  drawOffsetX: -0.5, //Offset of drawn image from middle point
+  drawOffsetY: 0.5,
+
   boxWidth: 0.15, //Size of hitbox
   boxHeight: 0.4,
-  get boxOffsetX(){ return (this.width-this.boxWidth)*0.5},
-  get boxOffsetY(){ return (this.width-this.boxWidth)*0.5},
-  yOffset: 0,
-  xOffset:0
+  boxOffsetX: 0.425, //Offset of hitbox from origin (x, y)
+  boxOffsetY: -0.425,
 }
 
 let JumpPad = {
-  height: 0.2,
-  width: 1,
-  used: false,
+  width: 1, //How much space object takes up
+  height: 1,
+
+  drawnWidth: 1,//How big will be drawn
+  drawnHeight: 0.2, 
+  drawOffsetX: -0.5, //Offset of drawn image from middle point
+  drawOffsetY: -0.3,
+  
   boxWidth: 1, //Size of hitbox
   boxHeight: 0.2,
-  boxOffsetX: 0,
-  boxOffsetY: 0,
-  yOffset: -0.8,
-  xOffset:0
+  boxOffsetX: 0, //Offset of hitbox from origin (x, y)
+  boxOffsetY: -0.8,
 }
 
 let Portal = {
+  width: 1, //How much space object takes up
   height: 2,
-  width: 1,
-  used: false,
+
+  drawnWidth: 1,//How big will be drawn
+  drawnHeight: 2, 
+  drawOffsetX: -0.5, //Offset of drawn image from middle point
+  drawOffsetY: 1,
+  
   boxWidth: 1, //Size of hitbox
   boxHeight: 2,
-  boxOffsetX: 0,
+  boxOffsetX: 0, //Offset of hitbox from origin (x, y)
   boxOffsetY: 0,
-  yOffset: 0,
-  xOffset:0
 }
 
 let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal] //Assign different types to a specific id
 
 function drawObject(object){
-  unitImage(objImages[object.id], object.x, object.y, object.width, object.height)
+  switch(object.rotation){
+    case 0:
+      unitImage(objImages[object.id], object.xCenter+object.drawOffsetX, object.yCenter+object.drawOffsetY, object.drawnWidth, object.drawnHeight) //Draw without rotation
+      break;
+    case 1:
+      rotateUnitImageByPointRotation(objImages[object.id], object.x+0.5*object.height, object.y-0.5*object.width, object.drawOffsetX, object.drawOffsetY, object.drawnWidth, object.drawnHeight, object.rotation*90)
+      break;
+    case 2:
+      rotateUnitImageByPointRotation(objImages[object.id], object.xCenter, object.yCenter, object.drawOffsetX, object.drawOffsetY, object.drawnWidth, object.drawnHeight, object.rotation*90)
+      break
+    case 3:
+      rotateUnitImageByPointRotation(objImages[object.id], object.x+0.5*object.height, object.y-0.5*object.width, object.drawOffsetX, object.drawOffsetY, object.drawnWidth, object.drawnHeight, object.rotation*90)
+      break;
+  }
+}
+
+function drawObjectHitbox(object){
+  fill(color(0, 0, 0, 0))
+  stroke("red")
+  strokeWeight(0.05*u)
+  switch(object.rotation){
+    case 0:
+      unitRect(object.x+object.boxOffsetX, object.y+object.boxOffsetY, object.boxWidth, object.boxHeight)
+      break;
+    case 1:
+      unitRect(object.x+object.height+object.boxOffsetY-object.boxHeight, object.y-object.boxOffsetX, object.boxHeight, object.boxWidth)
+      break;
+    case 2:
+      unitRect(object.x+object.boxOffsetX, object.y-object.height-object.boxOffsetY+object.boxHeight, object.boxWidth, object.boxHeight)
+      break
+    case 3:
+      unitRect(object.x-object.boxOffsetY, object.y-object.boxOffsetX, object.boxHeight, object.boxWidth)
+      break;
+  }
 }
 
 function collisionObject(player, object){
-  if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x, player.y, player.width, player.height))collideObject(player, object)//this.collide(collider, this)
+  let hit = false
+  switch(object.rotation){
+    case 0:
+      hit = collision(object.x+object.boxOffsetX, object.y+object.boxOffsetY, object.boxWidth, object.boxHeight, player.x, player.y, player.width, player.height)
+      break;
+    case 1:
+      hit = collision(object.x+object.height+object.boxOffsetY-object.boxHeight, object.y-object.boxOffsetX, object.boxHeight, object.boxWidth, player.x, player.y, player.width, player.height)
+      break;
+    case 2:
+      hit = collision(object.x+object.boxOffsetX, object.y-object.height-object.boxOffsetY+object.boxHeight, object.boxWidth, object.boxHeight, player.x, player.y, player.width, player.height)
+      break
+    case 3:
+      hit = collision(object.x-object.boxOffsetY, object.y-object.boxOffsetX, object.boxHeight, object.boxWidth, player.x, player.y, player.width, player.height)
+      break;
+  }
+  if(hit) collideObject(player, object)//this.collide(collider, this)
 }
 
 //Maybe this can be optimized since we know type == block
 function collisionBlockObject(player, object){
-  if(collision(object.x+object.boxOffsetX, object.y-object.boxOffsetY, object.boxWidth, object.boxHeight, player.x+player.blockHitboxOffset, player.y-player.blockHitboxOffset, player.blockHitboxSize, player.blockHitboxSize))collideObject(player, object)//this.collide(collider, this)
+  if(collision(object.x+object.boxOffsetX, object.y+object.boxOffsetY, object.boxWidth, object.boxHeight, player.x+player.blockHitboxOffset, player.y-player.blockHitboxOffset, player.blockHitboxSize, player.blockHitboxSize))collideObject(player, object)//this.collide(collider, this)
 }
 
 //THIS CODE ALSO SHIT
@@ -139,7 +204,7 @@ function collideObject(player, object){
     }break
     case 120:{ //cube portal
       if(object.used)break
-      player.switchMode(0)
+      player.switchMode(0, object)
       object.used = true
     }break
     case 121:{ //mini portal
@@ -154,37 +219,37 @@ function collideObject(player, object){
     }break
     case 123:{ //ship portal
       if(object.used)break
-      player.switchMode(1)
+      player.switchMode(1, object)
       object.used = true
     }break
     case 124:{ //ball portal
       if(object.used)break
-      player.switchMode(2)
+      player.switchMode(2, object)
       object.used = true
     }break
     case 125:{ //ufo portal
       if(object.used)break
-      player.switchMode(3)
+      player.switchMode(3, object)
       object.used = true
     }break
     case 126:{ //wave portal
       if(object.used)break
-      player.switchMode(4)
+      player.switchMode(4, object)
       object.used = true
     }break
     case 127:{ //robot portal
       if(object.used)break
-      player.switchMode(5)
+      player.switchMode(5, object)
       object.used = true
     }break
     case 128:{ //spider portal
       if(object.used)break
-      player.switchMode(6)
+      player.switchMode(6, object)
       object.used = true
     }break
     case 129:{ //swing copter portal
       if(object.used)break
-      player.switchMode(7)
+      player.switchMode(7, object)
       object.used = true
     }break
     case 130:{ //speed 0
@@ -227,17 +292,22 @@ function collideObject(player, object){
 
 //Convert object Object into string form, returns an array with all needed vars
 function convertObjToStringForm(obj){
-  const type = objectTypes[objectInfo[obj.id].type] //Get type object of object (block, spike, portal...)
-  return [obj.id, obj.x-type.xOffset, obj.y-type.yOffset]
+  return [obj.id, obj.x, obj.y, obj.rotation]
 }
 
 class gameObject{
-  constructor(id, x, y){
+  constructor(id, x, y, rotation){
     Object.assign(this, objectTypes[objectInfo[id].type])
-    this.x = x + this.xOffset;
-    this.y = y + this.yOffset;
-    this.id = id
 
-    Object.assign(this, objectInfo[id].extra) //Assign object from objects.js to get special properties like different width
+    //Check if properties are defined, if not set default values (backwards compatibility)
+    this.id = (id != undefined ? id : 0)
+    this.rotation = (rotation != undefined ? rotation : 0)
+    this.x = (x != undefined ? x : 0)
+    this.y = (y != undefined ? y : 0)
+
+    this.xCenter = this.x+this.width*0.5 //coordinates of center of block
+    this.yCenter = this.y-this.height*0.5
+
+    Object.assign(this, objectInfo[id].extra) //Assign object from objects.json to get special properties like different width
   }
 }

@@ -5,7 +5,7 @@ let editorList = [
     [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
 ]
 let editorLevel;
-let editor = {type:50, category:"Orbs", rowNumb: 2, columNumb: 8}
+let editor = {type:50, category:"Orbs", rowNumb: 2, columNumb: 8, rotation: 0}
 let editorPlaytest = false
 
 let editorWindow = {}
@@ -29,8 +29,8 @@ function drawEditor(){
     drawEditorUI();
     if(mouseY < editorWindow.y){
         fill(255, 255, 255, 100)
-        unitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1)
-        if(mouseClick)editorLevel.addObject(new gameObject(editor.type, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY))))
+        rotateUnitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1, editor.rotation*90)
+        if(mouseClick)editorLevel.addObject(new gameObject(editor.type, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation))
     }else{
         if(mouseClick){
             for(let j = 0; j < editor.rowNumb; j++){
@@ -122,7 +122,7 @@ function stopEditorLevel(){
 
   //Place all blocks again
   for(const obj of editorLevel.allObjects){
-    editorLevel.addObject(new gameObject(obj[0], obj[1], obj[2]))
+    editorLevel.addObject(new gameObject(obj[0], obj[1], obj[2], obj[3]))
   }
 
   editorLevel.allObjects = [] //Clear
@@ -144,10 +144,16 @@ function drawGrid(){
     line(unitToPixelX(0), 0, unitToPixelX(0), height)
 }
 
-function drawText(value, x, y, size = u, color = 0, strWeight = 0, strColor = 0){
-    strokeWeight(strWeight)
-    stroke(strColor)
-    fill(color)
-    textSize(size)
-    text(value, x, y)
+function editorKeyPressed(){
+  switch(keyCode){
+    case 38: //up arrow, zoom in
+      changeZoom(zoom-1)
+      break;
+    case 40: //downarrow, zoom out
+      changeZoom(zoom+1)
+      break;
+    case 82: //r, rotate object
+      editor.rotation = (editor.rotation+1)%4
+      break;
+  }
 }

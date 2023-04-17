@@ -109,6 +109,7 @@ class Player{
 
     if(this.gravitySwitch == -1 && this.gameMode != 0 && this.gameMode != 2 && this.gameMode != 4 && this.gameMode != 7){ //If upside and not cube, ball, wave or swing copter, flip image upside down
       rotateUnitImageFlipped(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, 180+this.rotation)
+      console.log("fsd")
     }else{
       if(this.rotation % 90 == 0) unitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
       else rotateUnitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
@@ -171,9 +172,9 @@ class Player{
     if(this.gameMode == 0 && this.rotation % 90 < this.rotationBackfireThreshold) this.rotation = floor(this.rotation/90)*90 //turn back rotation incase threshold wasnt exceeded
   }
 
-  //Switch to new gamemode
-  switchMode(newMode){
-    if(newMode == this.gameMode || !modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
+  //Switch to new gamemode, object is the portal which caused the change
+  switchMode(newMode, object = {y:camera.offsetY-4}){
+    if(!modeConstants[newMode]) return //Mode doesnt exist or player is already in that mode
     const oldWidth = this.width //Save width and height before change
     const oldHeight = this.height
 
@@ -184,7 +185,7 @@ class Player{
     Object.assign(this, modeConstants[newMode]) //change variables to fit with new mode
     if(this.mini) Object.assign(this, modeConstants[newMode+10]) //change specific values to fit with mini mode
 
-    if(modeConstants[newMode].cameraLock) camera.lock() //Lock or unlock camera depending on gamemode
+    if(modeConstants[newMode].cameraLock) camera.lock(object) //Lock or unlock camera depending on gamemode
     else camera.unlock()
 
     if(newMode == 4){ //Delete old wave Points and add one if changing to wave
@@ -326,7 +327,9 @@ class Player{
     this.yVelocity = this.xVelocity*this.gravitySwitch*dir*(this.mini ? 2:1)
 
     if(this.y == this.highCeiling || this.y-this.height == this.lowCeiling) this.rotation = 0 //Make rotation 0 if on ceiling or ground
-    else this.rotation = -dir*45*(this.mini ? 1.41:1)
+    else this.rotation = -dir*this.gravitySwitch*45*(this.mini ? 1.41:1)
+
+    
     
     if(this.input) this.canUseRing = false
   }

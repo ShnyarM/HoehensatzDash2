@@ -9,6 +9,10 @@ function drawLevel(levelObj){
   levelObj.groundObjects.forEach(element => drawObject(element));
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
+
+  levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
+  levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
+  levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
 }
 
 function playLevel(){
@@ -184,7 +188,7 @@ class Level{
   //Check if new objects has to be placed
   placeObjects(){
     while(this.placementIndex < this.allObjects.length && this.allObjects[this.placementIndex][1] < camera.offsetX+uwidth){ //place new object if in view of camera
-      this.addObject(new gameObject(this.allObjects[this.placementIndex][0], this.allObjects[this.placementIndex][1], this.allObjects[this.placementIndex][2]))
+      this.addObject(new gameObject(this.allObjects[this.placementIndex][0], this.allObjects[this.placementIndex][1], this.allObjects[this.placementIndex][2], this.allObjects[this.placementIndex][3]))
       this.placementIndex++
     }
   }
@@ -208,7 +212,6 @@ class Level{
   }
 
   addObject(obj){
-    //console.log(obj)
     switch(true){
       case obj.id < 50:
         this.groundObjects.push(obj);
@@ -248,7 +251,7 @@ class Level{
     
     allObjects.forEach(element => {
       const convertData = convertObjToStringForm(element)
-      levelSave += convertData[0] + "°" + convertData[1] + "°" + convertData[2] + "+"; 
+      levelSave += convertData[0] + "°" + convertData[1] + "°" + convertData[2] + "°" + convertData[3] + "+"; 
     });
     /*this.deathObjects.forEach(element => {
       levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
