@@ -28,4 +28,16 @@ function drawMainMenu(){
   buttonRect(width*0.25, height / 2.5 + (height / 8)*2, width / 5, height/ 10, "Endless", height / 45, () => { //get own world
     openEndless()
   })
+
+  buttonRect(width*0.5, height / 2.5 - height / 8, width / 5, height/ 10, "Play Level 1", height / 45, () => { //get own world
+    openLevel("read", "/rsc/levels/hd1Levels/hd1Level1.hd")
+  })
+
+  buttonRect(width*0.5, height / 2.5 + height / 8, width / 5, height/ 10, "Play Level 2", height / 45, () => { //get own world
+    openLevel("read", "/rsc/levels/hd1Levels/hd1Level2.hd")
+  })
+
+  buttonRect(width*0.5,height / 2.5 + (height / 8)*2, width / 5, height/ 10, "Play Level 3", height / 45, () => { //get own world
+    openLevel("read", "/rsc/levels/hd1Levels/hd1Level3.hd")
+  })
 }

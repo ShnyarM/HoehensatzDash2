@@ -10,9 +10,9 @@ function drawLevel(levelObj){
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
 
-  levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
-  levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
-  levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
 }
 
 function playLevel(){
@@ -156,7 +156,7 @@ class Level{
       blocks.forEach((element, index) => {
         blocks[index] = split(element, "°");
         blocks[index].forEach((elem, ind) => {
-          blocks[index][ind] = parseInt(elem)
+          blocks[index][ind] = parseFloat(elem)
         })
       })
       this.allObjects = blocks

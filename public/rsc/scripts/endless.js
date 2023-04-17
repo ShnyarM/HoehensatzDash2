@@ -1,7 +1,7 @@
 let endless = false //Says if current mode is endless or not
 let score = 0, highScore = 0
 let lastXCoordinate = 3 //xCoordinate of last object
-const obstacleDistance = 6 //minimum distance between obstacles
+const obstacleDistanceMin = 7, obstacleDistanceMax = 10 //minimum distance between obstacles
 
 //Open endless mode
 function openEndless(){
@@ -42,9 +42,11 @@ function endlessUI(){
 //Add a new random obstacle
 function addObstacle(levelObj){
   const obstacleToAdd = endlessObstacles[floor(random(endlessObstacles.length))] //Get random obstacle
+  const distance = round(random(obstacleDistanceMin, obstacleDistanceMax)) //Get random distance from last obstacle
+  console.log(distance)
 
   for(let i = 0; i < obstacleToAdd.length; i++){ //Add all objects of obstacle
-    levelObj.addObject(new gameObject(parseFloat(obstacleToAdd[i][0]), parseFloat(obstacleToAdd[i][1])+lastXCoordinate+obstacleDistance, parseFloat(obstacleToAdd[i][2])))
+    levelObj.addObject(new gameObject(parseFloat(obstacleToAdd[i][0]), parseFloat(obstacleToAdd[i][1])+lastXCoordinate+distance, parseFloat(obstacleToAdd[i][2]), parseFloat(obstacleToAdd[i][3])))
   }
-  lastXCoordinate = parseFloat(obstacleToAdd[obstacleToAdd.length-1][1])+lastXCoordinate+obstacleDistance //Get y coordinate of last block
+  lastXCoordinate = parseFloat(obstacleToAdd[obstacleToAdd.length-1][1])+lastXCoordinate+distance //Get y coordinate of last block
 }
