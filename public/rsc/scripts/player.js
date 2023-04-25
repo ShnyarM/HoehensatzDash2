@@ -7,9 +7,12 @@ function playerSetup(){
 
 function playerUpdate(levelObj){
   if(!player.dead){
-    player.input = player.checkInput()
-    if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
-    player.update(levelObj);
+    if(!player.completedLevel){
+      player.input = player.checkInput()
+      if(player.startJumpDeactivate && player.input) player.input = false //Deactivate player input if jump block active
+      player.update(levelObj);
+    }else player.completionAnimation()
+
     player.draw()
     //player.drawHitbox()
   }else{
@@ -82,6 +85,10 @@ class Player{
     this.dead = false
     this.deathAnimationTime = 0
     this.deathAnimationTimeMax = 1 //death animation time in seconds
+
+    this.completedLevel = false //If level has been completed
+    this.completedAnimationTime = 0 //At which point completion animation is
+    this.completedAnimationTimeMax = 2.5 //death animation time in seconds
 
     this.startJumpDeactivate = true //Make player unable to jump at start until letting go to stop jump at start
 
@@ -160,6 +167,27 @@ class Player{
     if(this.y > ceilingLimit || this.gravitySwitch == -1 && this.y - this.height < 0 && this.ceilingDeath){
       this.die()
     }
+  }
+
+  //Check if player has completed Level
+  checkCompletion(){
+    if(!endless && this.x > activeLevel.lastXCoordinate+8){
+      if(editorPlaytest) {stopEditorLevel(); return} //Just return if in editorplaytest mode
+      
+      this.completedLevel = true //Start animation
+      this.completedAnimationStartY = this.y
+      camera.movement = false
+    }
+  }
+
+  //Go throough animation for completion
+  completionAnimation(){
+    this.completedAnimationTime += sdeltaTime //Progress animation
+    this.y += (this.completedAnimationTime ** 2)* 0.1 //Move player up
+    this.rotation += (this.completedAnimationTime ** 2)*3 //Rotate player
+    camera.offsetY += (this.completedAnimationTime ** 1.5)*0.05 //move camera up
+
+    if(this.completedAnimationTime >= this.completedAnimationTimeMax) activeLevel.closeLevel = true //Close level at end of frame
   }
 
   //Code to be executed when player touches ground
@@ -532,6 +560,7 @@ class Player{
     this.getHighCeiling(levelObj)
     this.move()
     this.applyRotationChange()
+    this.checkCompletion()
 
     if(this.gameMode == 4) this.makeWavePoints() //Draw and create wavepoints, has to be after this.move()
 

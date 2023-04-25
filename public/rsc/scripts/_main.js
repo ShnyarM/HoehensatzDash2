@@ -34,6 +34,7 @@ function draw() {
     case 1:{
       playLevel()
       drawUI();
+      if(activeLevel.closeLevel) closeLevel()
     }break
     case 2:{
       drawEditor();

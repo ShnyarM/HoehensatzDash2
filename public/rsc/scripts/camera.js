@@ -26,6 +26,7 @@ class Camera{
   constructor(){
     this.offsetX = 0; //Offset from 0 point in x direction in units
     this.offsetY = 0.733*zoom; //Offset from 0 point in y direction in units
+    this.movement = true //Says if camera should move or not
 
     this.yitBorder = 0.375*zoom //Inner Border of the y Axis top
     this.yotBorder = 0.2333*zoom //Outer Border of the y Axis top
@@ -44,7 +45,7 @@ class Camera{
   }
 
   updateOffset(){
-    if(this.locked) return
+    if(this.locked || !this.movement) return
     //X position gets moved in player.move()
     
     //If player is inside of Inner Border, move Player with speed matching to distance from Outer Border

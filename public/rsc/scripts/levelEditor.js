@@ -93,6 +93,7 @@ function startEditorLevel(){
     const convertedData = convertObjToStringForm(allObjects[o])
     editorLevel.allObjects.push(convertedData)
   }
+  if(editorLevel.allObjects.length != 0) editorLevel.lastXCoordinate = editorLevel.allObjects[editorLevel.allObjects.length-1][1]
 
   //Delete all objects
   editorLevel.interactObjects = [];

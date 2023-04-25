@@ -10,9 +10,9 @@ function drawLevel(levelObj){
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
 
-  //levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
-  //levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
-  //levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
+  levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
+  levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
+  levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
 }
 
 function playLevel(){
@@ -125,6 +125,8 @@ class Level{
     this.deathObjects=[];
     this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
     this.song = 0
+    this.lastXCoordinate = 0 //Xcoordinate of the last block
+    this.closeLevel = false //If level should be closed at end of frame
     
     if(mode == "read"){
       this.readData(data, callback);
@@ -160,6 +162,7 @@ class Level{
         })
       })
       this.allObjects = blocks
+      this.lastXCoordinate = blocks[blocks.length-1][1] //Get x coordinate of last block
 
       let metaData = split(splitTxt[1], "+")
 
@@ -169,13 +172,7 @@ class Level{
       this.fgColor = metaData[3]
       this.levelName = metaData[4]
       this.musicLink = metaData[5]
-      //this.placeObjects() //place all objects that are already in view at start
 
-
-      /*blocks.forEach(element => {
-        console.log(element)
-        this.addObject(new gameObject(element[0], element[1], element[2]))
-      })*/
       this.tintDeco();
       loadSound(this.musicLink, data => {
         this.song = data
