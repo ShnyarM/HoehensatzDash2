@@ -6,6 +6,7 @@ let debug = false
 let lastFrames, fps = 60
 let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
 let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible
+let oldMouseX, oldMouseY, mouseIsDown;
 
 function setup() {
   canvas = createCanvas(1, 1)
@@ -46,6 +47,8 @@ function draw() {
   }
 
   mouseClick = false
+  oldMouseX = mouseX;
+  oldMouseY = mouseY
 }
 
 //Draw the User Interface while in game
@@ -98,18 +101,18 @@ function keyPressed(){
 
 function mousePressed(){
   mouseClick = true
+  mouseIsDown = true;
 
 }
 
 function mouseReleased(){
+  mouseIsDown = false;
 }
 
 function mouseDragged(){
-  
 }
 
 function mouseClicked(){
-  editorMouseClick();
 }
 
 function mouseWheel(event){
@@ -139,6 +142,24 @@ function buttonRect(x, y, l, h, _text, sizeText, returnFunction, options = {}){
   textAlign(CENTER, CENTER)
   text(_text, x, y)
   rectMode(CORNER)
+}
+
+function buttonImg(x, y, w, h, img, padding, returnFunction, options = {}){
+  const defaults = {colNor: color(0, 140, 0, 255), colHigh: color(0, 200, 0, 255), curve: [height/20], strokeW: width/750, strokeC: "#000000"} //Default values for options
+  const calcOptions = Object.assign(defaults, options)
+  push()
+  fill("green")
+  if(buttonCenter(x, y, w, h)){
+    fill(calcOptions.colHigh)
+    if(mouseClick) returnFunction()
+  }else fill(calcOptions.colNor)
+  strokeWeight(calcOptions.strokeW)
+  stroke(calcOptions.strokeC)
+  rect(x-w/2, y-h/2, w, h, ...calcOptions.curve);
+  //image(img, x-w/2+padding, y-h/2+padding, w-padding*2, h-padding*2)
+  image(img, x-w/2 + padding, y-h/2 + padding, w- padding*2, h - padding*2, 0, 0, img.width, img.height, CONTAIN)
+
+  pop()
 }
 
 //Draws two rects (bigger black one, smaller white one) which resemble a border, used for inventory

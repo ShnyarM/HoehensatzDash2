@@ -133,8 +133,8 @@ class Level{
     }else{
       this.bgSprite = 0
       this.fgSprite = 0
-      this.bgColor = "#FFFF00"
-      this.fgColor = "FF00FF"
+      this.bgColor = "#8888DD"
+      this.fgColor = "#8888DD"
       this.levelName = "NewLevel"
       this.musicLink = "/rsc/music/stereoMadness.mp3"
 

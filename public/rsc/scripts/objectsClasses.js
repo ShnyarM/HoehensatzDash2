@@ -311,3 +311,12 @@ class gameObject{
     Object.assign(this, objectInfo[id].extra) //Assign object from objects.json to get special properties like different width
   }
 }
+
+function moveObject(obj, x, y){
+  obj.x = x
+  obj.y = y
+
+  obj.xCenter = obj.x+obj.width*0.5 //coordinates of center of block
+  obj.yCenter = obj.y-obj.height*0.5
+
+}

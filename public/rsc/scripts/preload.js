@@ -4,6 +4,7 @@ let icon, ship, ball, ufo, wave, swingCopter
 let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
 let objectInfo
+let editorImgs = {zoomIn:""};
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -29,7 +30,10 @@ function preload(){
     }
   })
 
-  
+  editorImgs.zoomIn = loadImage("rsc/images/zoomIn.png")
+  editorImgs.zoomOut = loadImage("rsc/images/zoomOut.png")
+  editorImgs.move = loadImage("rsc/images/moveIcon.png")
+  editorImgs.play = loadImage("rsc/images/play.png")
 
   /*objImages[0] = loadImage("rsc/images/block.png")
   objImages[50] = loadImage("rsc/images/spike.png")

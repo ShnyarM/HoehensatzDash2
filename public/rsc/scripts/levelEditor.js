@@ -1,11 +1,11 @@
 let editorList = [
     [0],
     [50],
-    [100, 101, 102, 103, 104, 105, 106, 107, 108, 120, 121, 122, 123, 124, 125, 126],
-    [120, 121, 122, 123, 124, 125, 126, 127, 128, 129]
+    [100, 101, 102, 103, 104, 105, 106, 107, 108, 130, 131, 132, 133, 134],
+    [120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 135, 136]
 ]
 let editorLevel;
-let editor = {type:50, category:"Orbs", rowNumb: 2, columNumb: 8, rotation: 0}
+let editor = {object: "", selectedSite: 1, selectedCategory: 2, move: 0, type:50, rowNumb: 2, columNumb: 8, rotation: 0}
 let editorPlaytest = false
 
 let editorWindow = {}
@@ -14,74 +14,89 @@ function setupEditor(){
     editorWindow = {"x": 0,
         get y(){ return height*0.73},
         get height(){ return height-this.y},
-        get width(){ return width}
+        get width(){ return width},
+        get tabSize(){return width/20},
+        get itemSize(){return (this.height - this.height/10)/(editor.rowNumb+0.5)},
+        get itemPadding(){return this.height/20}
     }
+
     gameState = 2;
     editorLevel = new Level("empty")
     cameraSetup()
+
+    editor.object = new gameObject(0, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
 }
 
 function drawEditor(){
     background("blue")
+    let imgY = -height
+    image(editorLevel.bg, 0, imgY, width, height-imgY)
 
     drawGrid();
     drawLevel(editorLevel)
-    drawEditorUI();
     if(mouseY < editorWindow.y){
-        fill(255 , 255, 255, 100)
-        rotateUnitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1, editor.rotation*90)
-        if(mouseClick)editorLevel.addObject(new gameObject(editor.type, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation))
-    }else{
-        if(mouseClick){
-            for(let j = 0; j < editor.rowNumb; j++){
-                for(let i = 0; i < editor.columNumb; i++){
-                    let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
-                    if(button(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight))editor.type = editorList[2][j*editor.columNumb+i]
-                }
-            }
+      fill(255 , 255, 255, 100)
+      drawObject(editor.object)
+      moveObject(editor.object, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)))
+      
+      //rotateUnitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1, editor.rotation*90)
+      if(mouseClick){
+        let hasClicked = false;
+        for(let i = 0; i < editorList.length; i++){
+          if(button(editorWindow.tabSize*2*i + width/2 - (editorList.length-1)*editorWindow.tabSize - editorWindow.tabSize/2, editorWindow.y-editorWindow.tabSize, editorWindow.tabSize, editorWindow.tabSize))hasClicked=true
         }
-    }
-}
+        if(!hasClicked){
+          let id = editor.object.id
+          let rot = editor.object.rotation
+          editorLevel.addObject(editor.object)
+          editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
+        }
+      }
+      }else{
+      if(mouseClick){
+            for(let j = 0; j < editor.rowNumb; j++){
+              for(let i = 0; i < editor.columNumb; i++){
+                let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
+                if(button(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight))editor.object = new gameObject(editorList[editor.selectedCategory][j*editor.columNumb+i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+              }
+            }
+          }
+        }
+        stroke(0)
+
+        drawEditorUI();
+
+        text(pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX), 100,100)
+        //console.log(oldMouseX-mouseX)
+        if(mouseIsDown&&editor.mode==1){
+        camera.offsetX += (pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX));
+        camera.offsetY += (pixelToUnitY(oldMouseY)-pixelToUnitY(mouseY));
+      }
+      }
 
 function drawEditorUI(){
-    fill(120, 130, 1400)
-    strokeWeight(0)
+    fill(20, 20, 25, 180)
+    strokeWeight(width/800)
     rect(editorWindow.x, editorWindow.y, editorWindow.width, editorWindow.height)
 
     fill(40)
     for(let i = 0; i < editorList.length; i++){
-      rect(100*i + width/2 - editorList.length*50, editorWindow.y-50, 50, 50, 10, 10, 0, 0)
+      buttonImg(editorWindow.tabSize*2*i + width/2 - (editorList.length-1)*editorWindow.tabSize, editorWindow.y-editorWindow.tabSize/2, editorWindow.tabSize, editorWindow.tabSize, objImages[editorList[i][0]], width/140, ()=>{editor.selectedCategory=i}, {colNor:[60, 60, 60, 180], curve:[editorWindow.tabSize/3, editorWindow.tabSize/3, 0, 0]})
     }
+
     fill(40)
-    for(let j = 0; j < editor.rowNumb; j++){
-        for(let i = 0; i < editor.columNumb; i++){
-            let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
-            rect(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight)
-            image(objImages[editorList[2][j*editor.columNumb+i]], width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight)
+    for(let j = 0; j < ceil((editorList[editor.selectedCategory].length-(editor.selectedSite-1)*editor.rowNumb)/editor.rowNumb)&& j < editor.rowNumb; j++){
+        for(let i = 0; i < editorList[editor.selectedCategory].length-(editor.selectedSite-1)*editor.rowNumb*editor.columNumb-j*editor.columNumb&&i < editor.columNumb; i++){
+            buttonImg((editorWindow.itemSize+editorWindow.itemPadding)*i + width/2 - (editor.columNumb-1)*(editorWindow.itemSize+editorWindow.itemPadding)/2, editorWindow.y + editorWindow.itemPadding+editorWindow.itemSize/2 + (editorWindow.itemSize+editorWindow.itemPadding)*j, editorWindow.itemSize,editorWindow.itemSize, objImages[editorList[editor.selectedCategory][j*editor.columNumb+i]], 10, ()=>{editor.object = new gameObject(editorList[editor.selectedCategory][j*editor.columNumb+i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)}, {colHigh: "#aaaaaa", colNor: "#222222",curve:[width/100]});
         }
     }
-    editorList[2].forEach((element, index) => {
-        for(let i = 0; i < editor.rowNumb; i++){
-            //let dim = {"x":width/4 +width/8*index, "y":editorWindow.y + editorWindow.height/10 + editorWindow.height/2*parentIndex, "width": editorWindow.height/3, "height": editorWindow.height/3}
-            //rect(dim.x, dim.y, dim.width, dim.height);
-            //image(objImages[element], dim.x + (objectList[element].xOffset * dim.width), dim.y - (objectList[element].yOffset * dim.height), dim.width * objectList[element].width, dim.height * objectList[element].height)
-        }
-    })
+ 
+    buttonImg(width-editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.3, editorWindow.height/3, editorWindow.height/3, editorImgs.zoomIn, width/100, ()=>changeZoom(zoom - 1));
+    buttonImg(width-editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.7, editorWindow.height/3, editorWindow.height/3, editorImgs.zoomOut, width/100, ()=>changeZoom(zoom + 1));
+    buttonImg(width-editorWindow.height/1.35, editorWindow.y + editorWindow.height*0.7, editorWindow.height/3, editorWindow.height/3, editorImgs.move, width/100, ()=>{editor.mode=1});
 
-    strokeWeight(0.04*u)
-    stroke(0)
-    fill("red")
-    rect(width*0.8, height*0.9, width*0.2, height*0.1)
-
-    drawText("Save Level", width*0.9, height*0.95, 0.5*u)
-
-    strokeWeight(0.04*u)
-    stroke(0) 
-    fill("red")
-    rect(0, height*0.9, width*0.2, height*0.1)
-    drawText("Play Level", width*0.1, height*0.95, 0.5*u)
-
-}
+    buttonImg(editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.3, editorWindow.height/3, editorWindow.height/3, editorImgs.play, width/100, ()=>startEditorLevel());
+  }
 
 //Playtest level in editor
 function startEditorLevel(){
@@ -153,14 +168,7 @@ function editorKeyPressed(){
       changeZoom(zoom+1)
       break;
     case 82: //r, rotate object
-      editor.rotation = (editor.rotation+1)%4
+      editor.object.rotation = (editor.object.rotation+1)%4
       break;
-  }
-}
-
-function editorMouseClick(){
-  if(button(width*0.8, height*0.9, width*0.2, height*0.1))editorLevel.saveLevel();
-  if(button(0, height*0.9, width*0.2, height*0.1)){
-    startEditorLevel()
   }
 }
