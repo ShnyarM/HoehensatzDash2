@@ -53,7 +53,7 @@ function levelUI(){
   fill("white")
   stroke("black")
   strokeWeight(height/100)
-  text(round(percentage*100) + "%", width*0.73, height*0.04)
+  text(floor(percentage*100) + "%", width*0.73, height*0.04)
 }
 
 //draw background
