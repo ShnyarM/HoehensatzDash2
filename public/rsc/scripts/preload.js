@@ -5,6 +5,7 @@ let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
 let objectInfo
 let customFont
+let practiceCheckpointImg, practiceSong
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -13,6 +14,8 @@ function preload(){
   ufo = loadImage("rsc/images/ufo.png")
   wave = loadImage("rsc/images/wave.png")
   swingCopter = loadImage("rsc/images/swingCopter.png")
+  practiceCheckpointImg = loadImage("rsc/images/checkpoint.png")
+  practiceSong = loadSound("rsc/music/StayInsideMe.mp3")
 
   for(let i = 0; i < 5; i++) robotImgs[i] = loadImage("rsc/images/robotFrames/" + i + ".png")
   robotJump = loadImage("rsc/images/robotFrames/jump.png")

@@ -116,7 +116,6 @@ class Player{
 
     if(this.gravitySwitch == -1 && this.gameMode != 0 && this.gameMode != 2 && this.gameMode != 4 && this.gameMode != 7){ //If upside and not cube, ball, wave or swing copter, flip image upside down
       rotateUnitImageFlipped(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, 180+this.rotation)
-      console.log("fsd")
     }else{
       if(this.rotation % 90 == 0) unitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
       else rotateUnitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
@@ -188,9 +187,9 @@ class Player{
     if(this.completedAnimationTime >= this.completedAnimationTimeMax) return //Dont advance further if animation is already complete
 
     this.completedAnimationTime += sdeltaTime //Progress animation
-    this.y += (this.completedAnimationTime ** 2)* 0.1 //Move player up
-    this.rotation += (this.completedAnimationTime ** 2)*3 //Rotate player
-    camera.offsetY += (this.completedAnimationTime ** 1.5)*0.05 //move camera up
+    this.y += (this.completedAnimationTime ** 2)* 8 * sdeltaTime //Move player up
+    this.rotation += (this.completedAnimationTime ** 2)*300* sdeltaTime //Rotate player
+    camera.offsetY += (this.completedAnimationTime ** 1.5)* 5 * sdeltaTime //move camera up
 
     if(this.completedAnimationTime >= this.completedAnimationTimeMax) activeLevel.completed = true //Close level at end of frame
   }

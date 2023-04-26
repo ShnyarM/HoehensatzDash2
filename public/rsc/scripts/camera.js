@@ -38,6 +38,8 @@ class Camera{
     this.fastSpeed = 35
 
     this.locked = false
+    this.topLock = 0
+    this.downLock = 0
 
     this.groundPosition = 0 //Used for animation of ground moving up when locking camera, ranges from 0-1
     this.groundAdjustSpeed = 3 //Determines how quick animation goes

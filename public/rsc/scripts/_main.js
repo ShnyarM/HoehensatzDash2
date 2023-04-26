@@ -35,7 +35,6 @@ function draw() {
     case 1:{
       playLevel()
       drawUI();
-      if(activeLevel.closeLevel) closeLevel()
     }break
     case 2:{
       drawEditor();
@@ -52,9 +51,12 @@ function draw() {
 //Draw the User Interface while in game
 function drawUI(){
   if(debug) drawFramerate()
-  if(gamePaused) drawPauseMenu()
   if(endless) endlessUI()
+  else levelUI()
+
+  if(practiceMode) practiceUI()
   if(activeLevel.completed) drawCompletionScreen()
+  if(gamePaused) drawPauseMenu()
 }
 
 function drawFramerate(){
@@ -81,12 +83,13 @@ function drawFramerate(){
 
 function keyPressed(){
   if(gameState==1){
+    practiceKeyPressed()
     switch(keyCode){
       case 90: //z, toggle debug mode
         debug = !debug;
         break;
       case 27: //esc, toggle pauseMenu
-        gamePaused = !gamePaused
+        gamePaused ? closePauseMenu() : openPauseMenu()
         break;
       case 79: //o, toggle time running on and off
         timescale = timescale == 1 ? 0:1

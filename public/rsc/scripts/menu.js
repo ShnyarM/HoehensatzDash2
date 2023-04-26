@@ -14,10 +14,11 @@ function menuSetup(){
 }
 
 function menuDraw(){
+  drawMenuBackground()
   menus[menuState]();
 }
 
-function drawMainMenu(){
+function drawMenuBackground(){
   if(menuLevel.loaded){ //Draw Level
     drawBackground(menuLevel)
     drawForeground(menuLevel)
@@ -28,17 +29,19 @@ function drawMainMenu(){
   player.update(menuLevel)
   player.draw()
 
-  if(player.x > uwidth){ //Reset Player if not on screen
+  if(player.x > uwidth+3){ //Reset Player if not on screen
     player.switchMode(floor(random(0, 8))) //Choose random gamemode
     player.gravitySwitch = 1 //reset gravity
-    player.wavePoints = [0, 0] //Reset wavepoint incase player is in wave mode
+    player.wavePoints = [[0, player.height*0.5]] //Reset wavepoint incase player is in wave mode
     player.y = player.height //reset position
     player.x = -player.width
   }
+}
 
+function drawMainMenu(){
   textAlign(CENTER, CENTER)
   textSize(height/12)
-  fill("#00FF00")
+  fill("#FFFF00")
   stroke("black")
   strokeWeight(height/60)
   text("Höhensatz Dash 2", width*0.5, height*0.075)
@@ -47,11 +50,11 @@ function drawMainMenu(){
     openLevel("read", "/rsc/levels/1.hd")
   })
   
-  buttonRect(width*0.5-width*0.125, height*0.5, width / 5, height/ 10, "Level Editor", height / 45, () => { //get own world
-    setupEditor()
+  buttonRect(width*0.5-width*0.125, height*0.5, width / 5, height/ 10, "Endless", height / 45, () => { //get own world
+    openEndless()
   })
 
-  buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Endless", height / 45, () => { //get own world
+  buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Online Levels", height / 45, () => { //get own world
     openEndless()
   })
 
@@ -64,6 +67,6 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => { //get own world
-    openLevel("read", "/rsc/levels/hd1Levels/hd1Level3.hd")
+    setupEditor()
   })
 }
