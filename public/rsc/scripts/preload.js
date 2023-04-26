@@ -4,6 +4,7 @@ let icon, ship, ball, ufo, wave, swingCopter
 let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
 let objectInfo
+let customFont
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -28,6 +29,8 @@ function preload(){
       objImages[id] = loadImage("rsc/images/objects/"+id+".png")
     }
   })
+
+  customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 
   
 

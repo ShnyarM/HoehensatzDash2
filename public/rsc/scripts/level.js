@@ -10,9 +10,9 @@ function drawLevel(levelObj){
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
 
-  levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
-  levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
-  levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
+  //levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
 }
 
 function playLevel(){
@@ -67,7 +67,7 @@ function drawForeground(levelObj){
     //Line seperating background and foreground
     stroke("white")
     strokeWeight(0.06*u)
-    line(0, (camLockBorder*camera.groundPosition)*u, width, (camLockBorder*camera.groundPosition)*u) //top
+    if(gameState != 0) line(0, (camLockBorder*camera.groundPosition)*u, width, (camLockBorder*camera.groundPosition)*u) //top, dont draw if in main menu
     line(0, unitToPixelY(yBottom), width, unitToPixelY(yBottom)) //bottom
   }
 }
@@ -96,6 +96,7 @@ function closeLevel(){ //ATTENTION
   delete activeLevel
   deleteCamera()
   deletePlayer()
+  menuSetup()
 }
 
 //reset and restart current level
@@ -103,6 +104,7 @@ function resetLevel(levelObj){ //ATTENTION
   levelObj.interactObjects = [] //Delete all objects
   levelObj.groundObjects = []
   levelObj.deathObjects = []
+  levelObj.completed = false
 
   if(endless) resetEndless(levelObj)
   else{
@@ -113,6 +115,16 @@ function resetLevel(levelObj){ //ATTENTION
   cameraSetup()
   levelObj.placeObjects() //Place all objects that are already in view at start
   if(!endless) levelObj.song.play() //Start song again if not in endless
+}
+
+//Draw Level Complete Screen when level completed
+function drawCompletionScreen(){
+  fill("red")
+  textSize(height/12)
+  text("Level Complete", width*0.5, height*0.1)
+
+  buttonRect(width*0.5,height*0.4, width*0.3, height*0.1, "Main Menu", height*0.05, closeLevel)
+  buttonRect(width*0.5,height*0.6, width*0.3, height*0.1, "Replay", height*0.05, () => {resetLevel(activeLevel)})
 }
 
 //callback to signalise level has finished loading
@@ -127,10 +139,25 @@ class Level{
     this.song = 0
     this.lastXCoordinate = 0 //Xcoordinate of the last block
     this.closeLevel = false //If level should be closed at end of frame
+    this.completed = false //Says if level has been completed
+    this.loaded = false //If everything including images has loaded
     
     if(mode == "read"){
       this.readData(data, callback);
-    }else{
+    }else if(mode == "menu"){ //menu level
+      this.bgSprite = 0
+      this.fgSprite = 0
+      //get colors for background
+      const r = random(0, 360)
+      const g = random(0, 255)
+      const b = random(0, 100)
+
+      this.bgColor = color(r, g, b)
+      this.fgColor = color(r-40, g-40, b-40)
+
+      this.tintDeco();
+      this.loaded=true
+    }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
       this.bgColor = "#FFFF00"
@@ -142,6 +169,7 @@ class Level{
       loadSound(this.musicLink, data => {
         this.song = data
         this.song.setVolume(0.3)
+        this.loaded=true
         callback() //Level has finished loading, start game
       })
     }
@@ -177,6 +205,7 @@ class Level{
       loadSound(this.musicLink, data => {
         this.song = data
         this.song.setVolume(0.3)
+        this.loaded=true
         callback() //Level has finished loading, start game
       })
     });

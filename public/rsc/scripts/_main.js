@@ -9,12 +9,13 @@ let mouseClick = false //says if mouse was pressed in that frame, updated is use
 
 function setup() {
   canvas = createCanvas(1, 1)
-  //textFont() Maybe custom Font?
+  textFont(customFont)
   noSmooth()
   windowResized();
   angleMode(DEGREES)
   frameRate(120)
   defineModeConstants() //Define modeconstants in modeConstants.js
+  menuSetup()
 
   //Stop contextmenu
   canvas.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -53,6 +54,7 @@ function drawUI(){
   if(debug) drawFramerate()
   if(gamePaused) drawPauseMenu()
   if(endless) endlessUI()
+  if(activeLevel.completed) drawCompletionScreen()
 }
 
 function drawFramerate(){
@@ -118,7 +120,7 @@ function mouseWheel(event){
 
 //Creates button with specific design, returnfunction gets called when button was pressed
 function buttonRect(x, y, l, h, _text, sizeText, returnFunction, options = {}){
-  const defaults = {colNor: color(0, 0, 0, 0), colHigh: color(150, 150, 150, 200), curve: height/20, textCol: "white", strokeW: 0, strokeC: "#414149"} //Default values for options
+  const defaults = {colNor: color(0, 200, 0, 255), colHigh: color(0, 150, 0, 255), curve: height/50, textCol: "white", strokeW: height/120, strokeC: "#202020"} //Default values for options
   const calcOptions = Object.assign(defaults, options)
   rectMode(CENTER)
   strokeWeight(calcOptions.strokeW)
