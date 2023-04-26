@@ -98,6 +98,7 @@ function keyPressed(){
 
 function mousePressed(){
   mouseClick = true
+
 }
 
 function mouseReleased(){
@@ -105,6 +106,10 @@ function mouseReleased(){
 
 function mouseDragged(){
   
+}
+
+function mouseClicked(){
+  editorMouseClick();
 }
 
 function mouseWheel(event){
@@ -284,9 +289,8 @@ function windowResized(){
       canvas.position(0, (windowHeight-calculatedHeight)*0.5)
       break;
   }
-  u = height/zoom //Pixel per Unit
-  uwidth = width/u //Width in units
-  uheight = zoom //Height in units
+  
+  changeZoom(zoom);
 }
 
 function changeZoom(newZoomValue){

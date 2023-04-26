@@ -28,7 +28,7 @@ function drawEditor(){
     drawLevel(editorLevel)
     drawEditorUI();
     if(mouseY < editorWindow.y){
-        fill(255, 255, 255, 100)
+        fill(255 , 255, 255, 100)
         rotateUnitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1, editor.rotation*90)
         if(mouseClick)editorLevel.addObject(new gameObject(editor.type, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation))
     }else{
@@ -47,8 +47,11 @@ function drawEditorUI(){
     fill(120, 130, 1400)
     strokeWeight(0)
     rect(editorWindow.x, editorWindow.y, editorWindow.width, editorWindow.height)
-    fill("green")
 
+    fill(40)
+    for(let i = 0; i < editorList.length; i++){
+      rect(100*i + width/2 - editorList.length*50, editorWindow.y-50, 50, 50, 10, 10, 0, 0)
+    }
     fill(40)
     for(let j = 0; j < editor.rowNumb; j++){
         for(let i = 0; i < editor.columNumb; i++){
@@ -71,7 +74,6 @@ function drawEditorUI(){
     rect(width*0.8, height*0.9, width*0.2, height*0.1)
 
     drawText("Save Level", width*0.9, height*0.95, 0.5*u)
-    if(mouseClick&&button(width*0.8, height*0.9, width*0.2, height*0.1))editorLevel.saveLevel();
 
     strokeWeight(0.04*u)
     stroke(0) 
@@ -79,9 +81,6 @@ function drawEditorUI(){
     rect(0, height*0.9, width*0.2, height*0.1)
     drawText("Play Level", width*0.1, height*0.95, 0.5*u)
 
-    if(mouseClick&&button(0, height*0.9, width*0.2, height*0.1)){
-      startEditorLevel()
-    }
 }
 
 //Playtest level in editor
@@ -156,5 +155,12 @@ function editorKeyPressed(){
     case 82: //r, rotate object
       editor.rotation = (editor.rotation+1)%4
       break;
+  }
+}
+
+function editorMouseClick(){
+  if(button(width*0.8, height*0.9, width*0.2, height*0.1))editorLevel.saveLevel();
+  if(button(0, height*0.9, width*0.2, height*0.1)){
+    startEditorLevel()
   }
 }
