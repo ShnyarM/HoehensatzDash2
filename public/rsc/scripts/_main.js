@@ -10,12 +10,13 @@ let oldMouseX, oldMouseY, mouseIsDown;
 
 function setup() {
   canvas = createCanvas(1, 1)
-  //textFont() Maybe custom Font?
+  textFont(customFont)
   noSmooth()
   windowResized();
   angleMode(DEGREES)
   frameRate(120)
   defineModeConstants() //Define modeconstants in modeConstants.js
+  menuSetup()
 
   //Stop contextmenu
   canvas.canvas.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -35,7 +36,6 @@ function draw() {
     case 1:{
       playLevel()
       drawUI();
-      if(activeLevel.closeLevel) closeLevel()
     }break
     case 2:{
       drawEditor();
@@ -54,8 +54,12 @@ function draw() {
 //Draw the User Interface while in game
 function drawUI(){
   if(debug) drawFramerate()
-  if(gamePaused) drawPauseMenu()
   if(endless) endlessUI()
+  else levelUI()
+
+  if(practiceMode) practiceUI()
+  if(activeLevel.completed) drawCompletionScreen()
+  if(gamePaused) drawPauseMenu()
 }
 
 function drawFramerate(){
@@ -82,12 +86,13 @@ function drawFramerate(){
 
 function keyPressed(){
   if(gameState==1){
+    practiceKeyPressed()
     switch(keyCode){
       case 90: //z, toggle debug mode
         debug = !debug;
         break;
       case 27: //esc, toggle pauseMenu
-        gamePaused = !gamePaused
+        gamePaused ? closePauseMenu() : openPauseMenu()
         break;
       case 79: //o, toggle time running on and off
         timescale = timescale == 1 ? 0:1
@@ -126,7 +131,7 @@ function mouseWheel(event){
 
 //Creates button with specific design, returnfunction gets called when button was pressed
 function buttonRect(x, y, l, h, _text, sizeText, returnFunction, options = {}){
-  const defaults = {colNor: color(0, 0, 0, 0), colHigh: color(150, 150, 150, 200), curve: height/20, textCol: "white", strokeW: 0, strokeC: "#414149"} //Default values for options
+  const defaults = {colNor: color(0, 200, 0, 255), colHigh: color(0, 150, 0, 255), curve: height/50, textCol: "white", strokeW: height/120, strokeC: "#202020"} //Default values for options
   const calcOptions = Object.assign(defaults, options)
   rectMode(CENTER)
   strokeWeight(calcOptions.strokeW)

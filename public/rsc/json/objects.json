@@ -20,7 +20,7 @@
   "127": {"name": "robotPortal", "type": 4},
   "128": {"name": "spiderPortal", "type": 4},
   "129": {"name": "swingCopterPortal", "type": 4},
-  "130": {"name": "speed0", "type": 4, "extra":{"width": 1.3}},
+  "130": {"name": "speed0", "type": 4, "extra":{"width": 1.3, "drawnWidth":1.3, "boxWidth": 1.3}},
   "131": {"name": "speed1", "type": 4, "extra":{"width": 1.3}},
   "132": {"name": "speed2", "type": 4, "extra":{"width": 1.5}},
   "133": {"name": "speed3", "type": 4, "extra":{"width": 1.7}},

@@ -129,6 +129,7 @@ function startEditorLevel(){
 function stopEditorLevel(){
   //open editor
   gameState = 2;
+  closePractice()
   editorPlaytest = false
   editorLevel.song.stop()
   

@@ -5,6 +5,8 @@ let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
 let objectInfo
 let editorImgs = {zoomIn:""};
+let customFont
+let practiceCheckpointImg, practiceSong
 
 function preload(){
   icon = loadImage("rsc/images/icon.png")
@@ -13,6 +15,8 @@ function preload(){
   ufo = loadImage("rsc/images/ufo.png")
   wave = loadImage("rsc/images/wave.png")
   swingCopter = loadImage("rsc/images/swingCopter.png")
+  practiceCheckpointImg = loadImage("rsc/images/checkpoint.png")
+  practiceSong = loadSound("rsc/music/StayInsideMe.mp3")
 
   for(let i = 0; i < 5; i++) robotImgs[i] = loadImage("rsc/images/robotFrames/" + i + ".png")
   robotJump = loadImage("rsc/images/robotFrames/jump.png")
@@ -35,6 +39,8 @@ function preload(){
   editorImgs.move = loadImage("rsc/images/moveIcon.png")
   editorImgs.play = loadImage("rsc/images/play.png")
   editorImgs.cursor = loadImage("rsc/images/cursor.png")
+
+  customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 
   loadStrings("rsc/levels/obstacles.txt", obstacles => {
     for(let i = 0; i < obstacles.length; i++){//split blocks

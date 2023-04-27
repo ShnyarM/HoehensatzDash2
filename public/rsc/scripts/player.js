@@ -116,7 +116,6 @@ class Player{
 
     if(this.gravitySwitch == -1 && this.gameMode != 0 && this.gameMode != 2 && this.gameMode != 4 && this.gameMode != 7){ //If upside and not cube, ball, wave or swing copter, flip image upside down
       rotateUnitImageFlipped(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, 180+this.rotation)
-      console.log("fsd")
     }else{
       if(this.rotation % 90 == 0) unitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight)
       else rotateUnitImage(this.image, this.x+this.drawOffsetX, this.y+this.drawOffsetY, this.drawnWidth, this.drawnHeight, this.rotation) //draw rotated image if is rotating
@@ -139,7 +138,7 @@ class Player{
     this.x += (this.xVelocity*sdeltaTime) //add x
     
     //If player touches border/line, move camera to right
-    if(this.x + this.width - camera.offsetX >= camera.xBorder){
+    if(this.x + this.width - camera.offsetX >= camera.xBorder && camera.movement){
       camera.offsetX = this.x+this.width-camera.xBorder
     }
 
@@ -182,12 +181,17 @@ class Player{
 
   //Go throough animation for completion
   completionAnimation(){
-    this.completedAnimationTime += sdeltaTime //Progress animation
-    this.y += (this.completedAnimationTime ** 2)* 0.1 //Move player up
-    this.rotation += (this.completedAnimationTime ** 2)*3 //Rotate player
-    camera.offsetY += (this.completedAnimationTime ** 1.5)*0.05 //move camera up
+    fill(color(0, 0, 0, (this.completedAnimationTime/this.completedAnimationTimeMax)*255)) //Make Background Black
+    strokeWeight(0)
+    rect(0, 0, width, height)
+    if(this.completedAnimationTime >= this.completedAnimationTimeMax) return //Dont advance further if animation is already complete
 
-    if(this.completedAnimationTime >= this.completedAnimationTimeMax) activeLevel.closeLevel = true //Close level at end of frame
+    this.completedAnimationTime += sdeltaTime //Progress animation
+    this.y += (this.completedAnimationTime ** 2)* 8 * sdeltaTime //Move player up
+    this.rotation += (this.completedAnimationTime ** 2)*300* sdeltaTime //Rotate player
+    camera.offsetY += (this.completedAnimationTime ** 1.5)* 5 * sdeltaTime //move camera up
+
+    if(this.completedAnimationTime >= this.completedAnimationTimeMax) activeLevel.completed = true //Close level at end of frame
   }
 
   //Code to be executed when player touches ground
@@ -491,6 +495,8 @@ class Player{
 
   //Get lowest block from above player
   getHighCeiling(levelObj){
+    if(gameState == 0){this,this.highCeiling = camera.offsetY; return} //Return camera as ceiling if in main menu
+
     let highest = camera.locked ? camera.topLock-camLockBorder : ceilingLimit //Set highest possible ceiling, add camLockBorder because ground offset from camera border
     if(highest > ceilingLimit) highest = ceilingLimit //reduce highest if above ceiling limit
 

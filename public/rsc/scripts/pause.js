@@ -1,5 +1,17 @@
 let gamePaused = false
 
+function openPauseMenu(){
+  gamePaused = true
+  timescale = 0
+  if(activeLevel.song.isPlaying()) activeLevel.song.pause()
+}
+
+function closePauseMenu(){
+  gamePaused = false
+  timescale = 1
+  if(!practiceMode && !activeLevel.song.isPlaying()) activeLevel.song.play()
+}
+
 function drawPauseMenu(){
   if(!gamePaused)return
   strokeWeight(0)
@@ -7,27 +19,18 @@ function drawPauseMenu(){
   rect(0, 0, width, height)
 
   textAlign(CENTER, CENTER)
-  textSize(height/15)
-  strokeWeight(height/180)
-  fill("white")
-  text("Paused", width/2, height*0.075)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Paused", width*0.5, height*0.075)
 
-  buttonRect(width*0.15, height / 2.5 - height / 8, width / 5, height/ 10, "Continue", height / 45, () => gamePaused = false)
-  buttonRect(width*0.15, height / 2.5, width / 5, height/ 10, "Exit Game", height / 45, closeLevel)
-  //buttonRect(width*0.15, height / 2.5, width / 5, height/ 10, "Settings", height / 45, () => {console.log("settings")})
-  //buttonRect(width*0.15, height / 2.5 + height/ 8, width / 5, height/ 10, "Exit Game", height / 45, leaveGame)
-}
-
-function drawDeathScreen(){
-  if(gamePaused) return //Dont draw if game is paused
-  fill(color(255, 0, 0, 120))
-  rect(0, 0, width, height)
-  textAlign(CENTER)
-  textSize(height/15)
-  stroke("#414149")
-  strokeWeight(height/180)
-  fill("white")
-  text("You Died!", width/2, height*0.2)
-  buttonRect(width*0.5, height*0.55, width / 4, height/ 10, "Respawn", height / 30, () => {self.respawn()})
-  buttonRect(width*0.5, height*0.7, width / 4, height/ 10, "Exit Game", height / 30, leaveGame)
+  if(!endless){
+    buttonRect(width*0.5, height*0.5 - height*0.15, width / 5, height/ 10, "Continue", height / 45, closePauseMenu)
+    buttonRect(width*0.5, height*0.5, width / 5, height/ 10, (practiceMode ? "Normal Mode" : "Practice Mode"), height / 45, (practiceMode ? () => {closePractice(); closePauseMenu()} : practiceSetup))
+    buttonRect(width*0.5, height*0.5 + height*0.15, width / 5, height/ 10, "Exit Game", height / 45, () => {closePauseMenu(); closeLevel()})
+  }else{
+    buttonRect(width*0.5, height*0.5 - height*0.075, width / 5, height/ 10, "Continue", height / 45, closePauseMenu)
+    buttonRect(width*0.5, height*0.5 + height*0.075, width / 5, height/ 10, "Exit Game", height / 45, () => {closePauseMenu(); closeLevel()})
+  }
 }

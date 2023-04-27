@@ -24,18 +24,27 @@ function setupEndless(levelObj){
 
 //Stop current run and reset
 function resetEndless(levelObj){
-  if(score > highScore) highScore = score
-
   setupEndless(levelObj) //Setup next run
 }
 
 function endlessUpdate(levelObj){
-  score = floor(player.x/5) //Update score
+  if(!activeLevel.song.isPlaying() && !gamePaused) activeLevel.song.play()
+
+  if(!player.dead) score += sdeltaTime
+  if(floor(score) > highScore) highScore = floor(score) 
   if(lastXCoordinate < camera.offsetX+uwidth) addObstacle(levelObj) //add new obstacle if needed
 }
 
 function endlessUI(){
-  text(score, width*0.5, height*0.1)
+  textAlign(CENTER, CENTER)
+  textSize(height/20)
+  fill("white")
+  stroke("black")
+  strokeWeight(height/100)
+  text(floor(score), width*0.5, height*0.1)
+
+  textSize(height/30)
+  text("Highscore:", width*0.1, height*0.05)
   text(highScore, width*0.1, height*0.1)
 }
 
