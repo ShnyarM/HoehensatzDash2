@@ -20,11 +20,11 @@
   "127": {"name": "robotPortal", "type": 4},
   "128": {"name": "spiderPortal", "type": 4},
   "129": {"name": "swingCopterPortal", "type": 4},
-  "130": {"name": "speed0", "type": 4, "extra":{"width": 1.3, "drawnWidth":1.3, "boxWidth": 1.3}},
-  "131": {"name": "speed1", "type": 4, "extra":{"width": 1.3, "drawnWidth":1.3, "boxWidth": 1.3}},
-  "132": {"name": "speed2", "type": 4, "extra":{"width": 1.5, "drawnWidth":1.5, "boxWidth": 1.5}},
-  "133": {"name": "speed3", "type": 4, "extra":{"width": 1.7, "drawnWidth":1.7, "boxWidth": 1.7}},
-  "134": {"name": "speed4", "type": 4, "extra":{"width": 1.9, "drawnWidth":1.9, "boxWidth": 1.9}},
+  "130": {"name": "speed0", "type": 4, "extra":{"width": 1.3, "drawnWidth":1.3, "boxWidth": 1.3, "drawOffsetX": -0.65}},
+  "131": {"name": "speed1", "type": 4, "extra":{"width": 1.3, "drawnWidth":1.3, "boxWidth": 1.3, "drawOffsetX": -0.65}},
+  "132": {"name": "speed2", "type": 4, "extra":{"width": 1.5, "drawnWidth":1.5, "boxWidth": 1.5, "drawOffsetX": -0.75}},
+  "133": {"name": "speed3", "type": 4, "extra":{"width": 1.7, "drawnWidth":1.7, "boxWidth": 1.7, "drawOffsetX": -0.85}},
+  "134": {"name": "speed4", "type": 4, "extra":{"width": 1.9, "drawnWidth":1.9, "boxWidth": 1.9, "drawOffsetX": -0.95}},
   "135": {"name": "gravityPortal1", "type": 4},
   "136": {"name": "gravityPortal2", "type": 4}
 }
