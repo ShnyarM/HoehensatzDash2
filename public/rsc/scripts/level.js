@@ -207,7 +207,7 @@ class Level{
       this.tintDeco();
       loadSound(this.musicLink, data => {
         this.song = data
-        this.song.setVolume(0.3)
+        this.song.setVolume(parseFloat(savedVars.musicVolume))
         this.loaded=true
         callback() //Level has finished loading, start game
       })
@@ -243,7 +243,7 @@ class Level{
       this.tintDeco();
       loadSound(this.musicLink, data => {
         this.song = data
-        this.song.setVolume(0.3)
+        this.song.setVolume(parseFloat(savedVars.musicVolume))
         this.loaded=true
         callback() //Level has finished loading, start game
       })

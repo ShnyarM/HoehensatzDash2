@@ -10,7 +10,6 @@ function practiceSetup(){
   activeLevel.song.stop()
   closePauseMenu()
   checkpoints = []
-  practiceSong.play()
 }
 
 function closePractice(){
@@ -20,12 +19,8 @@ function closePractice(){
   if(gameState==1) resetLevel(activeLevel) //Reset level if still in game
 }
 
-function practiceUpdate(){
-
-}
-
 function practiceUI(){
-  if(!practiceSong.isPlaying()) practiceSong.play()
+  if(!practiceSong.isPlaying() && !gamePaused) {practiceSong.play(); console.log("started")}
 
   for(let i = 0; i < checkpoints.length; i++){
     checkpoints[i].draw()
@@ -54,6 +49,8 @@ function loadCheckpoint(){
   //apply player values
   player = Object.assign(player, checkpoint.player)
   player.switchMode(player.gameMode)
+  player.startJumpDeactivate = false
+  player.onGround = false
 
   //get correct placementindex
   let placementIndex = checkpoint.level.placementIndex

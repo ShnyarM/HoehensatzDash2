@@ -4,12 +4,15 @@ function openPauseMenu(){
   gamePaused = true
   timescale = 0
   if(activeLevel.song.isPlaying()) activeLevel.song.pause()
+  if(practiceMode) practiceSong.pause()
 }
 
 function closePauseMenu(){
   gamePaused = false
   timescale = 1
-  if(!practiceMode && !activeLevel.song.isPlaying()) activeLevel.song.play()
+  if(!practiceMode && !activeLevel.song.isPlaying() && !player.dead) activeLevel.song.play()
+  else if(practiceMode) practiceSong.play()
+  player.startJumpDeactivate = true
 }
 
 function drawPauseMenu(){

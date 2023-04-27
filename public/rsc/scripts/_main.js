@@ -7,9 +7,12 @@ let lastFrames, fps = 60
 let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
 let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible
 let oldMouseX, oldMouseY, mouseIsDown;
+let savedVars = {"musicVolume":0.3, "soundVolume":0.3} //Variable which will get automatically saved to localstorage
 
 function setup() {
   canvas = createCanvas(1, 1)
+  loadLocalStorage()
+  adjustVolume()
   textFont(customFont)
   noSmooth()
   windowResized();
@@ -110,7 +113,6 @@ function keyPressed(){
     editorKeyPressed()
   }
 }
-
 
 function mousePressed(){
   mouseClick = true
@@ -303,6 +305,12 @@ function collision(x1, y1, w1, h1, x2, y2, w2, h2){
   return (x1 + w1 > x2 && x1 < x2 + w2 && y1 - h1 < y2 && y1 > y2 - h2)
 }
 
+//Adjust volume of sound effects
+function adjustVolume(){
+  explodeSound.setVolume(parseFloat(savedVars.soundVolume))
+  practiceSong.setVolume(parseFloat(savedVars.musicVolume))
+}
+
 function windowResized(){
   //Resize and position canvas so it is always in 16:9 Ratio
   const divisedWidth = windowWidth/16
@@ -325,6 +333,12 @@ function windowResized(){
   }
   
   changeZoom(zoom);
+
+  if(gameState == 0 && menuState == 4){ //Readjust slider size if in settings menu
+    musicVolumeSlider.remove()
+    soundVolumeSlider.remove()
+    openSettingsMenu()
+  }
 }
 
 function changeZoom(newZoomValue){

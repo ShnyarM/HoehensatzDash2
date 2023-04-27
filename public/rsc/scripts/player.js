@@ -517,18 +517,36 @@ class Player{
   //Make player die
   die(){  
     this.dead = true
+    explodeSound.play()
     if(!endless) activeLevel.song.stop() //Stop music if not in endless
   }
 
   deathAnimation(levelObj){
     this.deathAnimationTime += sdeltaTime
-    circle(unitToPixelX(this.x+this.width*0.5,), unitToPixelY(this.y-this.height*0.5), this.deathAnimationTime*2*u)
+
+    //Draw lots of little particles in a circle for death effect
+    colorMode(HSB, 360, 100, 100)
+    for(let i = 0; i < round(40-60*this.deathAnimationTime); i++){ //Amount of particles, decreases with time (first constant how many at start, second how fast it decreases)
+      const angle = random(0, 360) //Choose random position, since it is in a circle postition determined with polar coordinates
+      const length = random(0, (Math.log(0.01+this.deathAnimationTime)+3)*0.75) //Max distance increases with time, using logarithmic function since it has high slope at start, leads to fast expansion at start and slow at the end, constant factors which are added prevent negative Numbers and multiplication at end decreases "max"
+      const x = player.x+player.width*0.5+cos(angle)*length //convert polar coordinates to x and y coordinates
+      const y = player.y-player.height*0.5+sin(angle)*length
+      const col = color(180, 100, random(40, 100), random(200, 255)) //Choose random color, hsb is used to get a blue color with differentiating brightness
+      const size = random(0.05, 0.15)
+      strokeWeight(0)
+      fill(col)
+      unitRect(x, y, size, size) //Draw particle
+    }
+    colorMode(RGB)
+
     if(this.deathAnimationTime >= this.deathAnimationTimeMax){
       resetLevel(levelObj)
     }
   }
 
   update(levelObj){
+    if(gamePaused) return
+
     levelObj.interactObjects.forEach(element => {
       collisionObject(this, element)   
     }); //Check for interactable Objects
