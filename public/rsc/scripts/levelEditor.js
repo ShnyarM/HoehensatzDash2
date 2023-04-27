@@ -35,7 +35,8 @@ function drawEditor(){
     drawGrid();
     drawLevel(editorLevel)
     if(mouseY < editorWindow.y){
-      if(editor.mode == 0){
+      switch(editor.mode){
+        case 0:{
         drawObject(editor.object)
         moveObject(editor.object, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)))
         
@@ -50,13 +51,18 @@ function drawEditor(){
             editorLevel.addObject(editor.object)
             editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
           }
-        }
-      }else if(editor.mode==1){
+        }break;
+      }case 1:{
         if(mouseIsDown){
           camera.offsetX += (pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX));
           camera.offsetY += (pixelToUnitY(oldMouseY)-pixelToUnitY(mouseY));
+        }break;
+      }case 2:{
+        if(mouseClick){
+          
         }
-      }
+      }break;
+    }
       }else{
       if(mouseClick){
             for(let j = 0; j < editor.rowNumb; j++){

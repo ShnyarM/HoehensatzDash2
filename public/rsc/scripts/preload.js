@@ -8,6 +8,10 @@ let editorImgs = {zoomIn:""};
 let customFont
 let practiceCheckpointImg, practiceSong
 
+document.onkeydown = function (e) {
+  return false;
+}
+
 function preload(){
   icon = loadImage("rsc/images/icon.png")
   ship = loadImage("rsc/images/ship.png")
