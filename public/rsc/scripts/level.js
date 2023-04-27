@@ -28,7 +28,7 @@ function playLevel(){
   activeLevel.deleteObjects()
 
   //Draw exit button when in editorPlaytest mode
-  if(editorPlaytest) buttonRect(width*0.05, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+  if(editorPlaytest) buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
     stopEditorLevel()
   })
 }
@@ -113,6 +113,7 @@ function openLevel(type, path = ""){
 
 function closeLevel(){ //ATTENTION
   gameState = 0;
+  menuState = 0;
   gamePaused = false
   endless = false
   editorPlaytest = false

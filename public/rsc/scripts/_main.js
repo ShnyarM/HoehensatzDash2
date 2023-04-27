@@ -45,6 +45,14 @@ function draw() {
     }break
   }
 
+  //Draw loading level text if loading level
+  if(openingLevel){
+    textSize(height/12)
+    fill("white")
+    strokeWeight(height/60)
+    text("Loading Level...", width*0.5, height*0.9)
+  }
+
   mouseClick = false
 }
 
