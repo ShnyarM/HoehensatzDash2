@@ -1,5 +1,7 @@
 let menuState = 0 //0 = main menu screen
-let menus = [drawMainMenu]
+let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect]
+const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
+const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
 
 let menuLevel
 
@@ -46,27 +48,68 @@ function drawMainMenu(){
   strokeWeight(height/60)
   text("Höhensatz Dash 2", width*0.5, height*0.075)
 
-  buttonRect(width*0.5-width*0.125, height*0.5-height*0.15, width / 5, height/ 10, "Play", height / 45, () => { //get own world
-    openLevel("read", "/rsc/levels/1.hd")
+  buttonRect(width*0.5-width*0.125, height*0.5-height*0.15, width / 5, height/ 10, "Play", height / 45, () => {
+    menuState=1
   })
   
-  buttonRect(width*0.5-width*0.125, height*0.5, width / 5, height/ 10, "Endless", height / 45, () => { //get own world
+  buttonRect(width*0.5-width*0.125, height*0.5, width / 5, height/ 10, "Endless", height / 45, () => {
     openEndless()
   })
 
-  buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Online Levels", height / 45, () => { //get own world
+  buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Online Levels", height / 45, () => {
     openEndless()
   })
 
-  buttonRect(width*0.5+width*0.125, height*0.5-height*0.15, width / 5, height/ 10, "Classic HD1 Levels   ", height / 45, () => { //get own world
-    openLevel("read", "/rsc/levels/hd1Levels/hd1Level1.hd")
+  buttonRect(width*0.5+width*0.125, height*0.5-height*0.15, width / 5, height/ 10, "Classic HD1 Levels   ", height / 45, () => {
+    menuState=2
   })
 
-  buttonRect(width*0.5+width*0.125, height*0.5, width / 5, height/ 10, "Classic Endless", height / 45, () => { //get own world
-    openLevel("read", "/rsc/levels/hd1Levels/hd1Level2.hd")
+  buttonRect(width*0.5+width*0.125, height*0.5, width / 5, height/ 10, "Classic Endless", height / 45, () => {
+    openEndless()
   })
 
-  buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => { //get own world
+  buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {
     setupEditor()
   })
 }
+
+function drawLevelSelect(){
+  textAlign(CENTER, CENTER)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Level Select", width*0.5, height*0.075)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+    menuState = 0
+  })
+
+  for(let i = 0; i < 2; i++){
+    for(let j = 0; j < 3; j++){
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, mainLevels[i*3+j], height / 45, () => { //get own world
+        openLevel("read", "rsc/levels/" + mainLevels[i*3+j] + ".hd")
+      })
+    }
+  }
+}
+
+function drawClassicLevelSelect(){
+  textAlign(CENTER, CENTER)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Classic Levels", width*0.5, height*0.075)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+    menuState = 0
+  })
+
+  for(let i = 0; i < 3; i++){
+    buttonRect(width*0.5, height*0.35+height*0.15*i, width / 4, height/ 9, classicLevels[i], height / 45, () => { //get own world
+      openLevel("read", "rsc/levels/hd1Levels/" + classicLevels[i] + ".hd")
+    })
+  }
+}
+
