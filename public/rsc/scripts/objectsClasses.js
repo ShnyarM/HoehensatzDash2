@@ -305,10 +305,9 @@ class gameObject{
     this.x = (x != undefined ? x : 0)
     this.y = (y != undefined ? y : 0)
 
+    Object.assign(this, objectInfo[id].extra) //Assign object from objects.json to get special properties like different width
     this.xCenter = this.x+this.width*0.5 //coordinates of center of block
     this.yCenter = this.y-this.height*0.5
-
-    Object.assign(this, objectInfo[id].extra) //Assign object from objects.json to get special properties like different width
   }
 }
 
