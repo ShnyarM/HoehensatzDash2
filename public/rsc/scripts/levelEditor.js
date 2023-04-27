@@ -5,7 +5,7 @@ let editorList = [
     [120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 135, 136]
 ]
 let editorLevel;
-let editor = {object: "", selectedSite: 1, selectedCategory: 2, move: 0, type:50, rowNumb: 2, columNumb: 8, rotation: 0}
+let editor = {mode: 0, object: "", selectedSite: 1, selectedCategory: 2, move: 0, type:50, rowNumb: 2, columNumb: 8, rotation: 0}
 let editorPlaytest = false
 
 let editorWindow = {}
@@ -35,21 +35,26 @@ function drawEditor(){
     drawGrid();
     drawLevel(editorLevel)
     if(mouseY < editorWindow.y){
-      fill(255 , 255, 255, 100)
-      drawObject(editor.object)
-      moveObject(editor.object, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)))
-      
-      //rotateUnitImage(objImages[editor.type], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), 1, 1, editor.rotation*90)
-      if(mouseClick){
-        let hasClicked = false;
-        for(let i = 0; i < editorList.length; i++){
-          if(button(editorWindow.tabSize*2*i + width/2 - (editorList.length-1)*editorWindow.tabSize - editorWindow.tabSize/2, editorWindow.y-editorWindow.tabSize, editorWindow.tabSize, editorWindow.tabSize))hasClicked=true
+      if(editor.mode == 0){
+        drawObject(editor.object)
+        moveObject(editor.object, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)))
+        
+        if(mouseClick){
+          let hasClicked = false;
+          for(let i = 0; i < editorList.length; i++){
+            if(button(editorWindow.tabSize*2*i + width/2 - (editorList.length-1)*editorWindow.tabSize - editorWindow.tabSize/2, editorWindow.y-editorWindow.tabSize, editorWindow.tabSize, editorWindow.tabSize))hasClicked=true
+          }
+          if(!hasClicked){
+            let id = editor.object.id
+            let rot = editor.object.rotation
+            editorLevel.addObject(editor.object)
+            editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
+          }
         }
-        if(!hasClicked){
-          let id = editor.object.id
-          let rot = editor.object.rotation
-          editorLevel.addObject(editor.object)
-          editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
+      }else if(editor.mode==1){
+        if(mouseIsDown){
+          camera.offsetX += (pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX));
+          camera.offsetY += (pixelToUnitY(oldMouseY)-pixelToUnitY(mouseY));
         }
       }
       }else{
@@ -57,7 +62,10 @@ function drawEditor(){
             for(let j = 0; j < editor.rowNumb; j++){
               for(let i = 0; i < editor.columNumb; i++){
                 let boxHeight = editorWindow.height/editor.rowNumb - editorWindow.height/20 - editorWindow.height/10
-                if(button(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight))editor.object = new gameObject(editorList[editor.selectedCategory][j*editor.columNumb+i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+                if(button(width/2 + i* (boxHeight+editorWindow.height/20) -boxHeight * (editor.columNumb+1)/2, editorWindow.y + editorWindow.height/20 + j*(editorWindow.height/20 + boxHeight), boxHeight, boxHeight)){
+                  editor.object = new gameObject(editorList[editor.selectedCategory][j*editor.columNumb+i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+                  editor.mode = 0
+                }
               }
             }
           }
@@ -65,13 +73,6 @@ function drawEditor(){
         stroke(0)
 
         drawEditorUI();
-
-        text(pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX), 100,100)
-        //console.log(oldMouseX-mouseX)
-        if(mouseIsDown&&editor.mode==1){
-        camera.offsetX += (pixelToUnitX(oldMouseX)-pixelToUnitX(mouseX));
-        camera.offsetY += (pixelToUnitY(oldMouseY)-pixelToUnitY(mouseY));
-      }
       }
 
 function drawEditorUI(){
@@ -93,6 +94,7 @@ function drawEditorUI(){
  
     buttonImg(width-editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.3, editorWindow.height/3, editorWindow.height/3, editorImgs.zoomIn, width/100, ()=>changeZoom(zoom - 1));
     buttonImg(width-editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.7, editorWindow.height/3, editorWindow.height/3, editorImgs.zoomOut, width/100, ()=>changeZoom(zoom + 1));
+    buttonImg(width-editorWindow.height/1.35, editorWindow.y + editorWindow.height*0.3, editorWindow.height/3, editorWindow.height/3, editorImgs.cursor, width/100, ()=>{editor.mode = 2});
     buttonImg(width-editorWindow.height/1.35, editorWindow.y + editorWindow.height*0.7, editorWindow.height/3, editorWindow.height/3, editorImgs.move, width/100, ()=>{editor.mode=1});
 
     buttonImg(editorWindow.height/3.2, editorWindow.y + editorWindow.height*0.3, editorWindow.height/3, editorWindow.height/3, editorImgs.play, width/100, ()=>startEditorLevel());
