@@ -52,7 +52,6 @@ function endlessUI(){
 function addObstacle(levelObj){
   const obstacleToAdd = endlessObstacles[floor(random(endlessObstacles.length))] //Get random obstacle
   const distance = round(random(obstacleDistanceMin, obstacleDistanceMax)) //Get random distance from last obstacle
-  console.log(distance)
 
   for(let i = 0; i < obstacleToAdd.length; i++){ //Add all objects of obstacle
     levelObj.addObject(new gameObject(parseFloat(obstacleToAdd[i][0]), parseFloat(obstacleToAdd[i][1])+lastXCoordinate+distance, parseFloat(obstacleToAdd[i][2]), parseFloat(obstacleToAdd[i][3])))

@@ -7,6 +7,8 @@ let objectInfo
 let editorImgs = {zoomIn:""};
 let customFont
 let practiceCheckpointImg, practiceSong
+let explodeSound
+let settingsIcon
 
 /*document.onkeydown = function (e) {
   return false;
@@ -21,6 +23,7 @@ function preload(){
   swingCopter = loadImage("rsc/images/swingCopter.png")
   practiceCheckpointImg = loadImage("rsc/images/checkpoint.png")
   practiceSong = loadSound("rsc/music/StayInsideMe.mp3")
+  explodeSound = loadSound("rsc/sounds/explodeSound.ogg")
 
   for(let i = 0; i < 5; i++) robotImgs[i] = loadImage("rsc/images/robotFrames/" + i + ".png")
   robotJump = loadImage("rsc/images/robotFrames/jump.png")
@@ -55,6 +58,8 @@ function preload(){
   editorImgs.close = loadImage("rsc/images/close.png")
   editorImgs.pause = loadImage("rsc/images/pauseIcon.png")
 
+  settingsIcon = loadImage("rsc/images/settings.png")
+
   customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 
   loadStrings("rsc/levels/obstacles.txt", obstacles => {
@@ -65,4 +70,19 @@ function preload(){
       }
     }
   })
+}
+
+//Get saved values from localStorage
+function loadLocalStorage(){
+  for(const varName in savedVars){
+    if(localStorage.getItem(varName) == null) {localStorage.setItem(varName, savedVars[varName]); continue}//save default value if no value exists
+    savedVars[varName] = localStorage.getItem(varName)
+  }
+}
+
+//Save all values into local Storage
+function saveLocalStorage(){
+  for(const varName in savedVars){
+    localStorage.setItem(varName, savedVars[varName])
+  }
 }

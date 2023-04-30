@@ -211,7 +211,7 @@ class Level{
   loadSong(callback =()=>{}){
     loadSound("rsc/music/"+this.songName+".mp3", data => {
       this.song = data
-      this.song.setVolume(0.3)
+      this.song.setVolume(parseFloat(savedVars.musicVolume))
       this.loaded=true
       callback() //Level has finished loading, start game
     })

@@ -1,7 +1,8 @@
-let menuState = 0 //0 = main menu screen
-let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect]
+let menuState = 0 //0 = main menu screen, 1=main level select, 2=classic level select, 3=online level select, 4=settings
+let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings]
 const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
 const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
+let musicVolumeSlider, soundVolumeSlider
 
 let menuLevel
 
@@ -71,6 +72,13 @@ function drawMainMenu(){
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {
     setupEditor()
   })
+
+  buttonRect(width-width*0.05, height-width*0.05, width*0.05, width*0.05, "", height / 45, () => {
+    openSettingsMenu()
+  }, {"curve": height})
+  imageMode(CENTER)
+  image(settingsIcon, width-width*0.05, height-width*0.05, width*0.03, width*0.03)
+  imageMode(CORNER)
 }
 
 function drawLevelSelect(){
@@ -81,13 +89,13 @@ function drawLevelSelect(){
   strokeWeight(height/60)
   text("Level Select", width*0.5, height*0.075)
 
-  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
     menuState = 0
   })
 
   for(let i = 0; i < 2; i++){
     for(let j = 0; j < 3; j++){
-      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, mainLevels[i*3+j], height / 45, () => { //get own world
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, mainLevels[i*3+j], height / 45, () => { 
         openLevel("read", "rsc/levels/" + mainLevels[i*3+j] + ".hd")
       })
     }
@@ -102,14 +110,47 @@ function drawClassicLevelSelect(){
   strokeWeight(height/60)
   text("Classic Levels", width*0.5, height*0.075)
 
-  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => { //get own world
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
     menuState = 0
   })
 
   for(let i = 0; i < 3; i++){
-    buttonRect(width*0.5, height*0.35+height*0.15*i, width / 4, height/ 9, classicLevels[i], height / 45, () => { //get own world
+    buttonRect(width*0.5, height*0.35+height*0.15*i, width / 4, height/ 9, classicLevels[i], height / 45, () => {
       openLevel("read", "rsc/levels/hd1Levels/" + classicLevels[i] + ".hd")
     })
   }
+}
+
+function drawSettings(){
+  textAlign(CENTER, CENTER)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Settings", width*0.5, height*0.075)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, closeSettingsMenu)
+
+  textSize(height/15)
+  text("Music Volume", width*0.5, height*0.35)
+  text("Sound Volume", width*0.5, height*0.55)
+}
+
+function openSettingsMenu(){
+  menuState=4
+  musicVolumeSlider = createSlider(0, 1, parseFloat(savedVars.musicVolume), 0.01).size(width*0.3, height*0.075).position(canvas.position().x + width*0.35, canvas.position().y + height*0.4)
+  soundVolumeSlider = createSlider(0, 1, parseFloat(savedVars.soundVolume), 0.01).size(width*0.3, height*0.075).position(canvas.position().x + width*0.35, canvas.position().y + height*0.6)
+
+  musicVolumeSlider.input(() => {savedVars.musicVolume = musicVolumeSlider.value()})
+  soundVolumeSlider.input(() => {savedVars.soundVolume = soundVolumeSlider.value()})
+}
+
+function closeSettingsMenu(){
+  menuState = 0
+
+  saveLocalStorage() //Save values into localStorage
+  adjustVolume()
+  musicVolumeSlider.remove()
+  soundVolumeSlider.remove()
 }
 
