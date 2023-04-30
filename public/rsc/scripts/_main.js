@@ -129,11 +129,8 @@ function mouseClicked(){
 }
 
 function mouseWheel(event){
-  switch(gameState){
-    case 2:{ // Editor to move around
-      if(camera.offsetY > 1.5||event.deltaY < 0)camera.offsetY -= event.deltaY/100
-      if(camera.offsetX > -1.5||event.deltaX > 0)camera.offsetX += event.deltaX/10
-    }break
+  if(gameState==2){
+    editorMouseWheel(event);
   }
 }
 
@@ -158,14 +155,15 @@ function buttonRect(x, y, l, h, _text, sizeText, returnFunction, options = {}){
 }
 
 function buttonImg(x, y, w, h, img, padding, returnFunction, options = {}){
-  const defaults = {colNor: color(0, 140, 0, 255), colHigh: color(0, 200, 0, 255), curve: [height/20], strokeW: width/750, strokeC: "#000000"} //Default values for options
+  const defaults = {colNor: color(0, 140, 0, 255), disabledCol:color(0, 140, 0, 255), colHigh: color(0, 200, 0, 255), curve: [height/20], strokeW: width/750, strokeC: "#000000", enabled:true} //Default values for options
   const calcOptions = Object.assign(defaults, options)
   push()
   fill("green")
-  if(buttonCenter(x, y, w, h)){
+  if(buttonCenter(x, y, w, h)&&calcOptions.enabled){
     fill(calcOptions.colHigh)
     if(mouseClick) returnFunction()
-  }else fill(calcOptions.colNor)
+  }else if(!calcOptions.enabled){fill(calcOptions.disabledCol)}
+  else fill(calcOptions.colNor)
   strokeWeight(calcOptions.strokeW)
   stroke(calcOptions.strokeC)
   rect(x-w/2, y-h/2, w, h, ...calcOptions.curve);
@@ -325,6 +323,7 @@ function windowResized(){
   }
   
   changeZoom(zoom);
+  if(gameState == 2)resizeEditor();
 }
 
 function changeZoom(newZoomValue){

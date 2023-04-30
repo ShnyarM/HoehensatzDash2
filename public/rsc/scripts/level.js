@@ -175,7 +175,6 @@ class Level{
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
-    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
     this.song = 0
     this.lastXCoordinate = 0 //Xcoordinate of the last block
     this.completed = false //Says if level has been completed
@@ -199,19 +198,23 @@ class Level{
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
-      this.bgColor = "#8888DD"
-      this.fgColor = "#8888DD"
+      this.bgColor = [136, 136, 221]
+      this.fgColor = [136, 136, 221]
       this.levelName = "NewLevel"
-      this.musicLink = "/rsc/music/stereoMadness.mp3"
+      this.songName = "StereoMadness"
 
       this.tintDeco();
-      loadSound(this.musicLink, data => {
-        this.song = data
-        this.song.setVolume(0.3)
-        this.loaded=true
-        callback() //Level has finished loading, start game
-      })
+      this.loadSong(callback);
     }
+  }
+
+  loadSong(callback =()=>{}){
+    loadSound("rsc/music/"+this.songName+".mp3", data => {
+      this.song = data
+      this.song.setVolume(0.3)
+      this.loaded=true
+      callback() //Level has finished loading, start game
+    })
   }
 
   readData(path, callback){
@@ -235,18 +238,13 @@ class Level{
 
       this.bgSprite = parseInt(metaData[0].toString())
       this.fgSprite = parseInt(metaData[1])
-      this.bgColor = metaData[2]
-      this.fgColor = metaData[3]
+      this.bgColor = split(metaData[2], ",")
+      this.fgColor = split(metaData[3], ",")
       this.levelName = metaData[4]
-      this.musicLink = metaData[5]
+      this.songName = metaData[5]
 
       this.tintDeco();
-      loadSound(this.musicLink, data => {
-        this.song = data
-        this.song.setVolume(0.3)
-        this.loaded=true
-        callback() //Level has finished loading, start game
-      })
+      this.loadSong(callback)
     });
   }
 
@@ -332,9 +330,10 @@ class Level{
     levelSave = levelSave.substring(0,levelSave.length-1);
 
     levelSave += "~"
-    levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
-    levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
-    levelSave += "+LevelName+/rsc/music/stereoMadness.mp3" // song link
+    levelSave += this.bgSprite+"+" + this.fgSprite
+    levelSave += "+"+this.bgColor+"+" + this.fgColor
+    levelSave += "+"+this.levelName
+    levelSave += "+"+this.songName // song link
 
     download("level.hd", levelSave)
   }
