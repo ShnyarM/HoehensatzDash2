@@ -73,7 +73,7 @@ function preload(){
   customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 
   //get endless obstacles
-  loadStrings("rsc/levels/obstacles.txt", obstacles => {
+  loadStrings("rsc/levels/obstacles/obstacles.txt", obstacles => {
     for(let i = 0; i < obstacles.length; i++){//split blocks
       endlessObstacles[i] = split(obstacles[i], "+")
       for(let j = 0; j < endlessObstacles[i].length; j++){ //split elements of block
@@ -83,7 +83,7 @@ function preload(){
   })
 
   //Get classic endless obstacles
-  loadStrings("rsc/levels/classicObstacles.txt", obstacles => {
+  loadStrings("rsc/levels/obstacles/classicObstacles.txt", obstacles => {
     for(let i = 0; i < obstacles.length; i++){//split blocks
       classicEndlessObstacles[i] = split(obstacles[i], "+")
       for(let j = 0; j < classicEndlessObstacles[i].length; j++){ //split elements of block
