@@ -8,6 +8,7 @@ let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
 let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible
 let oldMouseX, oldMouseY, mouseIsDown;
 let savedVars = {"musicVolume":0.3, "soundVolume":0.3, "highscore": 0, "classicHighscore": 0} //Variable which will get automatically saved to localstorage
+let sliders = {}
 
 function setup() {
   canvas = createCanvas(1, 1)
@@ -17,7 +18,7 @@ function setup() {
   noSmooth()
   windowResized();
   angleMode(DEGREES)
-  frameRate(120)
+  frameRate(144)
   defineModeConstants() //Define modeconstants in modeConstants.js
   menuSetup()
 
@@ -60,6 +61,7 @@ function draw() {
   mouseClick = false
   oldMouseX = mouseX;
   oldMouseY = mouseY
+  handleSliders()
 }
 
 //Draw the User Interface while in game
@@ -98,6 +100,7 @@ function drawFramerate(){
 function keyPressed(){
   if(gameState==1){
     practiceKeyPressed()
+    endlessKeyPressed()
     switch(keyCode){
       case 90: //z, toggle debug mode
         debug = !debug;
@@ -332,12 +335,6 @@ function windowResized(){
   
   changeZoom(zoom);
   if(gameState == 2)resizeEditor();
-
-  if(gameState == 0 && menuState == 4){ //Readjust slider size if in settings menu
-    musicVolumeSlider.remove()
-    soundVolumeSlider.remove()
-    openSettingsMenu()
-  }
 }
 
 function changeZoom(newZoomValue){

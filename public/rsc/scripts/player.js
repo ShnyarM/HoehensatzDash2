@@ -14,10 +14,10 @@ function playerUpdate(levelObj){
     }else player.completionAnimation()
 
     player.draw()
-    //player.drawHitbox()
   }else{
     player.deathAnimation(levelObj)
   }
+  if(debug) player.drawHitbox()
 }
 
 function playerMouseClicked(){

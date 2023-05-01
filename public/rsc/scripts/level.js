@@ -4,15 +4,18 @@ const groundTileSize = 5 //Size of single groundtile
 const backgroundSize = 20, parallaxFactor = 15 //size of background tile and parralax Strength
 const ceilingLimit = 140
 let openingLevel = false //says if game is currently opening level, used to prevent multiple levels from opening at oncc
+let attempts = 1 //Attempts which player has had
 
 function drawLevel(levelObj){
   levelObj.groundObjects.forEach(element => drawObject(element));
   levelObj.interactObjects.forEach(element => drawObject(element));
   levelObj.deathObjects.forEach(element => drawObject(element));
 
-  //levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
-  levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
-  //levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
+  if(debug){
+    levelObj.groundObjects.forEach(element => drawObjectHitbox(element));
+    levelObj.interactObjects.forEach(element => drawObjectHitbox(element));
+    levelObj.deathObjects.forEach(element => drawObjectHitbox(element));
+  }
 }
 
 function playLevel(){
@@ -54,6 +57,12 @@ function levelUI(){
   stroke("black")
   strokeWeight(height/100)
   text(floor(percentage*100) + "%", width*0.73, height*0.04)
+
+  //Draw attempt count
+  if(!editorPlaytest){
+    textSize(height/30)
+    text("Attempt " + attempts, width*0.08, height*0.05)
+  }
 }
 
 //draw background
@@ -101,6 +110,7 @@ function drawForeground(levelObj){
 function openLevel(type, path = ""){
   if(openingLevel) return //Stop if a level is already being opened
 
+  attempts = 1
   openingLevel = true
   activeLevel = new Level(type, path, () => {
     gameState = 1;
@@ -132,6 +142,7 @@ function resetLevel(levelObj){ //ATTENTION
   levelObj.groundObjects = []
   levelObj.deathObjects = []
   levelObj.completed = false
+  attempts++
 
   if(endless) {resetEndless(levelObj); saveLocalStorage()} //reset endless and save highscore in localstorage
   else{
@@ -201,7 +212,7 @@ class Level{
       this.tintDeco();
       loadSound("rsc/music/"+this.musicLink+".mp3", data => {
         this.song = data
-        this.song.setVolume(0.3)
+        this.song.setVolume(parseFloat(savedVars.musicVolume))
         getNextEndlessSong()
         this.loaded=true
         callback() //Level has finished loading, start game
@@ -217,7 +228,7 @@ class Level{
       this.tintDeco();
       loadSound("rsc/music/"+this.musicLink+".mp3", data => {
         this.song = data
-        this.song.setVolume(0.3)
+        this.song.setVolume(parseFloat(savedVars.musicVolume))
         this.loaded=true
         callback() //Level has finished loading, start game
       })
@@ -253,7 +264,7 @@ class Level{
       this.tintDeco();
       loadSound("rsc/music/"+this.musicLink+".mp3", data => {
         this.song = data
-        this.song.setVolume(0.3)
+        this.song.setVolume(parseFloat(savedVars.musicVolume))
         this.loaded=true
         callback() //Level has finished loading, start game
       })
