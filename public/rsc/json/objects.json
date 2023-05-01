@@ -1,5 +1,12 @@
 {
   "0": {"name": "block", "type": 0},
+  "1": {"name": "gridBlock1", "type": 0},
+  "2": {"name": "gridBlock2", "type": 0},
+  "3": {"name": "gridBlock3", "type": 0},
+  "4": {"name": "gridBlock4", "type": 0},
+  "5": {"name": "gridBlock5", "type": 0},
+  "6": {"name": "gridBlock6", "type": 0},
+  "7": {"name": "gridBlock7", "type": 0},
   "50": {"name": "spike", "type": 1},
   "100": {"name": "orb", "type": 2},
   "101": {"name": "pinkOrb", "type": 2},
