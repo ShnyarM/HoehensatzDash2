@@ -66,7 +66,7 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5, width / 5, height/ 10, "Classic Endless", height / 45, () => {
-    openEndless()
+    openEndless(true)
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {

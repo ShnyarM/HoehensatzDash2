@@ -1,5 +1,5 @@
 let images = {bg:[], fg:[]}, objImages=[]
-let endlessObstacles = []
+let endlessObstacles = [], classicEndlessObstacles = []
 let icon, ship, ball, ufo, wave, swingCopter
 let robotImgs = [], robotJump
 let spiderImgs = [], spiderJump
@@ -22,7 +22,7 @@ function preload(){
   wave = loadImage("rsc/images/wave.png")
   swingCopter = loadImage("rsc/images/swingCopter.png")
   practiceCheckpointImg = loadImage("rsc/images/checkpoint.png")
-  practiceSong = loadSound("rsc/music/StayInsideMe.mp3")
+  practiceSong = loadSound("rsc/music/Stay Inside Me.mp3")
   explodeSound = loadSound("rsc/sounds/explodeSound.ogg")
 
   for(let i = 0; i < 5; i++) robotImgs[i] = loadImage("rsc/images/robotFrames/" + i + ".png")
@@ -31,11 +31,11 @@ function preload(){
   for(let i = 0; i < 5; i++) spiderImgs[i] = loadImage("rsc/images/spiderFrames/" + i + ".png")
   spiderJump = loadImage("rsc/images/spiderFrames/jump.png")
 
-  for(let i = 0; i < 2;i++){
+  for(let i = 0; i < 20;i++){
     images.bg[i] = loadImage("rsc/images/backgrounds/"+i+".png")
   }
   
-  for(let i = 0; i < 2;i++){
+  for(let i = 0; i < 7;i++){
     images.fg[i] = loadImage("rsc/images/foregrounds/"+i+".png")
   }
 
@@ -62,6 +62,7 @@ function preload(){
 
   customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 
+  //get endless obstacles
   loadStrings("rsc/levels/obstacles.txt", obstacles => {
     for(let i = 0; i < obstacles.length; i++){//split blocks
       endlessObstacles[i] = split(obstacles[i], "+")
@@ -70,6 +71,18 @@ function preload(){
       }
     }
   })
+
+  //Get classic endless obstacles
+  loadStrings("rsc/levels/classicObstacles.txt", obstacles => {
+    for(let i = 0; i < obstacles.length; i++){//split blocks
+      classicEndlessObstacles[i] = split(obstacles[i], "+")
+      for(let j = 0; j < classicEndlessObstacles[i].length; j++){ //split elements of block
+        classicEndlessObstacles[i][j] = split(classicEndlessObstacles[i][j], "°")
+      }
+    }
+  })
+
+  songList = loadStrings("rsc/music/songList.txt")
 }
 
 //Get saved values from localStorage

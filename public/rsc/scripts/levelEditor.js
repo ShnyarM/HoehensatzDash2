@@ -25,7 +25,7 @@ let optionsMenu = false;
 let nameInput;
 let colorOptions = []
 let optionsSong;
-let songList = ["StayInsideMe", "StereoMadness", "Banger", "Polargeist", "BackOnTrack"], songId, optionsSongLoaded
+let songList, songId, optionsSongLoaded
 
 function setupEditor() {
   gameState = 2;
@@ -381,7 +381,7 @@ function drawOptionsMenu(){
     buttonImg(width / 1.55, height / 2 + width/14+height/20, width / 40, width / 40, editorImgs.leftArrow, width / 200, () => {
       editorLevel.fgSprite--;
       if (editorLevel.fgSprite < 0) {
-        editorLevel.fgSprite = images.bg.length - 1
+        editorLevel.fgSprite = images.fg.length - 1
       }
       editorLevel.tintDeco()
     }, {
@@ -389,7 +389,7 @@ function drawOptionsMenu(){
     })
 
     buttonImg(width / 1.45 + width / 7, height / 2 + width/14+height/20, width / 40, width / 40, editorImgs.rightArrow, width / 200, () => {
-      editorLevel.fgSprite = (editorLevel.fgSprite + 1) % images.bg.length;
+      editorLevel.fgSprite = (editorLevel.fgSprite + 1) % images.fg.length;
       editorLevel.tintDeco()
     }, {
       colNor: 200

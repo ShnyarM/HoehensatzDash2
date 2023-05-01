@@ -7,7 +7,7 @@ let lastFrames, fps = 60
 let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
 let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible
 let oldMouseX, oldMouseY, mouseIsDown;
-let savedVars = {"musicVolume":0.3, "soundVolume":0.3} //Variable which will get automatically saved to localstorage
+let savedVars = {"musicVolume":0.3, "soundVolume":0.3, "highscore": 0, "classicHighscore": 0} //Variable which will get automatically saved to localstorage
 
 function setup() {
   canvas = createCanvas(1, 1)

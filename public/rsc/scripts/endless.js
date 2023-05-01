@@ -1,11 +1,13 @@
-let endless = false //Says if current mode is endless or not
+let endless = false, classicEndless = false //Says if current mode is endless or not
 let score = 0, highScore = 0
 let lastXCoordinate = 3 //xCoordinate of last object
 const obstacleDistanceMin = 7, obstacleDistanceMax = 10 //minimum distance between obstacles
+let nextEndlessSong
 
 //Open endless mode
-function openEndless(){
-  openLevel("read", "/rsc/levels/endless.hd")
+function openEndless(classic = false){
+  openLevel(classic ? "classicEndless" : "endless")
+  classicEndless = classic
   endless = true
   setupEndless(activeLevel)
 }
@@ -28,10 +30,16 @@ function resetEndless(levelObj){
 }
 
 function endlessUpdate(levelObj){
-  if(!activeLevel.song.isPlaying() && !gamePaused) activeLevel.song.play()
+  if(!activeLevel.song.isPlaying() && !gamePaused) startNextEndlessSong() //Start new song if last one is over
 
   if(!player.dead) score += sdeltaTime
-  if(floor(score) > highScore) highScore = floor(score) 
+
+  if(classicEndless){
+    if(floor(score) > parseFloat(savedVars.classicHighscore)) savedVars.classicHighscore = floor(score) 
+  } else {
+    if(floor(score) > parseFloat(savedVars.highscore)) savedVars.highscore = floor(score); console.log("kldsfj")
+  }
+
   if(lastXCoordinate < camera.offsetX+uwidth) addObstacle(levelObj) //add new obstacle if needed
 }
 
@@ -45,16 +53,34 @@ function endlessUI(){
 
   textSize(height/30)
   text("Highscore:", width*0.1, height*0.05)
-  text(highScore, width*0.1, height*0.1)
+  text(classicEndless ? savedVars.classicHighscore : savedVars.highscore, width*0.1, height*0.1)
 }
 
 //Add a new random obstacle
 function addObstacle(levelObj){
-  const obstacleToAdd = endlessObstacles[floor(random(endlessObstacles.length))] //Get random obstacle
+  const obstacleList = classicEndless ? classicEndlessObstacles : endlessObstacles //Get obstacle list depending on if in classic
+  const obstacleToAdd = obstacleList[floor(random(obstacleList.length))] //Get random obstacle
   const distance = round(random(obstacleDistanceMin, obstacleDistanceMax)) //Get random distance from last obstacle
 
   for(let i = 0; i < obstacleToAdd.length; i++){ //Add all objects of obstacle
     levelObj.addObject(new gameObject(parseFloat(obstacleToAdd[i][0]), parseFloat(obstacleToAdd[i][1])+lastXCoordinate+distance, parseFloat(obstacleToAdd[i][2]), parseFloat(obstacleToAdd[i][3])))
   }
   lastXCoordinate = parseFloat(obstacleToAdd[obstacleToAdd.length-1][1])+lastXCoordinate+distance //Get y coordinate of last block
+}
+
+//Load next song so next song can directly play after last one
+function getNextEndlessSong(){
+  const song = songList[floor(random(0, songList.length))] //Choose random song
+
+  loadSound("rsc/music/"+song+".mp3", data => { //Get randomly selected song
+    nextEndlessSong = data
+    nextEndlessSong.setVolume(0.3)
+  })
+}
+
+//Start next endless song
+function startNextEndlessSong(){
+  activeLevel.song = nextEndlessSong
+  activeLevel.song.play()
+  getNextEndlessSong()
 }

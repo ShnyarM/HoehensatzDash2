@@ -133,7 +133,7 @@ function resetLevel(levelObj){ //ATTENTION
   levelObj.deathObjects = []
   levelObj.completed = false
 
-  if(endless) resetEndless(levelObj)
+  if(endless) {resetEndless(levelObj); saveLocalStorage()} //reset endless and save highscore in localstorage
   else{
     levelObj.placementIndex = 0
   }
@@ -175,6 +175,7 @@ class Level{
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
+    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
     this.song = 0
     this.lastXCoordinate = 0 //Xcoordinate of the last block
     this.completed = false //Says if level has been completed
@@ -183,38 +184,44 @@ class Level{
     if(mode == "read"){
       this.readData(data, callback);
     }else if(mode == "menu"){ //menu level
-      this.bgSprite = 0
-      this.fgSprite = 0
-      //get colors for background
-      const r = random(0, 360)
-      const g = random(0, 255)
-      const b = random(0, 100)
-
+      this.bgSprite = floor(random(0, images.bg.length))
+      this.fgSprite = floor(random(0, images.fg.length))
       this.bgColor = "#3333ff"
       this.fgColor = "#0000e6"
 
       this.tintDeco();
       this.loaded=true
+    }else if(mode == "classicEndless" || mode =="endless"){ //Endless
+      this.bgSprite = mode == "classicEndless" ? 0 : floor(random(0, images.bg.length)) //get random bg or default depending on if in classic
+      this.fgSprite = mode == "classicEndless" ? 0 : floor(random(0, images.fg.length))
+      this.bgColor = "#FF0000"
+      this.fgColor = "#800000"
+      this.musicLink = songList[floor(random(0, songList.length))]
+
+      this.tintDeco();
+      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
+        this.song = data
+        this.song.setVolume(0.3)
+        getNextEndlessSong()
+        this.loaded=true
+        callback() //Level has finished loading, start game
+      })
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
-      this.bgColor = [136, 136, 221]
-      this.fgColor = [136, 136, 221]
+      this.bgColor = "#FFFF00"
+      this.fgColor = "FF00FF"
       this.levelName = "NewLevel"
-      this.songName = "StereoMadness"
+      this.musicLink = "Stereo Madness"
 
       this.tintDeco();
-      this.loadSong(callback);
+      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
+        this.song = data
+        this.song.setVolume(0.3)
+        this.loaded=true
+        callback() //Level has finished loading, start game
+      })
     }
-  }
-
-  loadSong(callback =()=>{}){
-    loadSound("rsc/music/"+this.songName+".mp3", data => {
-      this.song = data
-      this.song.setVolume(parseFloat(savedVars.musicVolume))
-      this.loaded=true
-      callback() //Level has finished loading, start game
-    })
   }
 
   readData(path, callback){
@@ -238,13 +245,18 @@ class Level{
 
       this.bgSprite = parseInt(metaData[0].toString())
       this.fgSprite = parseInt(metaData[1])
-      this.bgColor = split(metaData[2], ",")
-      this.fgColor = split(metaData[3], ",")
+      this.bgColor = metaData[2]
+      this.fgColor = metaData[3]
       this.levelName = metaData[4]
-      this.songName = metaData[5]
+      this.musicLink = metaData[5]
 
       this.tintDeco();
-      this.loadSong(callback)
+      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
+        this.song = data
+        this.song.setVolume(0.3)
+        this.loaded=true
+        callback() //Level has finished loading, start game
+      })
     });
   }
 
@@ -330,10 +342,9 @@ class Level{
     levelSave = levelSave.substring(0,levelSave.length-1);
 
     levelSave += "~"
-    levelSave += this.bgSprite+"+" + this.fgSprite
-    levelSave += "+"+this.bgColor+"+" + this.fgColor
-    levelSave += "+"+this.levelName
-    levelSave += "+"+this.songName // song link
+    levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
+    levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
+    levelSave += "+LevelName+/rsc/music/stereoMadness.mp3" // song link
 
     download("level.hd", levelSave)
   }
