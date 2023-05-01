@@ -114,7 +114,7 @@ function drawObjectHitbox(object){
   }
 }
 
-function collisionObject(player, object){
+function collisionObject(player, object, callBack = ()=> collideObject(player, object)){
   let hit = false
   switch(object.rotation){
     case 0:
@@ -130,7 +130,7 @@ function collisionObject(player, object){
       hit = collision(object.x-object.boxOffsetY, object.y-object.boxOffsetX, object.boxHeight, object.boxWidth, player.x, player.y, player.width, player.height)
       break;
   }
-  if(hit) collideObject(player, object)//this.collide(collider, this)
+  if(hit) callBack()//this.collide(collider, this)
 }
 
 //Maybe this can be optimized since we know type == block

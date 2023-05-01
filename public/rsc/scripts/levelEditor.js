@@ -14,7 +14,8 @@ let editor = {
   type: 50,
   rowNumb: 2,
   columNumb: 8,
-  rotation: 0
+  rotation: 0,
+  editObject: {}
 }
 let editorPlaytest = false
 
@@ -73,6 +74,9 @@ function drawEditor() {
             if (!hasClicked) {
               let id = editor.object.id
               let rot = editor.object.rotation
+              if(editor.editObject[floor(editor.object.x)]==null)editor.editObject[floor(editor.object.x)] = {}
+              if(editor.editObject[floor(editor.object.x)][floor(editor.object.y)] == null) editor.editObject[floor(editor.object.x)][floor(editor.object.y)] = []
+              editor.editObject[floor(editor.object.x)][floor(editor.object.y)].push(editor.object)
               editorLevel.addObject(editor.object)
               if (editor.object.x > positionSlider.elt.max) positionSlider.elt.max = editor.object.x
               editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
@@ -88,14 +92,25 @@ function drawEditor() {
             if (positionSlider.elt.max < camera.offsetX) positionSlider.elt.max = camera.offsetX + 4;
             positionSlider.value(camera.offsetX)
           }
-          break;
-        }
+          
+        }break;
         case 2: {
           if (mouseClick) {
-
+            let unitX = floor(pixelToUnitX(mouseX))
+            let unitY = ceil(pixelToUnitY(mouseY))
+            for(let i = unitX -2; i < unitX+3;i++){
+              for(let j = unitY - 2; j < unitY + 3;j++){
+                if(editor.editObject[i]!=null){
+                  if(editor.editObject[i][j]!=null){
+                    editor.editObject[i][j].forEach(element => {
+                    collisionObject({x: unitX, y: unitY, width:1, height:1}, element, ()=>{editor.selectedObject = element})
+                  });
+                 }
+               }
+              }
+            }
           }
-        }
-        break;
+        }break;
       }
     } else {
       if (mouseClick) {
