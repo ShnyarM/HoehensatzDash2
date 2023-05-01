@@ -98,12 +98,25 @@ function drawEditor() {
           if (mouseClick) {
             let unitX = floor(pixelToUnitX(mouseX))
             let unitY = ceil(pixelToUnitY(mouseY))
+            let end = false
             for(let i = unitX -2; i < unitX+3;i++){
               for(let j = unitY - 2; j < unitY + 3;j++){
                 if(editor.editObject[i]!=null){
                   if(editor.editObject[i][j]!=null){
-                    editor.editObject[i][j].forEach(element => {
-                    collisionObject({x: unitX, y: unitY, width:1, height:1}, element, ()=>{editor.selectedObject = element})
+                    editor.editObject[i][j].forEach((element, index) => {
+                      collisionObject({x: unitX, y: unitY, width:1, height:1}, element, ()=>{
+                        if(editor.selectedObject != null){
+                          if(editor.selectedObject.index != element){
+                          editor.selectedObject = element; 
+                          editor.selectedObject.index = index;
+                          end=true
+                        }
+                      }else{
+                        editor.selectedObject = element; 
+                        editor.selectedObject.index = index;
+                        end=true
+                      }
+                    })
                   });
                  }
                }
@@ -112,17 +125,16 @@ function drawEditor() {
           }
         }break;
       }
-    } else {
-      if (mouseClick) {
-        for (let j = 0; j < ceil((editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb) / editor.rowNumb) && j < editor.rowNumb; j++) {
-          for (let i = 0; i < editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb * editor.columNumb - j * editor.columNumb && i < editor.columNumb; i++) {            let boxHeight = editorWindow.height / editor.rowNumb - editorWindow.height / 20 - editorWindow.height / 10
-            if (button(width / 2 + i * (boxHeight + editorWindow.height / 20) - boxHeight * (editor.columNumb + 1) / 2, editorWindow.y + editorWindow.height / 20 + j * (editorWindow.height / 20 + boxHeight), boxHeight, boxHeight)) {
-              editor.object = new gameObject(editorList[editor.selectedCategory][j * editor.columNumb + i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
-              editor.mode = 0
-            }
-          }
-        }
-      }
+    }
+  }
+
+  if(editor.mode == 2){
+    if(editor.selectedObject != null){
+      noFill()
+      strokeWeight(u/10)
+      stroke(0, 0, 255)
+      
+      unitRect(editor.selectedObject.xCenter+editor.selectedObject.drawOffsetX, editor.selectedObject.yCenter+editor.selectedObject.drawOffsetY, editor.selectedObject.drawnWidth, editor.selectedObject.drawnHeight) //Draw without rotation
     }
   }
   stroke(0)
@@ -139,34 +151,171 @@ function drawEditorUI() {
   strokeWeight(width / 800)
   rect(editorWindow.x, editorWindow.y, editorWindow.width, editorWindow.height)
 
-  for (let i = 0; i < editorList.length; i++) {
-    buttonImg(editorWindow.tabSize * 2 * i + width / 2 - (editorList.length - 1) * editorWindow.tabSize, editorWindow.y - editorWindow.tabSize / 2, editorWindow.tabSize, editorWindow.tabSize, objImages[editorList[i][0]], width / 140, () => {
-      editor.selectedCategory = i
-    }, {
-      colNor: [60, 60, 60, 180],
-      curve: [editorWindow.tabSize / 3, editorWindow.tabSize / 3, 0, 0],
-      enabled: !optionsMenu,
-      disabledCol: [60, 60, 60, 180]
-    })
-  }
+    if(editor.mode == 2){
+      buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, objImages[editor.object.id], width / 100, () => {editor.mode = 0}, {enabled:!optionsMenu});
 
-  for (let j = 0; j < ceil((editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb) / editor.rowNumb) && j < editor.rowNumb; j++) {
-    for (let i = 0; i < editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb * editor.columNumb - j * editor.columNumb && i < editor.columNumb; i++) {
-      buttonImg((editorWindow.itemSize + editorWindow.itemPadding) * i + width / 2 - (editor.columNumb - 1) * (editorWindow.itemSize + editorWindow.itemPadding) / 2, editorWindow.y + editorWindow.itemPadding + editorWindow.itemSize / 2 + (editorWindow.itemSize + editorWindow.itemPadding) * j, editorWindow.itemSize, editorWindow.itemSize, objImages[editorList[editor.selectedCategory][j * editor.columNumb + i]], 10, () => {
-        editor.object = new gameObject(editorList[editor.selectedCategory][j * editor.columNumb + i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+      buttonImg(width /2 - width/16, editorWindow.y + editorWindow.height * 0.75, editorWindow.height / 3, editorWindow.height / 3, editorImgs.doubleLeftArrow, width / 100, () => { 
+        moveEditorObject(-1, 0)
       }, {
         colHigh: "#aaaaaa",
         colNor: "#222222",
         curve: [width / 100],
-        enabled: !optionsMenu,
+        enabled: !optionsMenu&&editor.selectedObject !=null,
         disabledCol: "#222222"
       });
-    }
-  }
 
+      buttonImg(width /2 + width/8, editorWindow.y + editorWindow.height * 0.75, editorWindow.height / 3, editorWindow.height / 3, editorImgs.doubleRightArrow, width / 100, () => { 
+        moveEditorObject(1, 0)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2, editorWindow.y + editorWindow.height * 0.75, editorWindow.height / 3, editorWindow.height / 3, editorImgs.doubleDownArrow, width / 100, () => { 
+        moveEditorObject(0, -1)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2 + width/16, editorWindow.y + editorWindow.height * 0.75, editorWindow.height / 3, editorWindow.height / 3, editorImgs.doubleUpArrow, width / 100, () => { 
+        moveEditorObject(0, 1)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+
+      buttonImg(width /2 - width/16, editorWindow.y + editorWindow.height * 0.25, editorWindow.height / 3, editorWindow.height / 3, editorImgs.leftArrow, width / 100, () => { 
+        moveEditorObject(-0.1, 0)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2 + width/8, editorWindow.y + editorWindow.height * 0.25, editorWindow.height / 3, editorWindow.height / 3, editorImgs.rightArrow, width / 100, () => { 
+        moveEditorObject(0.1, 0)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2, editorWindow.y + editorWindow.height * 0.25, editorWindow.height / 3, editorWindow.height / 3, editorImgs.downArrow, width / 100, () => { 
+        moveEditorObject(0, -0.1)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2 + width/16, editorWindow.y + editorWindow.height * 0.25, editorWindow.height / 3, editorWindow.height / 3, editorImgs.upArrow, width / 100, () => { 
+        moveEditorObject(0, 0.1)
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2 - width/8, editorWindow.y + editorWindow.height * 0.75, editorWindow.height / 3, editorWindow.height / 3, editorImgs.rotateRight, width / 100, () => { 
+        editor.selectedObject.rotation = (editor.selectedObject.rotation + 1) % 4
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+      buttonImg(width /2 - width/8, editorWindow.y + editorWindow.height * 0.25, editorWindow.height / 3, editorWindow.height / 3, editorImgs.rotateLeft, width / 100, () => { 
+        editor.selectedObject.rotation--
+        if(editor.selectedObject.rotation < 0)editor.selectedObject.rotation=3
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+
+      buttonImg(width /2 + width/4, editorWindow.y + editorWindow.height * 0.5, editorWindow.height / 3, editorWindow.height / 3, editorImgs.trash, width / 100, () => { 
+        editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)].splice(editor.selectedObject.index, 1)
+        switch(true){
+          case editor.selectedObject.id < 50:
+            editorLevel.groundObjects.forEach((element, index)=>{
+              if(element == editor.selectedObject){editorLevel.groundObjects.splice(index, 1);editor.selectedObject = null;return}
+            })
+            break;
+          
+          case editor.selectedObject.id < 100:
+            editorLevel.deathObjects.forEach((element, index)=>{
+              if(element == editor.selectedObject){editorLevel.deathObjects.splice(index, 1);editor.selectedObject = null;return}
+            })
+            break
+
+          case editor.selectedObject.id >= 100:
+            editorLevel.interactObjects.forEach((element, index)=>{
+              if(element == editor.selectedObject){editorLevel.interactObjects.splice(index, 1);editor.selectedObject = null;return}
+            })
+            break
+        }
+      }, {
+        colHigh: "#aaaaaa",
+        colNor: "#222222",
+        curve: [width / 100],
+        enabled: !optionsMenu&&editor.selectedObject !=null,
+        disabledCol: "#222222"
+      });
+
+    }else{
+    for (let i = 0; i < editorList.length; i++) {
+      buttonImg(editorWindow.tabSize * 2 * i + width / 2 - (editorList.length - 1) * editorWindow.tabSize, editorWindow.y - editorWindow.tabSize / 2, editorWindow.tabSize, editorWindow.tabSize, objImages[editorList[i][0]], width / 140, () => {
+        editor.selectedCategory = i
+      }, {
+        colNor: [60, 60, 60, 180],
+        curve: [editorWindow.tabSize / 3, editorWindow.tabSize / 3, 0, 0],
+        enabled: !optionsMenu,
+        disabledCol: [60, 60, 60, 180]
+      })
+    }
+
+    for (let j = 0; j < ceil((editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb) / editor.rowNumb) && j < editor.rowNumb; j++) {
+      for (let i = 0; i < editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb * editor.columNumb - j * editor.columNumb && i < editor.columNumb; i++) {
+        buttonImg((editorWindow.itemSize + editorWindow.itemPadding) * i + width / 2 - (editor.columNumb - 1) * (editorWindow.itemSize + editorWindow.itemPadding) / 2, editorWindow.y + editorWindow.itemPadding + editorWindow.itemSize / 2 + (editorWindow.itemSize + editorWindow.itemPadding) * j, editorWindow.itemSize, editorWindow.itemSize, objImages[editorList[editor.selectedCategory][j * editor.columNumb + i]], width/100, () => {
+          editor.mode = 0
+          editor.object = new gameObject(editorList[editor.selectedCategory][j * editor.columNumb + i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+        }, {
+          colHigh: "#aaaaaa",
+          colNor: "#222222",
+          curve: [width / 100],
+          enabled: !optionsMenu,
+          disabledCol: "#222222"
+        });
+      }
+    }
+    buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.cursor, width / 100, () => {editor.mode = 2}, {enabled:!optionsMenu});
+  }
   buttonImg(width - editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.zoomIn, width / 100, () => changeZoom(zoom - 1), {enabled:!optionsMenu});
   buttonImg(width - editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.zoomOut, width / 100, () => changeZoom(zoom + 1), {enabled:!optionsMenu});
-  buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.cursor, width / 100, () => {editor.mode = 2}, {enabled:!optionsMenu});
   buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.move, width / 100, () => {editor.mode = 1}, {enabled:!optionsMenu});
 
   buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.play, width / 100, () => startEditorLevel(), {enabled:!optionsMenu});
@@ -227,10 +376,17 @@ function stopEditorLevel() {
   editorLevel.interactObjects = [];
   editorLevel.groundObjects = [];
   editorLevel.deathObjects = [];
-
+  
   //Place all blocks again
+  editor.selectedObject = null
+  editor.editObject = {}
   for (const obj of editorLevel.allObjects) {
-    editorLevel.addObject(new gameObject(obj[0], obj[1], obj[2], obj[3]))
+    let ob = new gameObject(obj[0], obj[1], obj[2], obj[3])
+    if(editor.editObject[floor(ob.x)]==null)editor.editObject[floor(ob.x)] = {}
+    if(editor.editObject[floor(ob.x)][floor(ob.y)] == null) editor.editObject[floor(ob.x)][floor(ob.y)] = []
+    editor.editObject[floor(ob.x)][floor(ob.y)].push(ob)
+    editorLevel.addObject(ob)
+
   }
 
   editorLevel.allObjects = [] //Clear
@@ -452,4 +608,14 @@ function drawOptionsMenu(){
         optionsSongLoaded = true;
       })
     })
+}
+
+function moveEditorObject(x, y){
+  moveObject(editor.selectedObject, editor.selectedObject.x+x, editor.selectedObject.y+y)
+  delete editor.editObject[floor(editor.selectedObject.x-x)][floor(editor.selectedObject.y-y)][editor.selectedObject.index]
+  if(editor.editObject[floor(editor.selectedObject.x)] == null)editor.editObject[floor(editor.selectedObject.x)] = {}
+  if(editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)] == null)editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)] = []
+  editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)].push(editor.selectedObject)
+  editor.selectedObject.index = editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)].length-1
+
 }
