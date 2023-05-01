@@ -55,6 +55,16 @@ function preload(){
   editorImgs.options = loadImage("rsc/images/optionsIcon.png")
   editorImgs.leftArrow = loadImage("rsc/images/leftArrow.png")
   editorImgs.rightArrow = loadImage("rsc/images/rightArrow.png")
+  editorImgs.downArrow = loadImage("rsc/images/downArrow.png")
+  editorImgs.upArrow = loadImage("rsc/images/upArrow.png")
+  editorImgs.rotateLeft = loadImage("rsc/images/rotateLeft.png")
+  editorImgs.rotateRight = loadImage("rsc/images/rotateRight.png")
+  editorImgs.trash = loadImage("rsc/images/trash.png")
+
+  editorImgs.doubleLeftArrow = loadImage("rsc/images/doubleLeftArrow.png")
+  editorImgs.doubleRightArrow = loadImage("rsc/images/doubleRightArrow.png")
+  editorImgs.doubleDownArrow = loadImage("rsc/images/doubleDownArrow.png")
+  editorImgs.doubleUpArrow = loadImage("rsc/images/doubleUpArrow.png")
   editorImgs.close = loadImage("rsc/images/close.png")
   editorImgs.pause = loadImage("rsc/images/pauseIcon.png")
 
