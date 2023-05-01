@@ -25,29 +25,45 @@
     <script src="rsc/scripts/practiceMode.js"></script>
 
     <style>
-      #p5_loading {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
 
+      /*disable scroll behaviour (mainly for laptop use)*/
       html {
         overscroll-behavior-x: none;
       } 
       body {
         overscroll-behavior-x: none;
       }
-
+      /*custom Font*/
       @font-face {
-font-family: "PixelSplitter";
-src: url("rsc/fonts/PixelSplitter-Bold.ttf");
-}
+        font-family: "PixelSplitter";
+        src: url("rsc/fonts/PixelSplitter-Bold.ttf");
+      }
+
+        /*rotate animation for loading screen*/
+      @keyframes rotation {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body style="background:black">
     <div id="p5_loading">
-      <img src="rsc/images/loadingIcon.png">
+      <img style="
+        width: 20em;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        animation: rotation 2s infinite linear;
+        "id = "loadingImg" class ="loadingImg" src="rsc/images/icon.png">
     </div>
+    <script>
+      console.log(window.innerWidth)
+      let el = document.getElementById("loadingImg")
+      el.style.top = window.innerHeight/2-el.width/2 + "px"
+      el.style.left = window.innerWidth/2-el.width/2 + "px"
+    </script>
   </body>
 </html>
