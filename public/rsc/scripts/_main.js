@@ -334,6 +334,7 @@ function windowResized(){
   }
   
   changeZoom(zoom);
+  updateSliderSizes()
   if(gameState == 2)resizeEditor();
 }
 

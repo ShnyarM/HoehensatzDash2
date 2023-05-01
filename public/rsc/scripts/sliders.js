@@ -24,6 +24,14 @@ function removeSlider(slider){
   delete sliders[slider]
 }
 
+//Update sizes of all sliders when window gets resized
+function updateSliderSizes(){
+  if(Object.keys(sliders).length == 0) return //Dont do anything if no sliders exist
+  
+  //Go through all slider
+  for(const slider in sliders) sliders[slider].updateSize()
+}
+
 class Slider{
   constructor(x, y, w, h, value, minValue, maxValue){
     this.x = x
@@ -37,11 +45,13 @@ class Slider{
     this.percentageFilled = map(this.value, this.minValue, this.maxValue, 0, 1)
     this.clickedLastFrame = false
     this.inputFunction = () => {}
+
+    this.updateSize()
   }
 
   //Check if mouse is over handle
   handleCollision(){
-    return button(width*(this.x+this.width*(-0.5+this.percentageFilled))-0.5*this.handleSize*height, height*(this.y-this.height*0.5+0.5*(this.height-this.handleSize)), this.handleSize*height, this.handleSize*height)
+    return button(this.xLeftPixel+this.widthPixel*this.percentageFilled-0.5*this.handleSizePixel, this.yTopPixel-0.5*(this.handleSizePixel-this.heightPixel), this.handleSizePixel, this.handleSizePixel)
   }
 
   //Handle is being moved
@@ -49,9 +59,9 @@ class Slider{
     this.clickedLastFrame = true
 
     //Update percentage
-    if(mouseX < (this.x-0.5*this.width)*width) this.percentageFilled = 0
-    else if(mouseX > (this.x+0.5*this.width)*width) this.percentageFilled = 1
-    else this.percentageFilled = map(mouseX-(this.x-0.5*this.width)*this.width, (this.x-0.5*this.width)*width, (this.x+0.5*this.width)*width, 0, 1)
+    if(mouseX < this.xLeftPixel) this.percentageFilled = 0
+    else if(mouseX > this.xLeftPixel+this.widthPixel) this.percentageFilled = 1
+    else this.percentageFilled = map(mouseX, this.xLeftPixel, this.xLeftPixel+this.widthPixel, 0, 1)
 
     //Set value
     if(this.percentageFilled == 0) this.value = this.minValue
@@ -66,18 +76,30 @@ class Slider{
     this.inputFunction = func
   }
 
+  //convert size and positions into pixels
+  updateSize(){
+    this.xPixel = this.x*width
+    this.yPixel = this.y*height
+    this.widthPixel = this.width*width
+    this.heightPixel = this.height*height
+    this.handleSizePixel = this.handleSize*height
+    //top left corner
+    this.xLeftPixel = this.xPixel-0.5*this.widthPixel
+    this.yTopPixel = this.yPixel-0.5*this.heightPixel
+  }
+
   draw(){
     stroke("black")
     strokeWeight(height/200)
     fill("gray")
     rectMode(CENTER)
-    rect(width*this.x, height*this.y, width*this.width, height*this.height, height)
+    rect(this.xPixel, this.yPixel, this.widthPixel, this.heightPixel, height)
 
     fill(color(0, 200, 0))
     rectMode(CORNER)
-    rect(width*(this.x-0.5*this.width), height*(this.y-0.5*this.height), width*this.width*this.percentageFilled, height*this.height, height)
+    rect(this.xLeftPixel, this.yTopPixel, this.widthPixel*this.percentageFilled, this.heightPixel, height)
 
     fill("yellow")
-    rect(width*(this.x+this.width*(-0.5+this.percentageFilled))-0.5*this.handleSize*height, height*(this.y-this.height*0.5+0.5*(this.height-this.handleSize)), this.handleSize*height, this.handleSize*height, height)
+    rect(this.xLeftPixel+this.widthPixel*this.percentageFilled-0.5*this.handleSizePixel, this.yTopPixel-0.5*(this.handleSizePixel-this.heightPixel), this.handleSizePixel, this.handleSizePixel, height)
   }
 }

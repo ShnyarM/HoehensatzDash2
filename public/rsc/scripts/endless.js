@@ -69,7 +69,7 @@ function endlessUI(){
 }
 
 function endlessKeyPressed(){
-  if(endless && keyCode == 78 && !loadingNextEndlessSong) startNextEndlessSong() //Skip to next song if N is pressed
+  if(endless && keyCode == 78 && !loadingNextEndlessSong && !gamePaused) startNextEndlessSong() //Skip to next song if N is pressed
 }
 
 //Add a new random obstacle

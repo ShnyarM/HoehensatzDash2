@@ -61,21 +61,36 @@ let JumpPad = {
 }
 
 let Portal = {
-  width: 1, //How much space object takes up
-  height: 2,
+  width: 1.5, //How much space object takes up
+  height: 3,
 
-  drawnWidth: 1,//How big will be drawn
-  drawnHeight: 2, 
-  drawOffsetX: -0.5, //Offset of drawn image from middle point
-  drawOffsetY: 1,
+  drawnWidth: 1.5,//How big will be drawn
+  drawnHeight: 3, 
+  drawOffsetX: -0.75, //Offset of drawn image from middle point
+  drawOffsetY: 1.5,
   
-  boxWidth: 1, //Size of hitbox
-  boxHeight: 2,
+  boxWidth: 1.5, //Size of hitbox
+  boxHeight: 3,
   boxOffsetX: 0, //Offset of hitbox from origin (x, y)
   boxOffsetY: 0,
 }
 
-let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal] //Assign different types to a specific id
+let Bush = {
+  width: 1, //How much space object takes up
+  height: 1,
+
+  drawnWidth: 1,//How big will be drawn
+  drawnHeight: 1.15,
+  drawOffsetX: -0.5, //Offset of drawn image from middle point
+  drawOffsetY: 0.3,
+
+  boxWidth: 1, //Size of hitbox
+  boxHeight: 0.3,
+  boxOffsetX: 0, //Offset of hitbox from origin (x, y)
+  boxOffsetY: -0.7,
+}
+
+let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal, Bush] //Assign different types to a specific id
 
 function drawObject(object){
   switch(object.rotation){

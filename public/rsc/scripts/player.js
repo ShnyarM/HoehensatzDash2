@@ -148,17 +148,21 @@ class Player{
       if(this.y-this.height <= this.lowCeiling && this.yVelocity <= 0){ //put player on ground if touching ground
         this.groundTouch()
       }
-      if(!this.ceilingDeath && this.y >= this.highCeiling){ //Put player on ceiling if gamemode allows it
+      if(!this.ceilingDeath && this.y > this.highCeiling){ //Player touches Ceiling and wont die, stick to ceiling
         this.yVelocity = 0
         this.y = this.highCeiling
+      }else if(this.ceilingDeath && this.y-this.blockHitboxOffset > this.highCeiling){ //Kill player if touching ceiling and not allowed
+        this.die()
       }
     }else{//upside down
       if(this.y >= this.highCeiling && this.yVelocity >= 0){ //put player on ground if touching ground, MAYBE EVERYTHING IS BROKEN NOW, CHECK IF NOT ON GROUND
         this.groundTouch()
       }
-      if(!this.ceilingDeath && this.y-this.height <= this.lowCeiling){ //Put player on ceiling if gamemode allows it
+      if(!this.ceilingDeath && this.y-this.height < this.lowCeiling){ //Player touches ground and wont die, stick to ground
         this.yVelocity = 0
         this.y = this.lowCeiling+this.height
+      }else if(this.ceilingDeath && this.y-this.height+this.blockHitboxOffset < this.lowCeiling){ //Kill player if touching ground and not allowed
+        this.die()
       }
     }
     
@@ -175,6 +179,7 @@ class Player{
       
       this.completedLevel = true //Start animation
       this.completedAnimationStartY = this.y
+      if(camera.locked) camera.unlock()
       camera.movement = false
     }
   }
@@ -210,6 +215,7 @@ class Player{
     const oldWidth = this.width //Save width and height before change
     const oldHeight = this.height
 
+    if(this.gameMode == 4)this.yVelocity = 0 //Reset yvelocity if player was in wave before
     this.gameMode = newMode //assign new Mode
     Object.assign(this, modeConstants[0]) //Apply default values before applying values of new Mode$
     if(this.mini) Object.assign(this, modeConstants[10]) //Apply default values of mini before applying values of new Mode
@@ -504,8 +510,8 @@ class Player{
 
     for(const block of levelObj.groundObjects){
       //Check if block is under player and higher than highest
-      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.height >= this.y-this.blockHitboxOffset && block.y-block.height < highest) 
-        highest = block.y-block.height
+      if(block.x < this.x+this.width && block.x+block.width > this.x && block.y-block.boxHeight >= this.y-this.blockHitboxOffset && block.y-block.boxHeight < highest) 
+        highest = block.y-block.boxHeight
     }
     this.highCeiling = highest
 
