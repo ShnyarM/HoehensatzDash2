@@ -186,7 +186,6 @@ class Level{
     this.interactObjects = [];
     this.groundObjects = [];
     this.deathObjects=[];
-    this.decoration={"bgSprite":0, "fgSprite":0, "bgColor": "#FFFF00", "fgColor": "FF00FF"}
     this.song = 0
     this.lastXCoordinate = 0 //Xcoordinate of the last block
     this.completed = false //Says if level has been completed
@@ -215,8 +214,8 @@ class Level{
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
-      this.bgColor = [136, 136, 221]
-      this.fgColor = [136, 136, 221]
+      this.bgColor = [51, 51, 255]
+      this.fgColor = [0, 0, 230]
       this.levelName = "NewLevel"
       this.songName = "Stereo Madness"
 
@@ -328,7 +327,7 @@ class Level{
     levelSave += "+"+this.levelName
     levelSave += "+"+this.songName // song link
 
-    download("level.hd", levelSave)
+    download(this.levelName+".hd", levelSave)
   }
 
   tintDeco(){

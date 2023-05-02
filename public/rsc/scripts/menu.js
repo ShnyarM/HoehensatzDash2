@@ -1,5 +1,5 @@
 let menuState = 0 //0 = main menu screen, 1=main level select, 2=classic level select, 3=online level select, 4=settings, 5=tutorialSelect
-let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect]
+let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect, levelEditorMenu]
 const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
 const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
 const tutorialLevels = ["Cube", "Ship", "Ball", "UFO", "Wave", "Robot", "Spider", "Swing Copter"]
@@ -71,7 +71,7 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {
-    setupEditor()
+    menuState = 6
   })
 
   buttonRect(width*0.5, height*0.5+height*0.3, width / 5, height/ 10, "Tutorial Levels", height / 45, () => {
