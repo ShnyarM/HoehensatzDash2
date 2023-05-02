@@ -9,7 +9,7 @@ let editorLevel;
 let editor = {
   mode: 0,
   object: "",
-  selectedSite: 1,
+  selectedSite: 0,
   selectedCategory: 2,
   move: 0,
   type: 50,
@@ -291,6 +291,7 @@ function drawEditorUI() {
     for (let i = 0; i < editorList.length; i++) {
       buttonImg(editorWindow.tabSize * 2 * i + width / 2 - (editorList.length - 1) * editorWindow.tabSize, editorWindow.y - editorWindow.tabSize / 2, editorWindow.tabSize, editorWindow.tabSize, objImages[editorList[i][0]], width / 140, () => {
         editor.selectedCategory = i
+        editor.selectedSite = 0;
       }, {
         colNor: [60, 60, 60, 180],
         curve: [editorWindow.tabSize / 3, editorWindow.tabSize / 3, 0, 0],
@@ -299,11 +300,11 @@ function drawEditorUI() {
       })
     }
 
-    for (let j = 0; j < ceil((editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb) / editor.rowNumb) && j < editor.rowNumb; j++) {
-      for (let i = 0; i < editorList[editor.selectedCategory].length - (editor.selectedSite - 1) * editor.rowNumb * editor.columNumb - j * editor.columNumb && i < editor.columNumb; i++) {
-        buttonImg((editorWindow.itemSize + editorWindow.itemPadding) * i + width / 2 - (editor.columNumb - 1) * (editorWindow.itemSize + editorWindow.itemPadding) / 2, editorWindow.y + editorWindow.itemPadding + editorWindow.itemSize / 2 + (editorWindow.itemSize + editorWindow.itemPadding) * j, editorWindow.itemSize, editorWindow.itemSize, objImages[editorList[editor.selectedCategory][j * editor.columNumb + i]], width/100, () => {
+    for (let j = 0; j < ceil((editorList[editor.selectedCategory].length - (editor.selectedSite) * editor.rowNumb) / editor.rowNumb) && j < editor.rowNumb; j++) {
+      for (let i = 0; i < editorList[editor.selectedCategory].length - (editor.selectedSite) * editor.rowNumb * editor.columNumb - j * editor.columNumb && i < editor.columNumb; i++) {
+        buttonImg((editorWindow.itemSize + editorWindow.itemPadding) * i + width / 2 - (editor.columNumb - 1) * (editorWindow.itemSize + editorWindow.itemPadding) / 2, editorWindow.y + editorWindow.itemPadding + editorWindow.itemSize / 2 + (editorWindow.itemSize + editorWindow.itemPadding) * j, editorWindow.itemSize, editorWindow.itemSize, objImages[editorList[editor.selectedCategory][j * editor.columNumb + i + editor.selectedSite*editor.rowNumb*editor.columNumb]], width/100, () => {
           editor.mode = 0
-          editor.object = new gameObject(editorList[editor.selectedCategory][j * editor.columNumb + i], floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
+          editor.object = new gameObject(editorList[editor.selectedCategory][j * editor.columNumb + i + editor.selectedSite*editor.rowNumb*editor.columNumb], floor(pixelToUnitX(mouseX)), floor(pixelToUnitY(mouseY)), editor.rotation)
         }, {
           colHigh: "#aaaaaa",
           colNor: "#222222",
@@ -314,6 +315,39 @@ function drawEditorUI() {
       }
     }
     buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.cursor, width / 100, () => {editor.mode = 2}, {enabled:!optionsMenu});
+  
+    if(ceil(editorList[editor.selectedCategory].length/(editor.rowNumb*editor.columNumb)) > 1){
+      buttonImg(width/2-width/3.7, editorWindow.y + editorWindow.height/2 - editorWindow.itemPadding, width/40, width/40, editorImgs.leftArrow, width/300, ()=>{
+        editor.selectedSite--
+        if(editor.selectedSite < 0)editor.selectedSite = ceil(editorList[editor.selectedCategory].length/(editor.rowNumb*editor.columNumb))-1
+      },
+      {
+        colHigh: "#aaaaaa",
+        colNor: "#888888",
+        curve: [width / 100],
+        enabled: !optionsMenu,
+        disabledCol: "#222222"
+      });
+    
+      buttonImg(width/2+width/3.7, editorWindow.y + editorWindow.height/2 - editorWindow.itemPadding, width/40, width/40, editorImgs.rightArrow, width/300, ()=>{
+        editor.selectedSite = (editor.selectedSite + 1) % ceil(editorList[editor.selectedCategory].length/(editor.rowNumb*editor.columNumb))
+      },
+      {
+        colHigh: "#aaaaaa",
+        colNor: "#888888",
+        curve: [width / 100],
+        enabled: !optionsMenu,
+        disabledCol: "#222222"
+      });
+    }
+
+    for(let i = 0; i < ceil(editorList[editor.selectedCategory].length/(editor.rowNumb*editor.columNumb));i++){
+      fill(100)
+      if(editor.selectedSite == i){
+        fill(240)
+      }
+      circle(width/2 + i*width/50 - ((ceil(editorList[editor.selectedCategory].length/(editor.rowNumb*editor.columNumb)) -1)*width/50)/2, height - width/75, width/100)
+    }
   }
   buttonImg(width - editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.zoomIn, width / 100, () => changeZoom(zoom - 1), {enabled:!optionsMenu});
   buttonImg(width - editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.zoomOut, width / 100, () => changeZoom(zoom + 1), {enabled:!optionsMenu});
@@ -322,6 +356,8 @@ function drawEditorUI() {
   buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.play, width / 100, () => startEditorLevel(), {enabled:!optionsMenu});
   buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.save, width / 100, () => editorLevel.saveLevel(), {enabled:!optionsMenu});
   buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.options, width / 100, () => openOptions(), {enabled:!optionsMenu});
+  
+  
   let selectedImage;
   switch(editor.mode){
     case 0: {
@@ -422,8 +458,9 @@ function editorKeyPressed() {
       changeZoom(zoom + 1)
       break;
     case 82: //r, rotate object
-      editor.object.rotation = (editor.object.rotation + 1) % 4
-      break;
+     if(editor.mode == 0)editor.object.rotation = (editor.object.rotation + 1) % 4
+      if(editor.mode == 2&&editor.selectedObject.rotation != null)editor.selectedObject.rotation = (editor.selectedObject.rotation + 1) % 4
+    break;
   }
 }
 

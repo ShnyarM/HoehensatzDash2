@@ -220,19 +220,23 @@ class Level{
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
-      this.bgColor = "#FFFF00"
-      this.fgColor = "FF00FF"
+      this.bgColor = [136, 136, 221]
+      this.fgColor = [136, 136, 221]
       this.levelName = "NewLevel"
-      this.musicLink = "Stereo Madness"
+      this.songName = "Stereo Madness"
 
       this.tintDeco();
-      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
-        this.song = data
-        this.song.setVolume(parseFloat(savedVars.musicVolume))
-        this.loaded=true
-        callback() //Level has finished loading, start game
-      })
+      this.loadSong(callback);
     }
+  }
+
+  loadSong(callback =()=>{}){
+    loadSound("rsc/music/"+this.songName+".mp3", data => {
+      this.song = data
+      this.song.setVolume(parseFloat(savedVars.musicVolume))
+      this.loaded=true
+      callback() //Level has finished loading, start game
+    })
   }
 
   readData(path, callback){
@@ -256,18 +260,13 @@ class Level{
 
       this.bgSprite = parseInt(metaData[0].toString())
       this.fgSprite = parseInt(metaData[1])
-      this.bgColor = metaData[2]
-      this.fgColor = metaData[3]
+      this.bgColor = split(metaData[2], ",")
+      this.fgColor = split(metaData[3], ",")
       this.levelName = metaData[4]
-      this.musicLink = metaData[5]
+      this.songName = metaData[5]
 
       this.tintDeco();
-      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
-        this.song = data
-        this.song.setVolume(parseFloat(savedVars.musicVolume))
-        this.loaded=true
-        callback() //Level has finished loading, start game
-      })
+      this.loadSong(callback)
     });
   }
 
@@ -313,22 +312,7 @@ class Level{
   }
 
   saveLevel(path){ // TEMPORARY: get e txt file with useable level data
-    /*let levelSave = {
-      "objects":[],
-      "decoration": this.decoration
-    }
-    this.deathObjects.forEach(element => {
-      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
-    });
-    this.groundObjects.forEach(element => {
 
-      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
-    });
-    this.interactObjects.forEach(element => {
-      levelSave.objects.push({"type":element.type, "x":element.x-element.xOffset, "y":element.y-element.yOffset}) 
-    });
-    var levelJson = JSON.stringify(levelSave);
-    console.log(levelJson)*/
     let levelSave = ""
 
     //put all objects in one array and sort by x coordinate
@@ -339,23 +323,15 @@ class Level{
       const convertData = convertObjToStringForm(element)
       levelSave += convertData[0] + "°" + convertData[1] + "°" + convertData[2] + "°" + convertData[3] + "+"; 
     });
-    /*this.deathObjects.forEach(element => {
-      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
-    });
 
-    this.interactObjects.forEach(element => {
-      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
-    });
 
-    this.groundObjects.forEach(element => {
-      levelSave += element.id + "°" + element.x + "°" + element.y + "+"; 
-    });*/
     levelSave = levelSave.substring(0,levelSave.length-1);
 
     levelSave += "~"
-    levelSave += this.decoration.bgSprite+"+" + this.decoration.fgSprite
-    levelSave += "+"+this.decoration.bgColor+"+" + this.decoration.fgColor
-    levelSave += "+LevelName+/rsc/music/stereoMadness.mp3" // song link
+    levelSave += this.bgSprite+"+" + this.fgSprite
+    levelSave += "+"+this.bgColor+"+" + this.fgColor
+    levelSave += "+"+this.levelName
+    levelSave += "+"+this.songName // song link
 
     download("level.hd", levelSave)
   }
