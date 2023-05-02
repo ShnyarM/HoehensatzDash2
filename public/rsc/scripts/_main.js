@@ -2,7 +2,7 @@ let canvas;
 const defaultZoom = 10
 let u, uwidth, uheight, zoom = defaultZoom; //Units are used instead of pixels, so there are no problems with different resolutions
 let sdeltaTime, timescale=1 //sdeltatime says time between frames in seconds, can be scaled up and down time with timescale
-let debug = false
+let debug = true
 let lastFrames, fps = 60
 let gameState = 0; //Which state the game is in, 0 = main menu, 1 = in-game
 let mouseClick = false //says if mouse was pressed in that frame, updated is used to make it possible

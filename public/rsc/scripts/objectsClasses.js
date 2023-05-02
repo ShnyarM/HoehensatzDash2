@@ -90,7 +90,22 @@ let Bush = {
   boxOffsetY: -0.7,
 }
 
-let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal, Bush] //Assign different types to a specific id
+let Saw = {
+  width: 1, //How much space object takes up
+  height: 1,
+
+  drawnWidth: 1.7,//How big will be drawn
+  drawnHeight: 1.7,
+  drawOffsetX: -0.85, //Offset of drawn image from middle point
+  drawOffsetY: 0.85,
+
+  boxWidth: 1, //Size of hitbox
+  boxHeight: 1,
+  boxOffsetX: 0, //Offset of hitbox from origin (x, y)
+  boxOffsetY: 0,
+}
+
+let objectTypes = [Block, Spike, JumpOrb, JumpPad, Portal, Bush, Saw] //Assign different types to a specific id
 
 function drawObject(object){
   switch(object.rotation){
