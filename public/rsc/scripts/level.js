@@ -207,16 +207,11 @@ class Level{
       this.fgSprite = mode == "classicEndless" ? 0 : floor(random(0, images.fg.length))
       this.bgColor = "#FF0000"
       this.fgColor = "#800000"
-      this.musicLink = songList[floor(random(0, songList.length))]
+      this.songName = songList[floor(random(0, songList.length))]
 
       this.tintDeco();
-      loadSound("rsc/music/"+this.musicLink+".mp3", data => {
-        this.song = data
-        this.song.setVolume(parseFloat(savedVars.musicVolume))
-        getNextEndlessSong()
-        this.loaded=true
-        callback() //Level has finished loading, start game
-      })
+      this.loadSong(callback)
+      getNextEndlessSong()
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0

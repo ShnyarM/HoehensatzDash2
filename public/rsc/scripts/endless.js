@@ -62,7 +62,7 @@ function endlessUI(){
 
   textSize(height/50)
   textAlign(LEFT)
-  text("Currently Playing: " + activeLevel.musicLink, width*0.02, height*0.9)
+  text("Currently Playing: " + activeLevel.songName, width*0.02, height*0.9)
   if(loadingNextEndlessSong) text("Loading next Song...", width*0.02, height*0.95)
   else text('Press N to skip to "'+nextEndlessSongName+'"', width*0.02, height*0.95)
   textAlign(CENTER, CENTER)
@@ -102,7 +102,7 @@ function startNextEndlessSong(){
   if(activeLevel.song.isPlaying()) activeLevel.song.stop()
 
   activeLevel.song = nextEndlessSong //make next song current song and play
-  activeLevel.musicLink = nextEndlessSongName
+  activeLevel.songName = nextEndlessSongName
   activeLevel.song.play()
   getNextEndlessSong()
 }
