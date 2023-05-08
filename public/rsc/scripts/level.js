@@ -151,13 +151,27 @@ function resetLevel(levelObj){ //ATTENTION
 
   playerSetup()
   cameraSetup()
-  player.x = levelObj.startPos.x
-  player.y = levelObj.startPos.y
+  goToStartPos()
   levelObj.placeObjects() //Place all objects that are already in view at start
   if(!endless && !practiceMode) levelObj.song.play() //Start song again if not in endless
   if(practiceMode && checkpoints.length != 0){
     loadCheckpoint()
   }
+}
+
+//Move player to startpos if exists
+function goToStartPos(){
+  if(activeLevel.startPos.x == 0 && activeLevel.startPos.y == 0) return //No startpos exists
+
+  player.x = activeLevel.startPos.x
+  player.y = activeLevel.startPos.y
+
+  camera.offsetX = player.x+player.width-camera.xBorder
+  camera.offsetY = player.y+6.144 //put y of camera in "default position" (where it is when player is on ground)
+
+  let placementIndex = 0 //Adjust placementIndex to fit camera position
+  while(activeLevel.allObjects[placementIndex][1] < camera.offsetX) placementIndex++ //go forward until placement index is at camera, this way all in view objects get spawned again
+  activeLevel.placementIndex = placementIndex
 }
 
 //Draw Level Complete Screen when level completed

@@ -404,8 +404,7 @@ function startEditorLevel() {
   activeLevel.song.play()
   playerSetup()
   cameraSetup()
-  player.x = activeLevel.startPos.x
-  player.y = activeLevel.startPos.y
+  goToStartPos()
 }
 
 function stopEditorLevel() {
