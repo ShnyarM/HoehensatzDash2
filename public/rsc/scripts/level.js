@@ -151,6 +151,8 @@ function resetLevel(levelObj){ //ATTENTION
 
   playerSetup()
   cameraSetup()
+  player.x = levelObj.startPos.x
+  player.y = levelObj.startPos.y
   levelObj.placeObjects() //Place all objects that are already in view at start
   if(!endless && !practiceMode) levelObj.song.play() //Start song again if not in endless
   if(practiceMode && checkpoints.length != 0){
@@ -190,6 +192,7 @@ class Level{
     this.lastXCoordinate = 0 //Xcoordinate of the last block
     this.completed = false //Says if level has been completed
     this.loaded = false //If everything including images has loaded
+    this.startPos = {x: 0, y:0}
     
     if(mode == "read"){
       this.readData(data, callback);
@@ -245,6 +248,7 @@ class Level{
         blocks[index] = split(element, "°");
         blocks[index].forEach((elem, ind) => {
           blocks[index][ind] = parseFloat(elem)
+          if(blocks[index][0] == 150){this.startPos.x = elem[1];this.startPos.x = elem[2]}
         })
       })
       this.allObjects = blocks
