@@ -153,7 +153,10 @@ function resetLevel(levelObj){ //ATTENTION
   cameraSetup()
   goToStartPos()
   levelObj.placeObjects() //Place all objects that are already in view at start
-  if(!endless && !practiceMode) levelObj.song.play() //Start song again if not in endless
+  if(!endless && !practiceMode){ 
+    levelObj.song.play() //Start song again if not in endless
+    goToStartPos()
+  }
   if(practiceMode && checkpoints.length != 0){
     loadCheckpoint()
   }
@@ -165,6 +168,35 @@ function goToStartPos(){
 
   player.x = activeLevel.startPos.x
   player.y = activeLevel.startPos.y
+
+  if(activeLevel.startPos.x != 0 && activeLevel.startPosSongStart == 0){ //Get start position of song if not already calculated
+    let speedChanges = []
+    let songStart = 0
+
+    for(let i = 0; i < activeLevel.allObjects.length; i++){ //Go through all objects and save all speedchanges
+      const element = activeLevel.allObjects[i]
+      if(element[1] > player.x+player.width) break;//Break if gone over position of player
+
+      if(element[0] >= 130 && element[0] <= 134){
+        speedChanges.push([element[0], element[1]]) //Push id and x coordinate into array
+      }
+    }
+   
+    if(speedChanges.length != 0){ //perform complex calculation if speed changes exist
+      songStart += (speedChanges[0][1]-player.width)/normalXVelocity //Time until first speedchange is hit
+
+      for(let i = 0; i < speedChanges.length-1; i++){
+        songStart += (speedChanges[i+1][1]-speedChanges[i][1])/(normalXVelocity*speedChangeMultiplication[speedChanges[i][0]-130]) //Add time until next one is hit till next speedchange
+      }
+
+      songStart += (player.x-speedChanges[speedChanges.length-1][1]+player.width)/(normalXVelocity*speedChangeMultiplication[speedChanges[speedChanges.length-1][0]-130]) //add from last one till player position
+    }else{ //perform basic calculation if no speed changes exist
+      songStart = player.x/normalXVelocity
+    }
+    activeLevel.startPosSongStart = songStart
+  }
+
+  activeLevel.song.jump(activeLevel.startPosSongStart) //Offset song to fit start pos
 
   camera.offsetX = player.x+player.width-camera.xBorder
   camera.offsetY = player.y+6.144 //put y of camera in "default position" (where it is when player is on ground)
@@ -207,6 +239,7 @@ class Level{
     this.completed = false //Says if level has been completed
     this.loaded = false //If everything including images has loaded
     this.startPos = {x: 0, y:0}
+    this.startPosSongStart = 0
     
     if(mode == "read"){
       this.readData(data, callback);

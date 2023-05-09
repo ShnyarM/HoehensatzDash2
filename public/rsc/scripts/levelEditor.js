@@ -402,6 +402,7 @@ function startEditorLevel() {
   editorPlaytest = true
   activeLevel = editorLevel;
   activeLevel.song.play()
+  activeLevel.song.jump()
   playerSetup()
   cameraSetup()
   goToStartPos()
@@ -413,6 +414,7 @@ function stopEditorLevel() {
   closePractice()
   editorPlaytest = false
   editorLevel.song.stop()
+  editorLevel.startPosSongStart = 0
 
   //Delete all objects
   editorLevel.interactObjects = [];

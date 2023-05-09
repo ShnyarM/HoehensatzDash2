@@ -1,5 +1,6 @@
 let player; //Own Player
 const normalXVelocity = 9
+const speedChangeMultiplication = [0.8, 1, 1.25, 1.5, 1.85]
 
 function playerSetup(){
   player = new Player()
