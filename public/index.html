@@ -18,10 +18,10 @@
     <script src="rsc/scripts/modeConstants.js"></script>
     <script src="rsc/scripts/camera.js"></script>
     <script src="rsc/scripts/pause.js"></script>
+    <script src="rsc/scripts/levelEditor.js"></script>
     <script src="rsc/scripts/menu.js"></script>
     <script src="rsc/scripts/level.js"></script>
     <script src="rsc/scripts/objectsClasses.js"></script>
-    <script src="rsc/scripts/levelEditor.js"></script>
     <script src="rsc/scripts/endless.js"></script>
     <script src="rsc/scripts/practiceMode.js"></script>
     <script src="rsc/scripts/database.js"></script>
@@ -50,19 +50,21 @@
           transform: rotate(360deg);
         }
       }
+      /*style the loading image*/
+      .loadingImg{
+        width: 12em;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        animation: rotation 2s infinite linear;
+      }
+
     </style>
   </head>
   <body style="background:black">
     <div id="p5_loading">
-      <img style="
-        width: 20em;
-        position: absolute;
-        transform: translate(-50%, -50%);
-        animation: rotation 2s infinite linear;
-        "id = "loadingImg" class ="loadingImg" src="rsc/images/icon.png">
+      <img id = "loadingImg" class ="loadingImg" src="rsc/images/icon.png">
     </div>
     <script>
-      console.log(window.innerWidth)
       let el = document.getElementById("loadingImg")
       el.style.top = window.innerHeight/2-el.width/2 + "px"
       el.style.left = window.innerWidth/2-el.width/2 + "px"

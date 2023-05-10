@@ -6,7 +6,7 @@ function handleSliders(){
   for(const slider in sliders){
     const s = sliders[slider]
     s.draw()
-    if(mouseIsDown && s.handleCollision() || mouseIsDown && s.clickedLastFrame) s.dragHandle() //true if handle was clicked or handle was clicked in last frame and mouse is still down
+    if((mouseIsDown && s.handleCollision() || mouseIsDown && s.clickedLastFrame)&&s.enabled) s.dragHandle() //true if handle was clicked or handle was clicked in last frame and mouse is still down
     else s.clickedLastFrame = false
   }
 }
@@ -33,7 +33,7 @@ function updateSliderSizes(){
 }
 
 class Slider{
-  constructor(x, y, w, h, value, minValue, maxValue){
+  constructor(x, y, w, h, value, minValue, maxValue, enabled = true){
     this.x = x
     this.y = y
     this.width = w
@@ -45,6 +45,7 @@ class Slider{
     this.percentageFilled = map(this.value, this.minValue, this.maxValue, 0, 1)
     this.clickedLastFrame = false
     this.inputFunction = () => {}
+    this.enabled = enabled
 
     this.updateSize()
   }
@@ -86,6 +87,10 @@ class Slider{
     //top left corner
     this.xLeftPixel = this.xPixel-0.5*this.widthPixel
     this.yTopPixel = this.yPixel-0.5*this.heightPixel
+  }
+
+  updateValue(){
+    this.percentageFilled = map(this.value, this.minValue, this.maxValue, 0, 1)
   }
 
   draw(){

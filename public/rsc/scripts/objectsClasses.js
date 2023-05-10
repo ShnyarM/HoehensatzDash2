@@ -284,27 +284,27 @@ function collideObject(player, object){
     }break
     case object.id == 130:{ //speed 0
       if(object.used)break
-      player.xVelocity = 0.8*normalXVelocity
+      player.xVelocity = speedChangeMultiplication[0]*normalXVelocity
       object.used = true
     }break
     case object.id == 131:{ //speed 1
       if(object.used)break
-      player.xVelocity = 1*normalXVelocity
+      player.xVelocity = speedChangeMultiplication[1]*normalXVelocity
       object.used = true
     }break
     case object.id == 132:{ //speed 2
       if(object.used)break
-      player.xVelocity = 1.25*normalXVelocity
+      player.xVelocity = speedChangeMultiplication[2]*normalXVelocity
       object.used = true
     }break
     case object.id == 133:{ //speed 3
       if(object.used)break
-      player.xVelocity = 1.5*normalXVelocity
+      player.xVelocity = speedChangeMultiplication[3]*normalXVelocity
       object.used = true
     }break
     case object.id == 134:{ //speed 4
       if(object.used)break
-      player.xVelocity = 1.85*normalXVelocity
+      player.xVelocity = speedChangeMultiplication[4]*normalXVelocity
       object.used = true
     }break
     case object.id == 135:{ //normal gravity portal

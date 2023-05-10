@@ -10,10 +10,6 @@ let practiceCheckpointImg, practiceSong
 let explodeSound
 let settingsIcon
 
-/*document.onkeydown = function (e) {
-  return false;
-}*/
-
 function preload(){
   icon = loadImage("rsc/images/icon.png")
   ship = loadImage("rsc/images/ship.png")

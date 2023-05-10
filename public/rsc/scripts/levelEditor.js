@@ -2,7 +2,7 @@ let editorList = [
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
     [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66],
     [67, 68, 69, 70, 71, 72, 73, 74],
-    [100, 101, 102, 103, 104, 105, 106, 107, 108, 130, 131, 132, 133, 134],
+    [100, 101, 102, 103, 104, 105, 106, 107, 108, 130, 131, 132, 133, 134, 150],
     [120, 123, 124, 125, 126, 127, 128, 129, 135, 136, 121, 122],
 ]
 let editorLevel;
@@ -10,7 +10,7 @@ let editor = {
   mode: 0,
   object: "",
   selectedSite: 0,
-  selectedCategory: 2,
+  selectedCategory: 0,
   move: 0,
   type: 50,
   rowNumb: 2,
@@ -46,13 +46,11 @@ function setupEditor() {
 
   editor.object = new gameObject(0, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
 
-  positionSlider = createSlider(-2, 10, 9, 0);
-  positionSlider.position(width / 2 - width / 16 + (windowWidth - width) / 2, height / 20 + (windowHeight - height) / 2);
-  positionSlider.style('width', width / 4 + "px")
+    positionSlider = addSlider("positionSlider", 0.5, 0.05, 0.35, 0.02, -1, -2, 10)
+    positionSlider.input(() => {camera.offsetX = positionSlider.value})
 }
 
 function drawEditor() {
-  camera.offsetX = positionSlider.value()
   background("blue")
   let imgY = -height
   image(editorLevel.bg, 0, imgY, width, height - imgY)
@@ -65,7 +63,7 @@ function drawEditor() {
       for (let i = 0; i < editorList.length; i++) {
         if (button(editorWindow.tabSize * 2 * i + width / 2 - (editorList.length - 1) * editorWindow.tabSize - editorWindow.tabSize / 2, editorWindow.y - editorWindow.tabSize, editorWindow.tabSize, editorWindow.tabSize)) hasClicked = true
       }
-      if (button(positionSlider.x - (windowWidth - width) / 2, positionSlider.y - (windowHeight - height) / 2, positionSlider.width, positionSlider.height)) hasClicked = true
+      if (button(positionSlider.xLeftPixel, positionSlider.yTopPixel, positionSlider.widthPixel, positionSlider.heightPixel)) hasClicked = true
       switch (editor.mode) {
         case 0: {
           drawObject(editor.object)
@@ -79,7 +77,7 @@ function drawEditor() {
               if(editor.editObject[floor(editor.object.x)][floor(editor.object.y)] == null) editor.editObject[floor(editor.object.x)][floor(editor.object.y)] = []
               editor.editObject[floor(editor.object.x)][floor(editor.object.y)].push(editor.object)
               editorLevel.addObject(editor.object)
-              if (editor.object.x > positionSlider.elt.max) positionSlider.elt.max = editor.object.x
+              if (editor.object.x > positionSlider.maxValue) {positionSlider.maxValue = editor.object.x; positionSlider.updateValue()}
               editor.object = new gameObject(id, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), rot)
             }
           }
@@ -90,8 +88,11 @@ function drawEditor() {
             camera.offsetX += (pixelToUnitX(oldMouseX) - pixelToUnitX(mouseX));
             camera.offsetY += (pixelToUnitY(oldMouseY) - pixelToUnitY(mouseY));
 
-            if (positionSlider.elt.max < camera.offsetX) positionSlider.elt.max = camera.offsetX + 4;
-            positionSlider.value(camera.offsetX)
+            if (positionSlider.maxValue < camera.offsetX)positionSlider.maxValue = camera.offsetX + 4;
+            if(camera.offsetX < -2)camera.offsetX = -2
+            if(camera.offsetY < 2)camera.offsetY = 2
+            positionSlider.value = camera.offsetX
+            positionSlider.updateValue()
           }
           
         }break;
@@ -375,7 +376,7 @@ function drawEditorUI() {
 
 //Playtest level in editor
 function startEditorLevel() {
-  positionSlider.remove()
+  removeSlider("positionSlider")
   if(optionsSong !=null)
   editorLevel.song=optionsSong
   //convert three arrays into one allobjects array which can be read to place blocks
@@ -386,7 +387,10 @@ function startEditorLevel() {
     editorLevel.allObjects.push(convertedData)
   }
   if (editorLevel.allObjects.length != 0) editorLevel.lastXCoordinate = editorLevel.allObjects[editorLevel.allObjects.length - 1][1]
-
+  editorLevel.startPos = {x: 0, y:0}
+  editorLevel.allObjects.forEach(element=>{
+    if(element[0] == 150){editorLevel.startPos.x = element[1];editorLevel.startPos.y = element[2]}
+  })
   //Delete all objects
   editorLevel.interactObjects = [];
   editorLevel.groundObjects = [];
@@ -398,8 +402,10 @@ function startEditorLevel() {
   editorPlaytest = true
   activeLevel = editorLevel;
   activeLevel.song.play()
+  activeLevel.song.jump()
   playerSetup()
   cameraSetup()
+  goToStartPos()
 }
 
 function stopEditorLevel() {
@@ -408,6 +414,7 @@ function stopEditorLevel() {
   closePractice()
   editorPlaytest = false
   editorLevel.song.stop()
+  editorLevel.startPosSongStart = 0
 
   //Delete all objects
   editorLevel.interactObjects = [];
@@ -429,9 +436,8 @@ function stopEditorLevel() {
   editorLevel.allObjects = [] //Clear
   editorLevel.placementIndex = 0
 
-  positionSlider = createSlider(-2, 10, 9, 0);
-  positionSlider.position(width / 2 - width / 16 + (windowWidth - width) / 2, height / 20 + (windowHeight - height) / 2);
-  positionSlider.style('width', width / 4 + "px")
+  positionSlider = addSlider("positionSlider", 0.5, 0.05, 0.35, 0.02, -1, -2, 10)
+  positionSlider.input(() => {camera.offsetX = positionSlider.value})
 }
 
 function drawGrid() {
@@ -465,43 +471,29 @@ function editorKeyPressed() {
 }
 
 function resizeEditor() {
-  positionSlider.position(width / 2 - width / 16 + (windowWidth - width) / 2, height / 20 + (windowHeight - height) / 2);
-  positionSlider.style('width', width / 4 + "px")
-
   if (optionsMenu) {
     nameInput.position(width / 6 + (windowWidth - width) / 2, height / 3 + (windowHeight - height) / 2)
     nameInput.size(width / 5, height / 20)
     nameInput.style("font-size", width / 80 + "px")
-  
-    colorOptions[0].position(width / 2.5+ (windowWidth - width) / 2, height / 2 -height/6.5 - height/30+ (windowHeight - height) / 2)
-    colorOptions[1].position(width / 2.5+ (windowWidth - width) / 2, height / 2 -height/6.5+ (windowHeight - height) / 2)
-    colorOptions[2].position(width / 2.5+ (windowWidth - width) / 2, height / 2 -height/6.5 + height/30+ (windowHeight - height) / 2)
-  
-    colorOptions[3].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5 - height/30+ (windowHeight - height) / 2)
-    colorOptions[4].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5+ (windowHeight - height) / 2)
-    colorOptions[5].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5 + height/30+ (windowHeight - height) / 2)  
-
-    colorOptions.forEach(element => {
-      element.style("width", width/10+"px")
-    });
   }
 }
 
 function editorMouseWheel(event) {
   if(!optionsMenu){
-  // Editor to move around
-  if (camera.offsetY > 1.5 || event.deltaY < 0) camera.offsetY -= event.deltaY / 100
-  if (camera.offsetX > -1.5 || event.deltaX > 0) {
+    // Editor to move around
     camera.offsetX += event.deltaX / 10
-    if (positionSlider.elt.max < camera.offsetX) positionSlider.elt.max = camera.offsetX + 4;
-    positionSlider.value(camera.offsetX)
+    camera.offsetY -= event.deltaY / 100
+    if (positionSlider.maxValue < camera.offsetX)positionSlider.maxValue = camera.offsetX + 4;
+    if(camera.offsetX < -2)camera.offsetX = -2
+    if(camera.offsetY < 2)camera.offsetY = 2
+    positionSlider.value = camera.offsetX
+    positionSlider.updateValue()
   }
-}
 }
 
 function openOptions() {
   optionsMenu = true;
-  positionSlider.elt.disabled = true;
+  positionSlider.enabled = false;
   nameInput = createInput(editorLevel.levelName)
   nameInput.position(width / 6 + (windowWidth - width) / 2, height / 3 + (windowHeight - height) / 2)
   nameInput.size(width / 5, height / 20)
@@ -509,25 +501,13 @@ function openOptions() {
   nameInput.style("font-size", width / 80 + "px")
   nameInput.style("font-family", "PixelSplitter")
 
-  colorOptions[0] = createSlider(0, 255, editorLevel.bgColor[0]);
-  colorOptions[1] = createSlider(0, 255, editorLevel.bgColor[1]);
-  colorOptions[2] = createSlider(0, 255, editorLevel.bgColor[2]);
+  colorOptions[0] = addSlider("redBg", 0.45, 0.3, 0.1, 0.015, editorLevel.bgColor[0], 0, 255)
+  colorOptions[1] = addSlider("greenBg", 0.45, 0.35, 0.1, 0.015, editorLevel.bgColor[1], 0, 255)
+  colorOptions[2] = addSlider("blueBg", 0.45, 0.4, 0.1, 0.015, editorLevel.bgColor[2], 0, 255)
 
-  colorOptions[0].position(width / 2.5 + (windowWidth - width) / 2, height / 2 -height/6.5 - height/30+ (windowHeight - height) / 2)
-  colorOptions[1].position(width / 2.5+ (windowWidth - width) / 2, height / 2 -height/6.5+ (windowHeight - height) / 2)
-  colorOptions[2].position(width / 2.5+ (windowWidth - width) / 2, height / 2 -height/6.5 + height/30+ (windowHeight - height) / 2)
-
-  colorOptions[3] = createSlider(0, 255, editorLevel.fgColor[0]);
-  colorOptions[4] = createSlider(0, 255, editorLevel.fgColor[1]);
-  colorOptions[5] = createSlider(0, 255, editorLevel.fgColor[2]);
-
-  colorOptions[3].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5 - height/30+ (windowHeight - height) / 2)
-  colorOptions[4].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5+ (windowHeight - height) / 2)
-  colorOptions[5].position(width / 2.5+ (windowWidth - width) / 2, height / 2 +height/5 + height/30+ (windowHeight - height) / 2)
-
-  colorOptions.forEach(element => {
-    element.style("width", width/10+"px")
-  });
+  colorOptions[3] = addSlider("redFg", 0.45, 0.65, 0.1, 0.015, editorLevel.fgColor[0], 0, 255)
+  colorOptions[4] = addSlider("greenFg", 0.45, 0.7, 0.1, 0.015, editorLevel.fgColor[1], 0, 255);
+  colorOptions[5] = addSlider("blueFg", 0.45, 0.75, 0.1, 0.015, editorLevel.fgColor[2], 0, 255)
 
   optionsSong = editorLevel.song;
   songId = songList.indexOf(editorLevel.songName)
@@ -537,12 +517,18 @@ function openOptions() {
 function closeOptions() {
   editorLevel.levelName = nameInput.value()
   nameInput.remove();
-  colorOptions.forEach(element => {
-    element.remove()
-  });
+
+  removeSlider("redBg");
+  removeSlider("greenBg");
+  removeSlider("blueBg");
+
+  removeSlider("redFg");
+  removeSlider("greenFg");
+  removeSlider("blueFg");
+
   optionsMenu = false;
   editorLevel.tintDeco();
-  positionSlider.elt.disabled=false;
+  positionSlider.enabled=true;
 
   editorLevel.songName = songList[songId]
   optionsSong.stop()
@@ -594,19 +580,19 @@ function drawOptionsMenu(){
       colNor: 200
     })
 
-    fill(colorOptions[0].value(), colorOptions[1].value(), colorOptions[2].value())
+    fill(colorOptions[0].value, colorOptions[1].value, colorOptions[2].value)
     rect(width / 1.75 - width / 20, height / 4, width / 10, width / 20)
 
-    fill(colorOptions[3].value(), colorOptions[4].value(), colorOptions[5].value())
+    fill(colorOptions[3].value, colorOptions[4].value, colorOptions[5].value)
     rect(width / 1.75 - width / 20, height / 2 + height/10, width / 10, width / 20)
 
     buttonRect(width / 1.75, height/2 - width/20, width / 10, width / 20, "Apply", width / 50, () => {
-      editorLevel.bgColor = [colorOptions[0].value(), colorOptions[1].value(), colorOptions[2].value()]
+      editorLevel.bgColor = [colorOptions[0].value, colorOptions[1].value, colorOptions[2].value]
       editorLevel.tintDeco();
     })
 
     buttonRect(width / 1.75, height/2 -width/20+ height/10+ width / 7, width / 10, width / 20, "Apply", width / 50, () => {
-      editorLevel.fgColor = [colorOptions[3].value(), colorOptions[4].value(), colorOptions[5].value()]
+      editorLevel.fgColor = [colorOptions[3].value, colorOptions[4].value, colorOptions[5].value]
       editorLevel.tintDeco();
     })
     
@@ -656,4 +642,22 @@ function moveEditorObject(x, y){
   editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)].push(editor.selectedObject)
   editor.selectedObject.index = editor.editObject[floor(editor.selectedObject.x)][floor(editor.selectedObject.y)].length-1
 
+}
+
+function levelEditorMenu(){
+  textAlign(CENTER, CENTER)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Level Select", width*0.5, height*0.075)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
+    menuState = 0
+  })
+
+  buttonRect(width*0.375+0*width*0.25, height*0.35+height*0.15*0, width / 5, height/ 10, "New Level", height / 45, () => { 
+    setupEditor()
+   // openLevel("empty")
+  })
 }
