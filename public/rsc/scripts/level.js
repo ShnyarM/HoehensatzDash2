@@ -212,6 +212,8 @@ class Level{
       this.tintDeco();
       this.loadSong(callback)
       getNextEndlessSong()
+    }else if(mode == "data"){
+      this.textToObj(data, callback)
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
@@ -238,8 +240,12 @@ class Level{
     fetch(path)
     .then((response) => response.text())
     .then((txt) => {
+      this.textToObj(txt);
+    });
+  }
 
-      let splitTxt = split(txt, "~");
+  textToObj(txt, callback){
+    let splitTxt = split(txt, "~");
       let blocks = split(splitTxt[0], "+");
 
       blocks.forEach((element, index) => {
@@ -262,7 +268,6 @@ class Level{
 
       this.tintDeco();
       this.loadSong(callback)
-    });
   }
 
   //Check if new objects has to be placed

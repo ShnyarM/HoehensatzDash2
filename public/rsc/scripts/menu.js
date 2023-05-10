@@ -1,5 +1,5 @@
 let menuState = 0 //0 = main menu screen, 1=main level select, 2=classic level select, 3=online level select, 4=settings, 5=tutorialSelect
-let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect]
+let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect, drawOnlineLevels]
 const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
 const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
 const tutorialLevels = ["Cube", "Ship", "Ball", "UFO", "Wave", "Robot", "Spider", "Swing Copter"]
@@ -59,7 +59,11 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Online Levels", height / 45, () => {
-    openEndless()
+    const data = { "page": 0 };
+    postJSON("/getLevelNames", data, (data)=>{
+      menuState = 6;
+      onlineLevelNames = data
+    });
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5-height*0.15, width / 5, height/ 10, "Classic HD1 Levels   ", height / 45, () => {
@@ -181,3 +185,27 @@ function closeSettingsMenu(){
   removeSlider("soundVolume")
 }
 
+
+function drawOnlineLevels(){
+  
+  textAlign(CENTER, CENTER)
+  textSize(height/12)
+  fill("#FFFF00")
+  stroke("black")
+  strokeWeight(height/60)
+  text("Online Levels", width*0.5, height*0.075)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
+    menuState = 0
+  })
+
+  for(let i = 0; i < 2; i++){
+    for(let j = 0; j < 4; j++){
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, onlineLevelNames[i*3+j].levelName, height / 45, () => { 
+        postJSON("/getLevel", { "id":  onlineLevelNames[i*3+j].id}, (data)=>{
+          openLevel("data", data.level)
+        });
+      })
+    }
+  }
+}
