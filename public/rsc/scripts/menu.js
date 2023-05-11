@@ -78,6 +78,10 @@ function drawMainMenu(){
     menuState=5
   })
 
+  buttonRect(width*0.145, height*0.93, width*0.25, height/ 10, "Play Höhensatz Dash 1", height / 45, () => {
+    window.open("hd1", "_self")
+  })
+
   buttonRect(width-width*0.05, height-width*0.05, width*0.05, width*0.05, "", height / 45, () => {
     openSettingsMenu()
   }, {"curve": height})
