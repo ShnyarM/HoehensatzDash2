@@ -336,6 +336,17 @@ function windowResized(){
   changeZoom(zoom);
   updateSliderSizes()
   if(gameState == 2)resizeEditor();
+
+  if(gameState == 0&&(menuState==8||menuState==9)){
+    passwordInput.style("font-size", width / 80 + "px")
+    passwordInput.position(width / 2 - width/8 + (windowWidth - width) / 2, height / 2 + height/10 + (windowHeight - height) / 2)
+    passwordInput.size(width / 4, height / 15)
+
+    usernameInput.position(width / 2 - width/8 + (windowWidth - width) / 2, height / 2 - height/10 + (windowHeight - height) / 2)
+    usernameInput.size(width / 4, height / 15)
+    usernameInput.style("font-size", width / 80 + "px")
+
+  }
 }
 
 function changeZoom(newZoomValue){

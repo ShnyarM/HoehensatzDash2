@@ -1,9 +1,10 @@
 let menuState = 0 //0 = main menu screen, 1=main level select, 2=classic level select, 3=online level select, 4=settings, 5=tutorialSelect
-let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect, levelEditorMenu, drawOnlineLevels]
+let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect, levelEditorMenu, drawOnlineLevels, loginMenu, registerMenu]
 const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
 const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
 const tutorialLevels = ["Cube", "Ship", "Ball", "UFO", "Wave", "Robot", "Spider", "Swing Copter"]
 let musicVolumeSlider, soundVolumeSlider
+let onlinePage = 0;
 
 let menuLevel
 
@@ -59,10 +60,12 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5-width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Online Levels", height / 45, () => {
-    const data = { "page": 0 };
-    postJSON("/getLevelNames", data, (data)=>{
+    onlinePage = 0;
+    postJSON("/getLevelNames", { "page": onlinePage}, (data)=>{
       menuState = 7;
-      onlineLevelNames = data
+      onlineLevelNames = data.reverse();
+      if(onlineLevelNames.length < 1)lastOnlinePage = 0;
+      else lastOnlinePage = ceil(onlineLevelNames[0].id/8)-1
     });
   })
 
@@ -75,19 +78,44 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {
-    menuState = 6
+    onlinePage = 0;
+    postJSON("/getPrivateLevelNames", { "page": onlinePage}, (data)=>{
+      menuState = 6
+      onlineLevelNames = data.reverse();
+      if(onlineLevelNames.length < 1)lastOnlinePage = 0;
+      else lastOnlinePage = ceil(onlineLevelNames[0].id/8)-1
+      console.log(onlineLevelNames)
+    });
   })
 
   buttonRect(width*0.5, height*0.5+height*0.3, width / 5, height/ 10, "Tutorial Levels", height / 45, () => {
     menuState=5
   })
 
-  buttonRect(width-width*0.05, height-width*0.05, width*0.05, width*0.05, "", height / 45, () => {
+  buttonImg(width-width*0.05, height-width*0.05, width*0.05, width*0.05, editorImgs.options, height / 100, () => {
     openSettingsMenu()
-  }, {"curve": height})
-  imageMode(CENTER)
-  image(settingsIcon, width-width*0.05, height-width*0.05, width*0.03, width*0.03)
-  imageMode(CORNER)
+  }, {"curve": [height]})
+
+  buttonImg(width-width*0.05, width*0.05, width*0.05, width*0.05, editorImgs.account, 0, () => {
+    menuState = 8;
+    usernameInput = createInput("")
+    passwordInput = createInput("", "password")
+    errorMessage = ""
+
+    usernameInput.position(width / 2 - width/8 + (windowWidth - width) / 2, height / 2 - height/10 + (windowHeight - height) / 2)
+    usernameInput.size(width / 4, height / 15)
+    usernameInput.style("text-align", "center")
+    usernameInput.style("font-size", width / 80 + "px")
+    usernameInput.style("font-family", "PixelSplitter")
+
+    passwordInput.position(width / 2 - width/8 + (windowWidth - width) / 2, height / 2 + height/10 + (windowHeight - height) / 2)
+    passwordInput.size(width / 4, height / 15)
+    passwordInput.style("text-align", "center")
+    passwordInput.style("font-size", width / 80 + "px")
+    passwordInput.style("font-family", "PixelSplitter")
+  
+  }, {"curve": [height]})
+  text(getCookie("username"), width-width*0.05, width*0.085)
 }
 
 function drawLevelSelect(){
@@ -199,13 +227,34 @@ function drawOnlineLevels(){
     menuState = 0
   })
 
-  for(let i = 0; i < 2; i++){
-    for(let j = 0; j < 4; j++){
-      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, onlineLevelNames[i*3+j].levelName, height / 45, () => { 
-        postJSON("/getLevel", { "id":  onlineLevelNames[i*3+j].id}, (data)=>{
+  for(let i = 0; i < ceil(onlineLevelNames.length/4)&& i < 2; i++){
+    for(let j = 0; j < (onlineLevelNames.length/4-i)*4&& j < 4; j++){
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, onlineLevelNames[i*4+j].levelName, height / 45, () => { 
+        postJSON("/getLevel", { "id":  onlineLevelNames[i*4+j].id}, (data)=>{
           openLevel("data", data.level)
         });
       })
     }
   }
+  if(onlinePage > 0)
+  buttonImg(width/4.5, height/1.75, width / 30, width / 30, editorImgs.leftArrow, width / 200, () => {
+    onlinePage--
+    postJSON("/getLevelNames", { "page": onlinePage }, (data)=>{
+      onlineLevelNames = data.reverse();
+    });
+  }, {
+    colNor: 200
+  })
+  if(onlinePage < lastOnlinePage)
+  buttonImg(width/2 + width/3.75, height/1.75, width / 30, width / 30, editorImgs.rightArrow, width / 200, () => {
+    onlinePage++
+    postJSON("/getLevelNames", { "page": onlinePage }, (data)=>{
+      onlineLevelNames = data.reverse();
+    });
+  }, {
+    colNor: 200
+  })
+
+  textSize(width/50)
+  text(onlinePage+1 + "/" + (lastOnlinePage+1), width/2, height/1.1)
 }

@@ -48,7 +48,8 @@ function preload(){
   editorImgs.play = loadImage("rsc/images/play.png")
   editorImgs.cursor = loadImage("rsc/images/cursor.png")
   editorImgs.save = loadImage("rsc/images/saveIcon.png")
-  editorImgs.options = loadImage("rsc/images/optionsIcon.png")
+  editorImgs.upload = loadImage("rsc/images/upload.png")
+  editorImgs.options = loadImage("rsc/images/settings.png")
   editorImgs.leftArrow = loadImage("rsc/images/leftArrow.png")
   editorImgs.rightArrow = loadImage("rsc/images/rightArrow.png")
   editorImgs.downArrow = loadImage("rsc/images/downArrow.png")
@@ -64,7 +65,7 @@ function preload(){
   editorImgs.close = loadImage("rsc/images/close.png")
   editorImgs.pause = loadImage("rsc/images/pauseIcon.png")
 
-  settingsIcon = loadImage("rsc/images/settings.png")
+  editorImgs.account = loadImage("rsc/images/account.png")
 
   customFont = loadFont("rsc/fonts/PixelSplitter-Bold.ttf")
 

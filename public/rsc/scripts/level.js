@@ -263,6 +263,7 @@ class Level{
       getNextEndlessSong()
     }else if(mode == "data"){
       this.textToObj(data, callback)
+
     }else{ //empty
       this.bgSprite = 0
       this.fgSprite = 0
@@ -361,8 +362,15 @@ class Level{
     }
   }
 
-  saveLevel(path){ // TEMPORARY: get e txt file with useable level data
+  saveLevel(){ // TEMPORARY: get e txt file with useable level data
+    postJSON("/saveLevel", {levelName:this.levelName, level:this.stringifyLevel(), levelID:this.id}, (res)=>console.log(res))
+  }
 
+  uploadLevel(){
+    postJSON("/uploadLevel", {levelName:this.levelName, level:this.stringifyLevel()}, (res)=>console.log(res))
+  }
+
+  stringifyLevel(){
     let levelSave = ""
 
     //put all objects in one array and sort by x coordinate
@@ -383,7 +391,7 @@ class Level{
     levelSave += "+"+this.levelName
     levelSave += "+"+this.songName // song link
 
-    download(this.levelName+".hd", levelSave)
+    return levelSave;
   }
 
   tintDeco(){
@@ -399,17 +407,4 @@ class Level{
     this.bg = coloredBg;
     this.fg = coloredFg;
   }
-}
-
-function download(filename, text) { //TEMPORARY: used to download files
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename);
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
 }

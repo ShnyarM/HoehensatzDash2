@@ -28,7 +28,7 @@ let colorOptions = []
 let optionsSong;
 let songList, songId, optionsSongLoaded
 
-function setupEditor() {
+function setupEditor(levelObj) {
   gameState = 2;
 
   editorWindow = {
@@ -41,13 +41,21 @@ function setupEditor() {
     get itemPadding() {return this.height / 20}
   }
 
-  editorLevel = new Level("empty")
+  editorLevel = levelObj
   cameraSetup()
 
   editor.object = new gameObject(0, floor(pixelToUnitX(mouseX)), ceil(pixelToUnitY(mouseY)), editor.rotation)
 
     positionSlider = addSlider("positionSlider", 0.5, 0.05, 0.35, 0.02, -1, -2, 10)
     positionSlider.input(() => {camera.offsetX = positionSlider.value})
+
+    optionsSongLoaded = false
+    songId = songList.indexOf(editorLevel.songName)
+    loadSound("rsc/music/"+editorLevel.songName+".mp3", data => {
+      optionsSong = data
+      optionsSong.setVolume(0.3)
+      optionsSongLoaded = true;
+    })
 }
 
 function drawEditor() {
@@ -152,6 +160,17 @@ function drawEditorUI() {
   fill(20, 20, 25, 180)
   strokeWeight(width / 800)
   rect(editorWindow.x, editorWindow.y, editorWindow.width, editorWindow.height)
+
+  buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
+    gameState = 0;
+    menuState = 0;
+    removeSlider("positionSlider")
+    
+    deleteCamera()
+    deletePlayer()
+    closePractice()
+    menuSetup()
+  })
 
     if(editor.mode == 2){
       buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, objImages[editor.object.id], width / 100, () => {editor.mode = 0}, {enabled:!optionsMenu});
@@ -354,11 +373,12 @@ function drawEditorUI() {
   buttonImg(width - editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.zoomOut, width / 100, () => changeZoom(zoom + 1), {enabled:!optionsMenu});
   buttonImg(width - editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.move, width / 100, () => {editor.mode = 1}, {enabled:!optionsMenu});
 
-  buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.play, width / 100, () => startEditorLevel(), {enabled:!optionsMenu});
+  buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.play, width / 100, () => startEditorLevel(), {enabled:!optionsMenu&&optionsSongLoaded});
   buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.save, width / 100, () => editorLevel.saveLevel(), {enabled:!optionsMenu});
   buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.options, width / 100, () => openOptions(), {enabled:!optionsMenu});
   
-  
+  buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.upload, width / 100, () => {editorLevel.uploadLevel()}, {enabled:!optionsMenu});
+
   let selectedImage;
   switch(editor.mode){
     case 0: {
@@ -371,7 +391,7 @@ function drawEditorUI() {
       selectedImage = editorImgs.cursor
     }break
   }
-  buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, selectedImage, width / 100, () => {}, {enabled:false, disabledCol: 180});
+  buttonImg(width*0.97, width*0.03, editorWindow.height / 3, editorWindow.height / 3, selectedImage, width / 100, () => {}, {enabled:false, disabledCol: 180});
 }
 
 //Playtest level in editor
@@ -508,10 +528,6 @@ function openOptions() {
   colorOptions[3] = addSlider("redFg", 0.45, 0.65, 0.1, 0.015, editorLevel.fgColor[0], 0, 255)
   colorOptions[4] = addSlider("greenFg", 0.45, 0.7, 0.1, 0.015, editorLevel.fgColor[1], 0, 255);
   colorOptions[5] = addSlider("blueFg", 0.45, 0.75, 0.1, 0.015, editorLevel.fgColor[2], 0, 255)
-
-  optionsSong = editorLevel.song;
-  songId = songList.indexOf(editorLevel.songName)
-  optionsSongLoaded = true
 }
 
 function closeOptions() {
@@ -600,7 +616,7 @@ function drawOptionsMenu(){
     text("Level Name:", width / 6 + width/10, height/3 - width/50)
     text("Song:", width / 6 + width/10, height/3*2 - width/50)
     text(songList[songId], width / 6 + width/10, height/3*2 +width/100)
-
+    if(optionsSongLoaded){
     if(!(optionsSong.isPlaying())){
       buttonImg(width / 6 + width/10, height/3*2 + width/20, width/30, width/30, editorImgs.play, width / 200, () => {
         optionsSong.play();
@@ -610,6 +626,11 @@ function drawOptionsMenu(){
         optionsSong.stop();
       })
     }
+  }else{
+    buttonImg(width / 6 + width/10, height/3*2 + width/20, width/30, width/30, editorImgs.play, width / 200, () => {
+      optionsSong.play();
+    }, {enabled: optionsSongLoaded, disabledCol: "#ff0000"})
+  }
     buttonImg(width / 6 + width/10 - width/25, height/3*2 + width/20, width/30, width/30, editorImgs.leftArrow, width / 200, () => {
       songId--
       if(songId < 0)songId=songList.length-1
@@ -650,14 +671,59 @@ function levelEditorMenu(){
   fill("#FFFF00")
   stroke("black")
   strokeWeight(height/60)
-  text("Level Select", width*0.5, height*0.075)
+  text("Level Editor", width*0.5, height*0.075)
 
   buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
     menuState = 0
   })
 
-  buttonRect(width*0.375+0*width*0.25, height*0.35+height*0.15*0, width / 5, height/ 10, "New Level", height / 45, () => { 
-    setupEditor()
-   // openLevel("empty")
+  buttonRect(width/2 + width/2.75, height/10, width / 5, height/ 10, "Creat Level", height / 45, () => { 
+    setupEditor(new Level("empty"))
+  })
+
+  for(let i = 0; i < ceil(onlineLevelNames.length/4)&&i < 2; i++){
+    for(let j = 0; j < (onlineLevelNames.length/4-i)*4&& j < 4; j++){
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, onlineLevelNames[i*4+j].levelName, height / 45, () => { 
+        postJSON("/getPrivateLevel", { "id":  onlineLevelNames[i*4+j].id}, (data)=>{
+
+          let tempLvl = new Level("data", data.level)
+                  //Delete all objects
+          tempLvl.interactObjects = [];
+          tempLvl.groundObjects = [];
+          tempLvl.deathObjects = [];
+          
+          //Place all blocks again
+          tempLvl.selectedObject = null
+          tempLvl.editObject = {}
+          for (const obj of tempLvl.allObjects) {
+            let ob = new gameObject(obj[0], obj[1], obj[2], obj[3])
+            tempLvl.addObject(ob)
+          }
+
+          tempLvl.allObjects = [] //Clear
+          tempLvl.placementIndex = 0
+          tempLvl.id = onlineLevelNames[i*4+j].id
+          setupEditor(tempLvl)
+        });
+      })
+    }
+  }
+  if(onlinePage > 0)
+  buttonImg(width/4.5, height/1.75, width / 30, width / 30, editorImgs.leftArrow, width / 200, () => {
+    onlinePage--
+    postJSON("/getPrivateLevelNames", { "page": onlinePage }, (data)=>{
+      onlineLevelNames = data.reverse();
+    });
+  }, {
+    colNor: 200
+  })
+  if(onlinePage < lastOnlinePage)
+  buttonImg(width/2 + width/3.75, height/1.75, width / 30, width / 30, editorImgs.rightArrow, width / 200, () => {
+    onlinePage++
+    postJSON("/getPrivateLevelNames", { "page": onlinePage }, (data)=>{
+      onlineLevelNames = data.reverse();
+    });
+  }, {
+    colNor: 200
   })
 }
