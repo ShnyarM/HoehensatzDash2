@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 var mysql = require('mysql');
-const PORT = 80;
+const PORT = 3004;
 var cookieParser = require('cookie-parser');
 
 app.use(express.static('public'));
@@ -14,7 +14,7 @@ app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 var con = mysql.createConnection({
     host: "localhost",
     user: "sql",
-    password: "Kiener69420!",
+    password: "Shnyar2005!",
     database: "höhensatzdash"
   });
   
