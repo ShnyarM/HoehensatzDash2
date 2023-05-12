@@ -11,18 +11,18 @@ app.use(cookieParser())
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 
 
-var con = mysql.createConnection({
+/*var con = mysql.createConnection({
     host: "localhost",
     user: "sql",
     password: "Kiener69420!",
     database: "höhensatzdash"
-  });
+  });*/
   
 
-  con.connect(function(err) {
+  /*con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
-  });
+  });*/
   
   app.post('/getLevel', (req, res) => {
     con.query("select * from levels where id="+ req.body.id.toString(), function (err, result) {

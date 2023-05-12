@@ -96,7 +96,7 @@ function drawMainMenu(){
     window.open("hd1", "_self")
   })
 
-  buttonRect(width-width*0.05, height-width*0.05, width*0.05, width*0.05, "", height / 45, () => {
+  buttonImg(width-width*0.05, height-width*0.05, width*0.05, width*0.05, editorImgs.options, height / 100, () => {
     openSettingsMenu()
   }, {"curve": [height]})
 

@@ -292,7 +292,7 @@ class Level{
     fetch(path)
     .then((response) => response.text())
     .then((txt) => {
-      this.textToObj(txt);
+      this.textToObj(txt, callback);
     });
   }
 
