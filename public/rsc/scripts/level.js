@@ -365,7 +365,14 @@ class Level{
   }
 
   saveLevel(){ // TEMPORARY: get e txt file with useable level data
-    postJSON("/saveLevel", {levelName:this.levelName, level:this.stringifyLevel(), levelID:this.id}, (res)=>console.log(res))
+    if(getCookie("username") == ""){
+      download(this.levelName+".hd", this.stringifyLevel())
+    }else{
+      postJSON("/saveLevel", {levelName:this.levelName, level:this.stringifyLevel(), levelID:this.id}, (res)=>{
+        console.log(res)
+        if(this.id == null) this.id = res.id
+      })
+    }
   }
 
   uploadLevel(){
@@ -409,4 +416,17 @@ class Level{
     this.bg = coloredBg;
     this.fg = coloredFg;
   }
+}
+
+function download(filename, text) { //TEMPORARY: used to download files
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }

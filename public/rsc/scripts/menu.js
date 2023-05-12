@@ -78,6 +78,9 @@ function drawMainMenu(){
   })
 
   buttonRect(width*0.5+width*0.125, height*0.5+height*0.15, width / 5, height/ 10, "Level Editor", height / 45, () => {
+    if(getCookie("username")== ""){
+      setupEditor(new Level("empty"))
+    }
     onlinePage = 0;
     postJSON("/getPrivateLevelNames", { "page": onlinePage}, (data)=>{
       menuState = 6

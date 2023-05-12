@@ -11,18 +11,18 @@ app.use(cookieParser())
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
 
 
-/*var con = mysql.createConnection({
+var con = mysql.createConnection({
     host: "localhost",
     user: "sql",
     password: "Kiener69420!",
     database: "höhensatzdash"
-  });*/
+  });
   
 
-  /*con.connect(function(err) {
+  con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
-  });*/
+  });
   
   app.post('/getLevel', (req, res) => {
     con.query("select * from levels where id="+ req.body.id.toString(), function (err, result) {
@@ -45,6 +45,11 @@ app.post('/getPrivateLevel', (req, res) => {
 app.post('/getLevelNames', (req, res) => {
   con.query("select id from levels ORDER BY id DESC LIMIT 1", function (err, result) {
       if (err) throw err;
+      if(result.length <1){
+        res.send([]);
+        return;
+      }
+
       let lastId = result[0].id - req.body.page*8
       let ids = lastId.toString();
       for(let i= 7; i > 0;i--){
@@ -80,7 +85,7 @@ app.post('/saveLevel', (req, res) => {
       if(re.length > 0)highestID = parseInt(re[0].id) + 1
       con.query("INSERT INTO privateLevels (username, levelName, id, level) VALUES ('"+req.cookies.username+"','"+req.body.levelName+"','"+highestID+ "', '"+req.body.level+"');", function (err, result) {
         if (err) throw err;
-        res.send(result)
+        res.send({id: highestID})
     });
   });
   }else{
@@ -179,7 +184,7 @@ function createSessionID() {
 }
 
 app.post('/test', (req, res) => {
-  con.query("select * from privateLevels where username='niggermann'", function (err, result) {
+  con.query("truncate levels", function (err, result) {
       if (err) throw err;
       console.log(result)
       res.send(result)

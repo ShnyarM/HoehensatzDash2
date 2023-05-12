@@ -71,6 +71,11 @@ function loginMenu(){
   })
   })
 
+  textSize(height/30)
+  text("Username", width*0.5, height*0.5-height*0.15)
+  text("Password", width*0.5, height*0.5 + height*0.05)
+
+
   buttonRect(width*0.06, height*0.05, width / 10, height/ 15, "Back", height / 45, () => {
     menuState = 0
     usernameInput.remove();
@@ -117,6 +122,10 @@ function registerMenu(){
     errorMessage = ""
     menuState = 8
   })
+
+  textSize(height/30)
+  text("Username", width*0.5, height*0.5-height*0.15)
+  text("Password", width*0.5, height*0.5 + height*0.05)
 }
 
 

@@ -166,10 +166,12 @@ function drawEditorUI() {
     menuState = 0;
     removeSlider("positionSlider")
     
+    changeZoom(defaultZoom)
     deleteCamera()
     deletePlayer()
     closePractice()
     menuSetup()
+
   })
 
     if(editor.mode == 2){
@@ -377,7 +379,7 @@ function drawEditorUI() {
   buttonImg(editorWindow.height / 3.2, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.save, width / 100, () => editorLevel.saveLevel(), {enabled:!optionsMenu});
   buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.3, editorWindow.height / 3, editorWindow.height / 3, editorImgs.options, width / 100, () => openOptions(), {enabled:!optionsMenu});
   
-  buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.upload, width / 100, () => {editorLevel.uploadLevel()}, {enabled:!optionsMenu});
+  buttonImg(editorWindow.height / 1.35, editorWindow.y + editorWindow.height * 0.7, editorWindow.height / 3, editorWindow.height / 3, editorImgs.upload, width / 100, () => {editorLevel.uploadLevel()}, {enabled:!optionsMenu&&!(getCookie("username") == ""), disabledCol: 180});
 
   let selectedImage;
   switch(editor.mode){
@@ -677,7 +679,7 @@ function levelEditorMenu(){
     menuState = 0
   })
 
-  buttonRect(width/2 + width/2.75, height/10, width / 5, height/ 10, "Creat Level", height / 45, () => { 
+  buttonRect(width/2 + width/2.75, height/10, width / 5, height/ 10, "Create Level", height / 45, () => { 
     setupEditor(new Level("empty"))
   })
 
