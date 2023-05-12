@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.32, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.33, for Linux (x86_64)
 --
 -- Host: localhost    Database: höhensatzdash
 -- ------------------------------------------------------
--- Server version	8.0.32-0ubuntu0.22.04.2
+-- Server version	8.0.33-0ubuntu0.22.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -28,7 +28,7 @@ CREATE TABLE `levels` (
   `userName` varchar(20) DEFAULT NULL,
   `level` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,8 +37,53 @@ CREATE TABLE `levels` (
 
 LOCK TABLES `levels` WRITE;
 /*!40000 ALTER TABLE `levels` DISABLE KEYS */;
-INSERT INTO `levels` VALUES (1,'der Poopenfarten','VamosMurak','52°17°1°0+71°20°2°0+107°22°1°0+124°23°6°3+136°23°6°3+126°72°4°0~19+4+255,44,22+255,54,0+penis+Hexagon Force');
 /*!40000 ALTER TABLE `levels` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `privateLevels`
+--
+
+DROP TABLE IF EXISTS `privateLevels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `privateLevels` (
+  `username` varchar(20) DEFAULT NULL,
+  `levelName` varchar(20) DEFAULT NULL,
+  `id` int DEFAULT NULL,
+  `level` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `privateLevels`
+--
+
+LOCK TABLES `privateLevels` WRITE;
+/*!40000 ALTER TABLE `privateLevels` DISABLE KEYS */;
+/*!40000 ALTER TABLE `privateLevels` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessionIds`
+--
+
+DROP TABLE IF EXISTS `sessionIds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessionIds` (
+  `username` varchar(20) DEFAULT NULL,
+  `sessionId` char(32) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessionIds`
+--
+
+LOCK TABLES `sessionIds` WRITE;
+/*!40000 ALTER TABLE `sessionIds` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sessionIds` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -49,8 +94,8 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `name` varchar(20) DEFAULT NULL,
-  `sessionId` varchar(64) DEFAULT NULL
+  `username` varchar(20) DEFAULT NULL,
+  `password` varchar(64) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -72,4 +117,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-09 21:11:11
+-- Dump completed on 2023-05-12 17:50:32
