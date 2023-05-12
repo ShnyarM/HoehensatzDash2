@@ -254,8 +254,10 @@ class Level{
     }else if(mode == "classicEndless" || mode =="endless"){ //Endless
       this.bgSprite = mode == "classicEndless" ? 0 : floor(random(0, images.bg.length)) //get random bg or default depending on if in classic
       this.fgSprite = mode == "classicEndless" ? 0 : floor(random(0, images.fg.length))
-      this.bgColor = "#FF0000"
-      this.fgColor = "#800000"
+
+      this.bgColor = mode == "classicEndless" ? "#3333ff" : "#FF0000" //set specific color for bg and fg depending on if in classic
+      this.fgColor = mode == "classicEndless" ? "#0000e6" : "#800000"
+      
       this.songName = songList[floor(random(0, songList.length))]
 
       this.tintDeco();
