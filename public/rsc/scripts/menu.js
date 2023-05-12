@@ -1,6 +1,6 @@
 let menuState = 0 //0 = main menu screen, 1=main level select, 2=classic level select, 3=online level select, 4=settings, 5=tutorialSelect
 let menus = [drawMainMenu, drawLevelSelect, drawClassicLevelSelect, , drawSettings, drawTutorialSelect, levelEditorMenu]
-const mainLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6"]
+const mainLevels = ["Cellar Door"]
 const classicLevels = ["Höhensatz Madness", "Back on Trigonometrie", "Prismageist"]
 const tutorialLevels = ["Cube", "Ship", "Ball", "UFO", "Wave", "Robot", "Spider", "Swing Copter"]
 let musicVolumeSlider, soundVolumeSlider
@@ -102,14 +102,18 @@ function drawLevelSelect(){
     menuState = 0
   })
 
-  for(let i = 0; i < 2; i++){
+  buttonRect(width*0.5, height*0.5, width / 5, height/ 10, "Cellar Door", height / 45, () => { 
+    openLevel("read", "rsc/levels/Cellar Door.hd")
+  })
+
+  /*for(let i = 0; i < 2; i++){
     for(let j = 0; j < 3; j++){
       
       buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, i*3+j+1 +". " + mainLevels[i*3+j], height / 45, () => { 
         openLevel("read", "rsc/levels/" + mainLevels[i*3+j] + ".hd")
       })
     }
-  }
+  }*/
 }
 
 function drawClassicLevelSelect(){
@@ -160,8 +164,8 @@ function drawTutorialSelect(){
 
   for(let i = 0; i < 2; i++){
     for(let j = 0; j < 4; j++){
-      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, i*3+j+1 +". " + tutorialLevels[i*3+j], height / 45, () => { 
-        openLevel("read", "rsc/levels/tutorialLevels/" + tutorialLevels[i*3+j] + ".hd")
+      buttonRect(width*0.375+i*width*0.25, height*0.35+height*0.15*j, width / 5, height/ 10, i*4+j+1 +". " + tutorialLevels[i*4+j], height / 45, () => { 
+        openLevel("read", "rsc/levels/tutorialLevels/" + tutorialLevels[i*4+j] + ".hd")
       })
     }
   }
