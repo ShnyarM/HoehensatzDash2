@@ -56,7 +56,7 @@ app.post('/getLevelNames', (req, res) => {
         ids +=","+(lastId -i).toString()
       }
       con.query("select levelName, id from levels where id in ("+ids+")", function (er, resu) {
-        if (er) throw er;
+        if (er) return//throw er;
         res.send(resu)
     });
   });
@@ -83,8 +83,8 @@ app.post('/saveLevel', (req, res) => {
       if (err) throw err;
       let highestID = 1
       if(re.length > 0)highestID = parseInt(re[0].id) + 1
-      con.query("INSERT INTO privateLevels (username, levelName, id, level) VALUES ('"+req.cookies.username+"','"+req.body.levelName+"','"+highestID+ "', '"+req.body.level+"');", function (err, result) {
-        if (err) throw err;
+      con.query("INSERT INTO privateLevels (username, levelName, id, level) VALUES ('"+req.cookies.username+"','"+req.body.levelName+"','"+highestID+ "', '"+req.body.level+"');", function (er, result) {
+        if (er) return//throw er;
         res.send({id: highestID})
     });
   });
@@ -122,7 +122,7 @@ app.post('/register', (req, res) => {
         res.send({status: false, msg:"user already exist"})
       }else{
         con.query("insert into users (username, password) values ('"+req.body.username.toString()+"','"+req.body.password.toString()+"')", function (er, resul) {
-          if (er) throw er;
+          if (er) return//throw er;
           let sessionId = createSessionID();
           addSessionId(req.body.username.toString(), sessionId)
           res.cookie('username', req.body.username.toString());
@@ -155,7 +155,7 @@ app.post('/getPrivateLevelNames', (req, res) => {
         ids +=","+(lastId -i).toString()
       }
       con.query("select levelName, id from privateLevels where id in ("+ids+") and username='"+req.cookies.username+"'", function (er, resu) {
-        if (er) throw er;
+        if (er) returns//throw er;
         console.log(resu)
         res.send(resu)
     });
