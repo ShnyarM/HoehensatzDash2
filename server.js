@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const fs = require('fs');
 var mysql = require('mysql');
 const PORT = 3004;
 var cookieParser = require('cookie-parser');
@@ -197,3 +198,10 @@ function addSessionId(username, sessionId){
     console.log(result)
   });
 }
+
+//catches uncaught exception
+process.on('uncaughtException', err => { //Add crashes to crashlog for debugging
+  fs.appendFileSync("crashlog.txt", new Date() + "\n" + err.stack + "\n\n");
+  console.log(err);
+  process.exit(1); // mandatory (as per the Node.js docs)
+});

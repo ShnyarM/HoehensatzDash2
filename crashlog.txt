@@ -1,0 +1,30 @@
+Tue Sep 17 2024 19:40:18 GMT+0200 (Central European Summer Time)
+Error: connect ECONNREFUSED 127.0.0.1:3306
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1247:16)
+    --------------------
+    at Protocol._enqueue (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\protocol\Protocol.js:144:48)
+    at Protocol.handshake (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\protocol\Protocol.js:51:23)
+    at Connection.connect (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\Connection.js:116:18)
+    at Object.<anonymous> (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\server.js:23:7)
+    at Module._compile (node:internal/modules/cjs/loader:1126:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1180:10)
+    at Module.load (node:internal/modules/cjs/loader:1004:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:839:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12)
+    at node:internal/main/run_main_module:17:47
+
+Tue Sep 17 2024 19:40:28 GMT+0200 (Central European Summer Time)
+Error: connect ECONNREFUSED 127.0.0.1:3306
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1247:16)
+    --------------------
+    at Protocol._enqueue (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\protocol\Protocol.js:144:48)
+    at Protocol.handshake (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\protocol\Protocol.js:51:23)
+    at Connection.connect (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\node_modules\mysql\lib\Connection.js:116:18)
+    at Object.<anonymous> (C:\Users\shnya\Documents\_EigeneScheiss\HoehensatzDash2\server.js:23:7)
+    at Module._compile (node:internal/modules/cjs/loader:1126:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1180:10)
+    at Module.load (node:internal/modules/cjs/loader:1004:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:839:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:81:12)
+    at node:internal/main/run_main_module:17:47
+
